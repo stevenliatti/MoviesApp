@@ -8,6 +8,14 @@ import ch.hes.master.mobopproject.dummy.DummyContent
 class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractionListener {
     override fun onListFragmentInteraction(item: DummyContent.DummyItem?) {
         Log.println(Log.DEBUG,"test", "test" + item)
+
+        val movieDetailsFragment = MovieDetails.newInstance()
+
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragment_container, movieDetailsFragment, "moviedetailsfragment")
+            .addToBackStack("moviedetailsfragment")
+            .commit()
         //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -15,12 +23,12 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        var myFirstFragment = MovieFragment.newInstance(1)
+        var movieFragment = MovieFragment.newInstance(1)
 
         supportFragmentManager
             .beginTransaction()
-            .add(R.id.fragment_container, myFirstFragment, "mymoviefragment")
-            .addToBackStack("mymoviefragment")
+            .add(R.id.fragment_container, movieFragment, "moviefragment")
+            .addToBackStack("moviefragment")
             .commit()
 
 
