@@ -2,16 +2,14 @@ package ch.hes.master.mobopproject
 
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-
-import ch.hes.master.mobopproject.dummy.DummyContent
-import ch.hes.master.mobopproject.dummy.DummyContent.DummyItem
+import ch.hes.master.mobopproject.data.Movie
 
 /**
  * A fragment representing a list of Items.
@@ -20,8 +18,8 @@ import ch.hes.master.mobopproject.dummy.DummyContent.DummyItem
  */
 class MovieFragment : Fragment() {
 
-    // TODO: Customize parameters
     private var columnCount = 1
+    var movies: ArrayList<Movie> = ArrayList()
 
     private var listener: OnListFragmentInteractionListener? = null
 
@@ -46,7 +44,7 @@ class MovieFragment : Fragment() {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter = MyMovieRecyclerViewAdapter(DummyContent.ITEMS, listener)
+                adapter = MyMovieRecyclerViewAdapter(movies, listener)
             }
         }
         return view
@@ -79,7 +77,7 @@ class MovieFragment : Fragment() {
      */
     interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        fun onListFragmentInteraction(item: DummyItem?)
+        fun onListFragmentInteraction(item: Movie?)
     }
 
     companion object {
@@ -89,11 +87,13 @@ class MovieFragment : Fragment() {
 
         // TODO: Customize parameter initialization
         @JvmStatic
-        fun newInstance(columnCount: Int) =
-            MovieFragment().apply {
+        fun newInstance(columnCount: Int, movies: ArrayList<Movie>) : MovieFragment {
+            return MovieFragment().apply {
+                this.movies = movies
                 arguments = Bundle().apply {
                     putInt(ARG_COLUMN_COUNT, columnCount)
                 }
             }
+        }
     }
 }
