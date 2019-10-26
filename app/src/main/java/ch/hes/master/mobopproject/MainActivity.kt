@@ -3,6 +3,7 @@ package ch.hes.master.mobopproject
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.fragment.app.Fragment
 import ch.hes.master.mobopproject.data.Constants
 import ch.hes.master.mobopproject.data.Movie
 import com.android.volley.Request
@@ -44,14 +45,19 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
     override fun onListFragmentInteraction(item: Movie?) {
         Log.println(Log.DEBUG,"test", "test$item")
 
-        val movieDetailsFragment = MovieDetails.newInstance()
 
+        val movieDetailsFragment = MovieDetails.newInstance(item)
+
+        setActiveFragment(movieDetailsFragment, "moviedetailsfragment")
+        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    private fun setActiveFragment(frag: Fragment, tag: String) {
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.fragment_container, movieDetailsFragment, "moviedetailsfragment")
-            .addToBackStack("moviedetailsfragment")
+            .replace(R.id.fragment_container, frag, tag)
+            .addToBackStack(tag)
             .commit()
-        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
