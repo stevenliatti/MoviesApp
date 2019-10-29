@@ -39,7 +39,7 @@ class MyMovieRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mValues[position]
-        holder.idView.text = item.id.toString()
+        // holder.idView.text = item.id.toString()
         holder.originalTitleView.text = item.originalTitle
         holder.overviewView.text = item.overview
 
@@ -52,7 +52,7 @@ class MyMovieRecyclerViewAdapter(
     override fun getItemCount(): Int = mValues.size
 
     inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
-        val idView: TextView = mView.findViewById(R.id.movie_id)
+        // val idView: TextView = mView.findViewById(R.id.movie_id)
         val originalTitleView: TextView = mView.findViewById(R.id.original_title)
         val overviewView: TextView = mView.findViewById(R.id.overview)
 
