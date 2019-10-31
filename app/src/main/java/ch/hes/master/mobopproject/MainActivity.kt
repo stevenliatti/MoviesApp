@@ -35,9 +35,11 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
                     movies.add(movie)
                 }
 
+                val fragMovie = MovieFragment.newInstance(1, movies)
+
                 supportFragmentManager
                     .beginTransaction()
-                    .add(R.id.fragment_container, MovieFragment.newInstance(1, movies), "moviefragment")
+                    .add(R.id.fragment_container, fragMovie, "moviefragment")
                     .addToBackStack("moviefragment")
                     .commit()
             },
@@ -49,8 +51,6 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
 
     private fun getImage(res: JSONObject, movie: Movie): ImageRequest {
         val url = "https://image.tmdb.org/t/p/w300" + res.getString("poster_path")
-
-        Log.println(Log.DEBUG, this.javaClass.name, "URL OF POSTER : $url")
 
         return ImageRequest(url,
             Response.Listener { response ->

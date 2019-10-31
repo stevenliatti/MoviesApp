@@ -20,6 +20,7 @@ class MovieFragment : Fragment() {
 
     private var columnCount = 1
     var movies: ArrayList<Movie> = ArrayList()
+    // val adapter: MyMovieRecyclerViewAdapter = MyMovieRecyclerViewAdapter(movies, null)
 
     private var listener: OnListFragmentInteractionListener? = null
 
@@ -45,6 +46,7 @@ class MovieFragment : Fragment() {
                     else -> GridLayoutManager(context, columnCount)
                 }
                 adapter = MyMovieRecyclerViewAdapter(movies, listener)
+                // TODO : adapter.notifyItemChanged()
             }
         }
         return view
@@ -63,6 +65,10 @@ class MovieFragment : Fragment() {
         super.onDetach()
         listener = null
     }
+
+    /*public fun updateCell(pos: Int) {
+        this.
+    }*/
 
     /**
      * This interface must be implemented by activities that contain this
