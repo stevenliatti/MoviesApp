@@ -9,14 +9,19 @@ import ch.hes.master.mobopproject.data.Movie
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.Volley
+import org.json.JSONObject
+import android.graphics.Bitmap
+import com.android.volley.toolbox.ImageRequest
+
 
 class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractionListener {
 
+    val apiKey = Constants.apiKey
+
     private fun makeRequest(): JsonObjectRequest {
-        val apiKey = Constants.apiKey
+
+        var movies: ArrayList<Movie> = ArrayList()
         val url = "https://api.themoviedb.org/3/discover/movie?api_key=$apiKey&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1"
-        val movies: ArrayList<Movie> = ArrayList()
 
         return JsonObjectRequest(
             Request.Method.GET, url, null,
@@ -25,9 +30,9 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
                 Log.println(Log.DEBUG, this.javaClass.name, "makeRequest : $results")
                 for (i in 0 until results.length()) {
                     val res = results.getJSONObject(i)
-                    val newMovie = Movie(res.getInt("id"), res.getString("original_title"), res.getString("overview"))
-                    Log.println(Log.DEBUG, this.javaClass.name, "newMovie : $newMovie")
-                    movies.add(newMovie)
+                    val movie = Movie(res.getInt("id"), res.getString("original_title"), res.getString("overview"), null)
+                    HttpQueue.getInstance(this).addToRequestQueue(getImage(res, movie))
+                    movies.add(movie)
                 }
 
                 supportFragmentManager
@@ -40,6 +45,19 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
                 Log.println(Log.DEBUG, this.javaClass.name, "error in makeRequest : $error")
             }
         )
+    }
+
+    private fun getImage(res: JSONObject, movie: Movie): ImageRequest {
+        val url = "https://image.tmdb.org/t/p/w300" + res.getString("poster_path")
+
+        Log.println(Log.DEBUG, this.javaClass.name, "URL OF POSTER : $url")
+
+        return ImageRequest(url,
+            Response.Listener { response ->
+                val img = Bitmap.createBitmap(response)
+                movie.img = img
+            }, 0, 0, null, null)
+
     }
 
     override fun onListFragmentInteraction(item: Movie?) {
@@ -64,7 +82,7 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val httpQueue = Volley.newRequestQueue(this)
-        httpQueue.add(makeRequest())
+        HttpQueue.getInstance(this).addToRequestQueue(makeRequest())
+
     }
 }

@@ -4,6 +4,7 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 
 
@@ -42,6 +43,7 @@ class MyMovieRecyclerViewAdapter(
         // holder.idView.text = item.id.toString()
         holder.originalTitleView.text = item.originalTitle
         holder.overviewView.text = item.overview
+        holder.img.setImageBitmap(item.img)
 
         with(holder.mView) {
             tag = item
@@ -55,6 +57,7 @@ class MyMovieRecyclerViewAdapter(
         // val idView: TextView = mView.findViewById(R.id.movie_id)
         val originalTitleView: TextView = mView.findViewById(R.id.original_title)
         val overviewView: TextView = mView.findViewById(R.id.overview)
+        val img: ImageView = mView.findViewById(R.id.img)
 
         override fun toString(): String {
             return super.toString() + " '" + overviewView.text + "'"
