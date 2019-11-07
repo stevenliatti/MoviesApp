@@ -20,7 +20,7 @@ class MovieFragment : Fragment() {
 
     private var columnCount = 1
     var movies: ArrayList<Movie> = ArrayList()
-    // val adapter: MyMovieRecyclerViewAdapter = MyMovieRecyclerViewAdapter(movies, null)
+    private lateinit var myAdapter: MyMovieRecyclerViewAdapter
 
     private var listener: OnListFragmentInteractionListener? = null
 
@@ -45,11 +45,17 @@ class MovieFragment : Fragment() {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter = MyMovieRecyclerViewAdapter(movies, listener)
+                myAdapter = MyMovieRecyclerViewAdapter(movies, listener)
+                adapter = myAdapter
                 // TODO : adapter.notifyItemChanged()
             }
         }
         return view
+    }
+
+    public fun updateCell(pos: Int) {
+        myAdapter.notifyItemChanged(pos)
+        // myAdapter.notifyDataSetChanged()
     }
 
     override fun onAttach(context: Context) {
@@ -67,7 +73,7 @@ class MovieFragment : Fragment() {
     }
 
     /*public fun updateCell(pos: Int) {
-        this.
+
     }*/
 
     /**

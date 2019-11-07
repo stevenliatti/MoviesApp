@@ -26,16 +26,15 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
         return JsonObjectRequest(
             Request.Method.GET, url, null,
             Response.Listener { response ->
+                val fragMovie = MovieFragment.newInstance(1, movies)
                 val results = response.getJSONArray("results")
                 Log.println(Log.DEBUG, this.javaClass.name, "makeRequest : $results")
                 for (i in 0 until results.length()) {
                     val res = results.getJSONObject(i)
-                    val movie = Movie(res.getInt("id"), res.getString("original_title"), res.getString("overview"), null)
-                    HttpQueue.getInstance(this).addToRequestQueue(getImage(res, movie))
+                    val movie = Movie(res.getInt("id"), res.getString("original_title"), res.getString("overview"), res.getString("poster_path"),null)
+                    HttpQueue.getInstance(this).addToRequestQueue(getImage(movie, fragMovie, i))
                     movies.add(movie)
                 }
-
-                val fragMovie = MovieFragment.newInstance(1, movies)
 
                 supportFragmentManager
                     .beginTransaction()
@@ -49,13 +48,14 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
         )
     }
 
-    private fun getImage(res: JSONObject, movie: Movie): ImageRequest {
-        val url = "https://image.tmdb.org/t/p/w300" + res.getString("poster_path")
+    private fun getImage(movie: Movie, frag: MovieFragment, i: Int): ImageRequest {
+        val url = "https://image.tmdb.org/t/p/w300" + movie.urlImg
 
         return ImageRequest(url,
             Response.Listener { response ->
                 val img = Bitmap.createBitmap(response)
                 movie.img = img
+                frag.updateCell(i)
             }, 0, 0, null, null)
 
     }
@@ -63,8 +63,11 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
     override fun onListFragmentInteraction(item: Movie?) {
         Log.println(Log.DEBUG,"test", "test$item")
 
+        val id = item?.id
+        val urlImg = item?.urlImg
 
-        val movieDetailsFragment = MovieDetails.newInstance(item)
+
+        val movieDetailsFragment = MovieDetails.newInstance(id, urlImg)
 
         setActiveFragment(movieDetailsFragment, "moviedetailsfragment")
         //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
