@@ -64,7 +64,7 @@ class MovieDetails : Fragment() {
 
                 this.movieDetails = MvDetails(
                     res.getInt("id"),
-                    res.getString("original_title"),
+                    res.getString("title"),
                     res.getString("overview"),
                     genresNames,
                     popularity,
@@ -76,7 +76,7 @@ class MovieDetails : Fragment() {
 
                 // TODO: use ViewModel instead
 
-                titleView.setText(this.movieDetails?.originalTitle)
+                titleView.setText(this.movieDetails?.title)
                 descriptionView.setText(this.movieDetails?.overview)
 
                 var adapter = ArrayAdapter(dummyContext, android.R.layout.simple_list_item_1, genresNames)

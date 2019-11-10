@@ -17,38 +17,35 @@
 
             <ImageView
                 android:id="@+id/img"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_marginLeft="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
                 android:scaleType="fitXY"
                 app:srcCompat="@color/colorAccent" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="100dp"
-                android:layout_marginLeft="10dp"
+                android:layout_height="150dp"
+                android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:weightSum="10">
 
                 <TextView
                     android:id="@+id/original_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_weight="1"
-                    android:text="NOM"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="7"
                     android:textColor="#000000"
-                    android:textSize="20sp"
+                    android:textSize="16sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/overview"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    android:text="DESCRIPTOONweiejrewjrewprwe"
-                    android:textStyle="bold" />
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
 
             </LinearLayout>
 

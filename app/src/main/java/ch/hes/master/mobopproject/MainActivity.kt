@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
                 Log.println(Log.DEBUG, this.javaClass.name, "makeRequest : $results")
                 for (i in 0 until results.length()) {
                     val res = results.getJSONObject(i)
-                    val movie = Movie(res.getInt("id"), res.getString("original_title"), res.getString("overview"), res.getString("poster_path"),null)
+                    val movie = Movie(res.getInt("id"), res.getString("title"), res.getString("overview"), res.getString("poster_path"),null)
                     HttpQueue.getInstance(this).addToRequestQueue(Common.getImageInList(movie, fragMovie, i))
                     movies.add(movie)
                 }

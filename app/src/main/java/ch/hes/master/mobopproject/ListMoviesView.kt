@@ -41,7 +41,7 @@ class ListMoviesView(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mValues[position]
         // holder.idView.text = item.id.toString()
-        holder.originalTitleView.text = item.originalTitle
+        holder.titleView.text = item.title
         holder.overviewView.text = item.overview
         holder.img.setImageBitmap(item.img)
 
@@ -55,7 +55,7 @@ class ListMoviesView(
 
     inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
         // val idView: TextView = mView.findViewById(R.id.movie_id)
-        val originalTitleView: TextView = mView.findViewById(R.id.original_title)
+        val titleView: TextView = mView.findViewById(R.id.original_title)
         val overviewView: TextView = mView.findViewById(R.id.overview)
         val img: ImageView = mView.findViewById(R.id.img)
 
