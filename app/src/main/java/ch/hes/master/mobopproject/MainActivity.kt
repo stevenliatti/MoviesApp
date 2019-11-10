@@ -9,10 +9,6 @@ import ch.hes.master.mobopproject.data.Movie
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
-import org.json.JSONObject
-import android.graphics.Bitmap
-import com.android.volley.toolbox.ImageRequest
-
 
 class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractionListener {
 
@@ -32,7 +28,7 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
                 for (i in 0 until results.length()) {
                     val res = results.getJSONObject(i)
                     val movie = Movie(res.getInt("id"), res.getString("original_title"), res.getString("overview"), res.getString("poster_path"),null)
-                    HttpQueue.getInstance(this).addToRequestQueue(getImage(movie, fragMovie, i))
+                    HttpQueue.getInstance(this).addToRequestQueue(Common.getImageInList(movie, fragMovie, i))
                     movies.add(movie)
                 }
 
@@ -46,18 +42,6 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
                 Log.println(Log.DEBUG, this.javaClass.name, "error in makeRequest : $error")
             }
         )
-    }
-
-    private fun getImage(movie: Movie, frag: MovieFragment, i: Int): ImageRequest {
-        val url = "https://image.tmdb.org/t/p/w300" + movie.urlImg
-
-        return ImageRequest(url,
-            Response.Listener { response ->
-                val img = Bitmap.createBitmap(response)
-                movie.img = img
-                frag.updateCell(i)
-            }, 0, 0, null, null)
-
     }
 
     override fun onListFragmentInteraction(item: Movie?) {

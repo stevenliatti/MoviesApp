@@ -16,10 +16,10 @@ import ch.hes.master.mobopproject.data.Movie
  * specified [OnListFragmentInteractionListener].
  * TODO: Replace the implementation with code for your data type.
  */
-class MyMovieRecyclerViewAdapter(
+class ListMoviesView(
     private val mValues: List<Movie>,
     private val mListener: OnListFragmentInteractionListener?
-) : RecyclerView.Adapter<MyMovieRecyclerViewAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<ListMoviesView.ViewHolder>() {
 
     private val mOnClickListener: View.OnClickListener
 
