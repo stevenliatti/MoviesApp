@@ -8,10 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.ImageView
-import android.widget.ListView
-import android.widget.TextView
+import android.widget.*
 import ch.hes.master.mobopproject.data.Constants
 import ch.hes.master.mobopproject.data.MvDetails
 import com.android.volley.Request
@@ -21,7 +18,7 @@ import org.json.JSONArray
 
 class MovieDetails : Fragment() {
 
-    val apiKey = Constants.apiKey
+    private val apiKey = Constants.apiKey
 
     private lateinit var dummyContext: Context
 
@@ -32,12 +29,14 @@ class MovieDetails : Fragment() {
     private lateinit var titleView: TextView
     private lateinit var descriptionView: TextView
     private lateinit var imageView: ImageView
-    private lateinit var genreNamesView: ListView
+    private lateinit var genreNamesView: LinearLayout
     private lateinit var popularityView: TextView
-    private lateinit var prodCountriesView: ListView
+    private lateinit var prodCountriesView: LinearLayout
     private lateinit var releaseDateView: TextView
     private lateinit var subtitleView: TextView
     private lateinit var voteCountView: TextView
+
+    private lateinit var similarMoviesView: LinearLayout
 
     companion object {
         @JvmStatic
@@ -79,13 +78,19 @@ class MovieDetails : Fragment() {
                 titleView.setText(this.movieDetails?.title)
                 descriptionView.setText(this.movieDetails?.overview)
 
-                var adapter = ArrayAdapter(dummyContext, android.R.layout.simple_list_item_1, genresNames)
-                this.genreNamesView.adapter = adapter
+                for (genre in genresNames) {
+                    val genreView = TextView(view?.context)
+                    genreView.text = genre
+                    this.genreNamesView.addView(genreView)
+                }
 
                 popularityView.setText("Popularity : " + popularity.toString())
 
-                adapter = ArrayAdapter(dummyContext, android.R.layout.simple_list_item_1, productionCountries)
-                this.prodCountriesView.adapter = adapter
+                for (prodCount in productionCountries) {
+                    val prodCountView = TextView(view?.context)
+                    prodCountView.text = prodCount
+                    this.prodCountriesView.addView(prodCountView)
+                }
 
                 releaseDateView.setText(releaseDate)
                 subtitleView.setText(subtitle)
@@ -93,10 +98,45 @@ class MovieDetails : Fragment() {
 
             },
             Response.ErrorListener { error ->
-                Log.println(Log.DEBUG, this.javaClass.name, "error in makeRequest : $error")
+                Log.println(Log.DEBUG, this.javaClass.name, "error in makeRequestForDetails : $error")
             }
         )
     }
+
+    private fun makeRequestForSimilarMovies(): JsonObjectRequest {
+        val url = "https://api.themoviedb.org/3/movie/${this.movieId}/similar?api_key=$apiKey"
+
+        return JsonObjectRequest(
+            Request.Method.GET, url, null,
+            Response.Listener { res ->
+                val similarMovies = buildStringListFromJsonSArray(res.getJSONArray("results"), "title")
+
+                for (movie in similarMovies) {
+                    val movieView = TextView(view?.context)
+                    movieView.text = movie
+                    this.similarMoviesView.addView(movieView)
+                }
+            },
+            Response.ErrorListener { error ->
+                Log.println(Log.DEBUG, this.javaClass.name, "error in makeRequestForSimilarMovies : $error")
+            }
+        )
+    }
+
+    private fun makeRequestForVideos(): JsonObjectRequest {
+        val url = "https://api.themoviedb.org/3/movie/${this.movieId}?api_key=$apiKey"
+
+        return JsonObjectRequest(
+            Request.Method.GET, url, null,
+            Response.Listener { res ->
+
+            },
+            Response.ErrorListener { error ->
+                Log.println(Log.DEBUG, this.javaClass.name, "error in makeRequestForVideos : $error")
+            }
+        )
+    }
+
     private fun buildStringListFromJsonSArray(jsonArray: JSONArray, key: String): ArrayList<String> {
         val strings: ArrayList<String> = ArrayList()
         for (i in 0 until jsonArray.length()) {
@@ -115,17 +155,19 @@ class MovieDetails : Fragment() {
         titleView = view.findViewById(R.id.original_title) as TextView
         descriptionView = view.findViewById(R.id.overview) as TextView
         imageView = view.findViewById(R.id.imgDetails) as ImageView
-        genreNamesView = view.findViewById(R.id.genreNames) as ListView
+        genreNamesView = view.findViewById(R.id.genreNames) as LinearLayout
         popularityView = view.findViewById(R.id.popularity) as TextView
-        prodCountriesView = view.findViewById(R.id.prodCountries) as ListView
+        prodCountriesView = view.findViewById(R.id.prodCountries) as LinearLayout
         releaseDateView = view.findViewById(R.id.release_date) as TextView
         subtitleView = view.findViewById(R.id.subtitle) as TextView
         voteCountView = view.findViewById(R.id.vote_count) as TextView
-
+        similarMoviesView = view.findViewById(R.id.similarMovies) as LinearLayout
 
         // Call http request for movie details
         HttpQueue.getInstance(view.context).addToRequestQueue(Common.setImage(urlImg, imageView, 500))
         HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForDetails())
+        HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForSimilarMovies())
+        //HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForVideos())
 
         return view
     }
