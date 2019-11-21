@@ -157,12 +157,13 @@
                 android:textColor="#000000"
                 android:textStyle="bold" />
 
-            <LinearLayout
-                android:id="@+id/similarMovies"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingLeft="10dp"></LinearLayout>
+            <androidx.gridlayout.widget.GridLayout
+                android:id="@+id/similarMoviesGridLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="10dp">
+
+            </androidx.gridlayout.widget.GridLayout>
 
         </LinearLayout>
 

@@ -11,6 +11,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.gridlayout.widget.GridLayout
 import androidx.lifecycle.ViewModelProviders
 import ch.hes.master.mobopproject.data.Constants
 import ch.hes.master.mobopproject.data.MvDetails
@@ -41,7 +42,7 @@ class MovieDetails : Fragment() {
     private lateinit var subtitleView: TextView
     private lateinit var voteCountView: TextView
 
-    private lateinit var similarMoviesView: LinearLayout
+    private lateinit var similarMoviesGridView: GridLayout
 
     companion object {
         @JvmStatic
@@ -115,11 +116,35 @@ class MovieDetails : Fragment() {
             Request.Method.GET, url, null,
             Response.Listener { res ->
                 val similarMovies = buildStringListFromJsonSArray(res.getJSONArray("results"), "title")
+                val total = similarMovies.size
+                val columnsNumber: Int = 2
+                var row = 0
+                var col = 0
 
+               this.similarMoviesGridView.setColumnCount(columnsNumber)
+               this.similarMoviesGridView.setRowCount(total / columnsNumber)
                 for (movie in similarMovies) {
-                    val movieView = TextView(view?.context)
-                    movieView.text = movie
-                    this.similarMoviesView.addView(movieView)
+                    if (col == columnsNumber) {
+                        col = 0
+                        row++
+                    }
+
+                    var rowSpan = GridLayout.spec(GridLayout.UNDEFINED, 1)
+                    var colspan = GridLayout.spec(GridLayout.UNDEFINED, 1)
+                    if (row == 0 && col == 0) {
+                        Log.e("", "spec")
+                        colspan = GridLayout.spec(GridLayout.UNDEFINED, 2)
+                        rowSpan = GridLayout.spec(GridLayout.UNDEFINED, 2)
+                    }
+
+                    val gridParam: GridLayout.LayoutParams = GridLayout.LayoutParams(rowSpan, colspan)
+
+                   val movieView = TextView(view?.context)
+                   movieView.text = movie
+
+
+                    this.similarMoviesGridView.addView(movieView, gridParam)
+                    col++
                 }
             },
             Response.ErrorListener { error ->
@@ -166,7 +191,7 @@ class MovieDetails : Fragment() {
         releaseDateView = view.findViewById(R.id.release_date) as TextView
         subtitleView = view.findViewById(R.id.subtitle) as TextView
         voteCountView = view.findViewById(R.id.vote_count) as TextView
-        similarMoviesView = view.findViewById(R.id.similarMovies) as LinearLayout
+        similarMoviesGridView = view.findViewById(R.id.similarMoviesGridLayout) as GridLayout
 
         // Call http request for movie details
         HttpQueue.getInstance(view.context).addToRequestQueue(Common.setImage(urlImg, imageView, 500))
