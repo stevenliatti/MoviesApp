@@ -12,7 +12,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 
 class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractionListener {
 
-    val apiKey = Constants.apiKey
+    val apiKey = Constants.tmdbApiKey
 
     private fun makeRequest(): JsonObjectRequest {
 

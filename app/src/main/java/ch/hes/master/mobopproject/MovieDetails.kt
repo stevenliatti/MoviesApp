@@ -1,24 +1,29 @@
 package ch.hes.master.mobopproject
 
 import android.content.Context
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
+import android.provider.MediaStore.Video.Thumbnails.VIDEO_ID
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProviders
 import ch.hes.master.mobopproject.data.Constants
 import ch.hes.master.mobopproject.data.MvDetails
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
+import com.google.android.youtube.player.YouTubeStandalonePlayer
 import org.json.JSONArray
+
 
 class MovieDetails : Fragment() {
 
-    private val apiKey = Constants.apiKey
+    private val apiKey = Constants.tmdbApiKey
 
     private lateinit var dummyContext: Context
 
@@ -168,6 +173,13 @@ class MovieDetails : Fragment() {
         HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForDetails())
         HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForSimilarMovies())
         //HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForVideos())
+
+        val intent = YouTubeStandalonePlayer.createVideoIntent(
+            activity,
+            Constants.youtubeApiKey,
+            "GKXS_YA9s7E"
+        )
+        startActivity(intent)
 
         return view
     }
