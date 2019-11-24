@@ -1,25 +1,26 @@
 package ch.hes.master.mobopproject
 
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
-import android.provider.MediaStore.Video.Thumbnails.VIDEO_ID
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.gridlayout.widget.GridLayout
 import androidx.lifecycle.ViewModelProviders
 import ch.hes.master.mobopproject.data.Constants
+import ch.hes.master.mobopproject.data.MovieYoutubeVideo
 import ch.hes.master.mobopproject.data.MvDetails
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.google.android.youtube.player.YouTubeStandalonePlayer
 import org.json.JSONArray
+import java.lang.Exception
 
 
 class MovieDetails : Fragment() {
@@ -43,6 +44,7 @@ class MovieDetails : Fragment() {
     private lateinit var voteCountView: TextView
 
     private lateinit var similarMoviesGridView: GridLayout
+    private lateinit var videosView: LinearLayout
 
     companion object {
         @JvmStatic
@@ -154,11 +156,60 @@ class MovieDetails : Fragment() {
     }
 
     private fun makeRequestForVideos(): JsonObjectRequest {
-        val url = "https://api.themoviedb.org/3/movie/${this.movieId}?api_key=$apiKey"
+        val url = "https://api.themoviedb.org/3/movie/${this.movieId}/videos?api_key=$apiKey"
 
         return JsonObjectRequest(
             Request.Method.GET, url, null,
-            Response.Listener { res ->
+            Response.Listener { response ->
+                val results = response.getJSONArray("results")
+                val videos: ArrayList<MovieYoutubeVideo> = ArrayList()
+                for (i in 0 until results.length()) {
+                    val video = results.getJSONObject(i)
+                    if (video.getString("site").equals("YouTube", true)) {
+                        val key = video.getString("key")
+                        val name = video.getString("name")
+                        val type = video.getString("type")
+                        videos.add(MovieYoutubeVideo(key, name, type))
+                    }
+                }
+
+                for (video in videos) {
+                    val videoView = LinearLayout(view?.context)
+                    val playButton = ImageButton(view?.context)
+                    playButton.setOnClickListener {
+                        try {
+                            val intent = YouTubeStandalonePlayer.createVideoIntent(
+                                activity,
+                                Constants.youtubeApiKey,
+                                video.key
+                            )
+                            startActivity(intent)
+                        }
+                        catch (e: ActivityNotFoundException) {
+                            val toast = Toast.makeText(view?.context, "You have to install YouTube app", Toast.LENGTH_LONG)
+                            toast.show()
+                        }
+
+                    }
+                    playButton.setImageResource(android.R.drawable.ic_media_play)
+                    playButton.minimumWidth= 250
+                    playButton.minimumHeight = 250
+                    videoView.addView(playButton)
+
+                    val nameView = TextView(view?.context)
+                    val typeView = TextView(view?.context)
+                    nameView.text = video.name
+                    nameView.setTextColor(Color.BLACK)
+                    typeView.text = video.type
+
+                    val infoView = LinearLayout(view?.context)
+                    infoView.orientation = LinearLayout.VERTICAL
+                    infoView.addView(nameView)
+                    infoView.addView(typeView)
+
+                    videoView.addView(infoView)
+                    this.videosView.addView(videoView)
+                }
 
             },
             Response.ErrorListener { error ->
@@ -192,19 +243,13 @@ class MovieDetails : Fragment() {
         subtitleView = view.findViewById(R.id.subtitle) as TextView
         voteCountView = view.findViewById(R.id.vote_count) as TextView
         similarMoviesGridView = view.findViewById(R.id.similarMoviesGridLayout) as GridLayout
+        videosView = view.findViewById(R.id.videos) as LinearLayout
 
         // Call http request for movie details
         HttpQueue.getInstance(view.context).addToRequestQueue(Common.setImage(urlImg, imageView, 500))
         HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForDetails())
         HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForSimilarMovies())
-        //HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForVideos())
-
-        val intent = YouTubeStandalonePlayer.createVideoIntent(
-            activity,
-            Constants.youtubeApiKey,
-            "GKXS_YA9s7E"
-        )
-        startActivity(intent)
+        HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForVideos())
 
         return view
     }

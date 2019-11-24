@@ -21,3 +21,5 @@ data class MvDetails(
     var subtitle: String?,
     var voteCount: Int?
 )
+
+data class MovieYoutubeVideo(val key: String, val name: String, val type: String)
