@@ -35,6 +35,7 @@ class MovieDetails : Fragment() {
 
     private lateinit var titleView: TextView
     private lateinit var descriptionView: TextView
+    private lateinit var castView: TextView
     private lateinit var imageView: ImageView
     private lateinit var genreNamesView: LinearLayout
     private lateinit var popularityView: TextView
@@ -107,6 +108,30 @@ class MovieDetails : Fragment() {
             },
             Response.ErrorListener { error ->
                 Log.println(Log.DEBUG, this.javaClass.name, "error in makeRequestForDetails : $error")
+            }
+        )
+    }
+
+    private fun makeRequestForCast(): JsonObjectRequest {
+        val url = "https://api.themoviedb.org/3/movie/${this.movieId}/credits?api_key=$apiKey"
+
+        return JsonObjectRequest(
+            Request.Method.GET, url, null,
+            Response.Listener { res ->
+                val cast = buildStringPairListFromJsonSArray(res.getJSONArray("cast"), "name", "character")
+                val crew = buildStringPairListFromJsonSArray(res.getJSONArray("crew"), "name", "job")
+                var castString = ""
+                for (c in cast) {
+                    castString += c + ","
+                }
+                var crewString = ""
+                for (c in crew) {
+                    crewString += c + ","
+                }
+                castView.text = castString + "\n" + crewString
+            },
+            Response.ErrorListener { error ->
+                Log.println(Log.DEBUG, this.javaClass.name, "error in makeRequestForCast : $error")
             }
         )
     }
@@ -227,6 +252,15 @@ class MovieDetails : Fragment() {
         return strings
     }
 
+    private fun buildStringPairListFromJsonSArray(jsonArray: JSONArray, key1: String, key2: String): ArrayList<String> {
+        val strings: ArrayList<String> = ArrayList()
+        for (i in 0 until jsonArray.length()) {
+            val res = jsonArray.getJSONObject(i)
+            strings.add(res.getString(key1) + " (" + res.getString(key2) + ")")
+        }
+        return strings
+    }
+
     private lateinit var viewModel: MovieDetailsViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -235,6 +269,7 @@ class MovieDetails : Fragment() {
 
         titleView = view.findViewById(R.id.original_title) as TextView
         descriptionView = view.findViewById(R.id.overview) as TextView
+        castView = view.findViewById(R.id.cast) as TextView
         imageView = view.findViewById(R.id.imgDetails) as ImageView
         genreNamesView = view.findViewById(R.id.genreNames) as LinearLayout
         popularityView = view.findViewById(R.id.popularity) as TextView
@@ -248,6 +283,7 @@ class MovieDetails : Fragment() {
         // Call http request for movie details
         HttpQueue.getInstance(view.context).addToRequestQueue(Common.setImage(urlImg, imageView, 500))
         HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForDetails())
+        HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForCast())
         HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForSimilarMovies())
         HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForVideos())
 
