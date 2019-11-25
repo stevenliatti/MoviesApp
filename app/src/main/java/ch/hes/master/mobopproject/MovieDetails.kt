@@ -1,6 +1,7 @@
 package ch.hes.master.mobopproject
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore.Video.Thumbnails.VIDEO_ID
 import android.util.Log
@@ -19,12 +20,14 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.google.android.youtube.player.YouTubeStandalonePlayer
+import kotlinx.android.synthetic.main.fragment_movie.view.*
 import org.json.JSONArray
 
 
 class MovieDetails : Fragment() {
 
     private val apiKey = Constants.tmdbApiKey
+    val requestControler = VolleyRequestController()
 
     private lateinit var dummyContext: Context
 
@@ -117,12 +120,13 @@ class MovieDetails : Fragment() {
             Response.Listener { res ->
                 val similarMovies = buildStringListFromJsonSArray(res.getJSONArray("results"), "title")
                 val total = similarMovies.size
-                val columnsNumber: Int = 2
+                val columnsNumber = 3
                 var row = 0
                 var col = 0
 
                this.similarMoviesGridView.setColumnCount(columnsNumber)
                this.similarMoviesGridView.setRowCount(total / columnsNumber)
+                var idx = 0
                 for (movie in similarMovies) {
                     if (col == columnsNumber) {
                         col = 0
@@ -139,12 +143,39 @@ class MovieDetails : Fragment() {
 
                     val gridParam: GridLayout.LayoutParams = GridLayout.LayoutParams(rowSpan, colspan)
 
-                   val movieView = TextView(view?.context)
-                   movieView.text = movie
+                    val movieView = TextView(view?.context)
+                    movieView.text = movie
+
+                    /******* inflate *************/
+                    var inflater: LayoutInflater = LayoutInflater.from(context)
+
+                    //to get the MainLayout
+                    val view: View = inflater.inflate(R.layout.movie_details_fragment, null)
+
+                    val inflatedLayout: View = inflater.inflate(R.layout.fragment_movie, view as ViewGroup, false)
+
+                    inflatedLayout.setLayoutParams(LinearLayout.LayoutParams
+                        (
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        )
+                    )
+
+                    var tit = inflatedLayout.findViewById(R.id.original_title) as TextView
+                    var mv = inflatedLayout.findViewById(R.id.img) as ImageView
+
+                    //tit.setText(movie)
+                    displayImgs(res.getJSONArray("results"), "poster_path", mv, view.context, idx)
+
+                    /******* inflate *************/
+
+                    this.similarMoviesGridView.addView(inflatedLayout, gridParam)
 
 
-                    this.similarMoviesGridView.addView(movieView, gridParam)
+
+                    // this.similarMoviesGridView.addView(movieView, gridParam)
                     col++
+                    idx++
                 }
             },
             Response.ErrorListener { error ->
@@ -176,6 +207,16 @@ class MovieDetails : Fragment() {
         return strings
     }
 
+    private fun displayImgs(jsonArray: JSONArray, key: String, mv: ImageView, context: Context, idx: Int) {
+            val res = jsonArray.getJSONObject(idx)
+            val path = res.getString(key)
+            requestControler.getPosterImage(path, context, object : ServerCallback<Bitmap> {
+                override fun onSuccess(result: Bitmap) {
+                    mv.setImageBitmap(result)
+                }
+            })
+    }
+
     private lateinit var viewModel: MovieDetailsViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -199,12 +240,12 @@ class MovieDetails : Fragment() {
         HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForSimilarMovies())
         //HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForVideos())
 
-        val intent = YouTubeStandalonePlayer.createVideoIntent(
+       /* val intent = YouTubeStandalonePlayer.createVideoIntent(
             activity,
             Constants.youtubeApiKey,
             "GKXS_YA9s7E"
         )
-        startActivity(intent)
+        startActivity(intent)*/
 
         return view
     }

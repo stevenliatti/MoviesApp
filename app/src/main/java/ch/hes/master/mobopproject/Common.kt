@@ -18,16 +18,4 @@ object Common {
             }, 0, 0, null, null)
 
     }
-
-    fun getImageInList(movie: Movie, frag: MovieFragment, i: Int): ImageRequest {
-        val url = "https://image.tmdb.org/t/p/w300" + movie.urlImg
-
-        return ImageRequest(url,
-            Response.Listener { response ->
-                val img = Bitmap.createBitmap(response)
-                movie.img = img
-                frag.updateCell(i)
-            }, 0, 0, null, null)
-
-    }
 }

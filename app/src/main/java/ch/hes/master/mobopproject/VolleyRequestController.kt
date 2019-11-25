@@ -1,38 +1,36 @@
 package ch.hes.master.mobopproject
-//
-//import android.util.Log
-//import ch.hes.master.mobopproject.data.Movie
-//
-//class VolleyRequestController {
-//    fun VolleyRequest(URL: String, callback: ServerCallback) {
-//        JsonObjectRequest jsonObjReq =
-//
-//
-//    }
-//}
-//
-//
-//JsonObjectRequest(
-//Request.Method.GET, url, null,
-//Response.Listener { response ->
-//    val fragMovie = MovieFragment.newInstance(1, movies)
-//    val results = response.getJSONArray("results")
-//    Log.println(Log.DEBUG, this.javaClass.name, "makeRequest : $results")
-//    for (i in 0 until results.length()) {
-//        val res = results.getJSONObject(i)
-//        val movie = Movie(res.getInt("id"), res.getString("title"), res.getString("overview"), res.getString("poster_path"),null)
-//        HttpQueue.getInstance(this).addToRequestQueue(Common.getImageInList(movie, fragMovie, i))
-//        movies.add(movie)
-//    }
-//
-//    supportFragmentManager
-//        .beginTransaction()
-//        .add(R.id.fragment_container, fragMovie, "moviefragment")
-//        .addToBackStack("moviefragment")
-//        .commit()
-//},
-//Response.ErrorListener { error ->
-//    Log.println(Log.DEBUG, this.javaClass.name, "error in makeRequest : $error")
-//}
-//)
-//
+
+import android.content.Context
+import android.graphics.Bitmap
+import android.util.Log
+import ch.hes.master.mobopproject.data.Movie
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.ImageRequest
+import com.android.volley.toolbox.JsonObjectRequest
+import org.json.JSONObject
+
+class VolleyRequestController {
+    fun VolleyRequest(URL: String, context: Context, callback: ServerCallback<JSONObject>) {
+        val jsonObjReq = JsonObjectRequest(Request.Method.GET, URL, null,
+        Response.Listener { response ->
+            callback.onSuccess(response) // call call back function here
+        },
+        Response.ErrorListener { error ->
+            Log.println(Log.DEBUG, this.javaClass.name, "error in makeRequest : $error")
+        })
+
+        // Adding request to request queue
+        HttpQueue.getInstance(context).addToRequestQueue(jsonObjReq)
+    }
+
+    fun getPosterImage(posterPath: String, context: Context, callback: ServerCallback<Bitmap>) {
+        val url = "https://image.tmdb.org/t/p/w300" + posterPath
+        val imgRequest = ImageRequest(url,
+            Response.Listener { response ->
+                callback.onSuccess(Bitmap.createBitmap(response))
+            }, 0, 0, null, null)
+
+        HttpQueue.getInstance(context).addToRequestQueue(imgRequest)
+    }
+}
