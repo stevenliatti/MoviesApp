@@ -1,20 +1,20 @@
 package ch.hes.master.mobopproject
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.os.Bundle
-import android.provider.MediaStore.Video.Thumbnails.VIDEO_ID
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.gridlayout.widget.GridLayout
 import androidx.lifecycle.ViewModelProviders
 import ch.hes.master.mobopproject.data.Constants
+import ch.hes.master.mobopproject.data.MovieYoutubeVideo
 import ch.hes.master.mobopproject.data.MvDetails
 import com.android.volley.Request
 import com.android.volley.Response
@@ -22,6 +22,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.google.android.youtube.player.YouTubeStandalonePlayer
 import kotlinx.android.synthetic.main.fragment_movie.view.*
 import org.json.JSONArray
+import java.lang.Exception
 
 
 class MovieDetails : Fragment() {
@@ -37,6 +38,7 @@ class MovieDetails : Fragment() {
 
     private lateinit var titleView: TextView
     private lateinit var descriptionView: TextView
+    private lateinit var castView: TextView
     private lateinit var imageView: ImageView
     private lateinit var genreNamesView: LinearLayout
     private lateinit var popularityView: TextView
@@ -46,6 +48,7 @@ class MovieDetails : Fragment() {
     private lateinit var voteCountView: TextView
 
     private lateinit var similarMoviesGridView: GridLayout
+    private lateinit var videosView: LinearLayout
 
     companion object {
         @JvmStatic
@@ -108,6 +111,30 @@ class MovieDetails : Fragment() {
             },
             Response.ErrorListener { error ->
                 Log.println(Log.DEBUG, this.javaClass.name, "error in makeRequestForDetails : $error")
+            }
+        )
+    }
+
+    private fun makeRequestForCast(): JsonObjectRequest {
+        val url = "https://api.themoviedb.org/3/movie/${this.movieId}/credits?api_key=$apiKey"
+
+        return JsonObjectRequest(
+            Request.Method.GET, url, null,
+            Response.Listener { res ->
+                val cast = buildStringPairListFromJsonSArray(res.getJSONArray("cast"), "name", "character")
+                val crew = buildStringPairListFromJsonSArray(res.getJSONArray("crew"), "name", "job")
+                var castString = ""
+                for (c in cast) {
+                    castString += c + ","
+                }
+                var crewString = ""
+                for (c in crew) {
+                    crewString += c + ","
+                }
+                castView.text = castString + "\n" + crewString
+            },
+            Response.ErrorListener { error ->
+                Log.println(Log.DEBUG, this.javaClass.name, "error in makeRequestForCast : $error")
             }
         )
     }
@@ -185,11 +212,60 @@ class MovieDetails : Fragment() {
     }
 
     private fun makeRequestForVideos(): JsonObjectRequest {
-        val url = "https://api.themoviedb.org/3/movie/${this.movieId}?api_key=$apiKey"
+        val url = "https://api.themoviedb.org/3/movie/${this.movieId}/videos?api_key=$apiKey"
 
         return JsonObjectRequest(
             Request.Method.GET, url, null,
-            Response.Listener { res ->
+            Response.Listener { response ->
+                val results = response.getJSONArray("results")
+                val videos: ArrayList<MovieYoutubeVideo> = ArrayList()
+                for (i in 0 until results.length()) {
+                    val video = results.getJSONObject(i)
+                    if (video.getString("site").equals("YouTube", true)) {
+                        val key = video.getString("key")
+                        val name = video.getString("name")
+                        val type = video.getString("type")
+                        videos.add(MovieYoutubeVideo(key, name, type))
+                    }
+                }
+
+                for (video in videos) {
+                    val videoView = LinearLayout(view?.context)
+                    val playButton = ImageButton(view?.context)
+                    playButton.setOnClickListener {
+                        try {
+                            val intent = YouTubeStandalonePlayer.createVideoIntent(
+                                activity,
+                                Constants.youtubeApiKey,
+                                video.key
+                            )
+                            startActivity(intent)
+                        }
+                        catch (e: ActivityNotFoundException) {
+                            val toast = Toast.makeText(view?.context, "You have to install YouTube app", Toast.LENGTH_LONG)
+                            toast.show()
+                        }
+
+                    }
+                    playButton.setImageResource(android.R.drawable.ic_media_play)
+                    playButton.minimumWidth= 250
+                    playButton.minimumHeight = 250
+                    videoView.addView(playButton)
+
+                    val nameView = TextView(view?.context)
+                    val typeView = TextView(view?.context)
+                    nameView.text = video.name
+                    nameView.setTextColor(Color.BLACK)
+                    typeView.text = video.type
+
+                    val infoView = LinearLayout(view?.context)
+                    infoView.orientation = LinearLayout.VERTICAL
+                    infoView.addView(nameView)
+                    infoView.addView(typeView)
+
+                    videoView.addView(infoView)
+                    this.videosView.addView(videoView)
+                }
 
             },
             Response.ErrorListener { error ->
@@ -208,13 +284,22 @@ class MovieDetails : Fragment() {
     }
 
     private fun displayImgs(jsonArray: JSONArray, key: String, mv: ImageView, context: Context, idx: Int) {
-            val res = jsonArray.getJSONObject(idx)
-            val path = res.getString(key)
-            requestControler.getPosterImage(path, context, object : ServerCallback<Bitmap> {
-                override fun onSuccess(result: Bitmap) {
-                    mv.setImageBitmap(result)
-                }
-            })
+        val res = jsonArray.getJSONObject(idx)
+        val path = res.getString(key)
+        requestControler.getPosterImage(path, context, object : ServerCallback<Bitmap> {
+            override fun onSuccess(result: Bitmap) {
+                mv.setImageBitmap(result)
+            }
+        })
+    }
+
+    private fun buildStringPairListFromJsonSArray(jsonArray: JSONArray, key1: String, key2: String): ArrayList<String> {
+        val strings: ArrayList<String> = ArrayList()
+        for (i in 0 until jsonArray.length()) {
+            val res = jsonArray.getJSONObject(i)
+            strings.add(res.getString(key1) + " (" + res.getString(key2) + ")")
+        }
+        return strings
     }
 
     private lateinit var viewModel: MovieDetailsViewModel
@@ -225,6 +310,7 @@ class MovieDetails : Fragment() {
 
         titleView = view.findViewById(R.id.original_title) as TextView
         descriptionView = view.findViewById(R.id.overview) as TextView
+        castView = view.findViewById(R.id.cast) as TextView
         imageView = view.findViewById(R.id.imgDetails) as ImageView
         genreNamesView = view.findViewById(R.id.genreNames) as LinearLayout
         popularityView = view.findViewById(R.id.popularity) as TextView
@@ -233,19 +319,14 @@ class MovieDetails : Fragment() {
         subtitleView = view.findViewById(R.id.subtitle) as TextView
         voteCountView = view.findViewById(R.id.vote_count) as TextView
         similarMoviesGridView = view.findViewById(R.id.similarMoviesGridLayout) as GridLayout
+        videosView = view.findViewById(R.id.videos) as LinearLayout
 
         // Call http request for movie details
         HttpQueue.getInstance(view.context).addToRequestQueue(Common.setImage(urlImg, imageView, 500))
         HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForDetails())
+        HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForCast())
         HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForSimilarMovies())
-        //HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForVideos())
-
-       /* val intent = YouTubeStandalonePlayer.createVideoIntent(
-            activity,
-            Constants.youtubeApiKey,
-            "GKXS_YA9s7E"
-        )
-        startActivity(intent)*/
+        HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForVideos())
 
         return view
     }

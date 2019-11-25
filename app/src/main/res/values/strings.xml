@@ -5,4 +5,7 @@
     <string name="production_countries">Production Countries</string>
     <string name="poster">poster</string>
     <string name="similar_movies">Similar Movies</string>
+    <string name="videos">Videos</string>
+    <string name="overview">Overview</string>
+    <string name="cast">Cast and crew</string>
 </resources>
