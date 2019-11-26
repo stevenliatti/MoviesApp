@@ -7,5 +7,6 @@
     <string name="similar_movies">Similar Movies</string>
     <string name="videos">Videos</string>
     <string name="overview">Overview</string>
-    <string name="cast">Cast and crew</string>
+    <string name="cast">Cast</string>
+    <string name="crew">Crew</string>
 </resources>

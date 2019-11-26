@@ -23,3 +23,9 @@ data class MvDetails(
 )
 
 data class MovieYoutubeVideo(val key: String, val name: String, val type: String)
+
+data class Cast(val name: String, val function: String) {
+    override fun toString(): String {
+        return name + " (" + function + ")"
+    }
+}

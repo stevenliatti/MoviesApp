@@ -14,21 +14,20 @@ import androidx.fragment.app.Fragment
 import androidx.gridlayout.widget.GridLayout
 import androidx.lifecycle.ViewModelProviders
 import ch.hes.master.mobopproject.data.Constants
+import ch.hes.master.mobopproject.data.Cast
 import ch.hes.master.mobopproject.data.MovieYoutubeVideo
 import ch.hes.master.mobopproject.data.MvDetails
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.google.android.youtube.player.YouTubeStandalonePlayer
-import kotlinx.android.synthetic.main.fragment_movie.view.*
 import org.json.JSONArray
-import java.lang.Exception
 
 
 class MovieDetails : Fragment() {
 
     private val apiKey = Constants.tmdbApiKey
-    val requestControler = VolleyRequestController()
+    private val requestController = VolleyRequestController()
 
     private lateinit var dummyContext: Context
 
@@ -39,6 +38,7 @@ class MovieDetails : Fragment() {
     private lateinit var titleView: TextView
     private lateinit var descriptionView: TextView
     private lateinit var castView: TextView
+    private lateinit var crewView: TextView
     private lateinit var imageView: ImageView
     private lateinit var genreNamesView: LinearLayout
     private lateinit var popularityView: TextView
@@ -115,23 +115,27 @@ class MovieDetails : Fragment() {
         )
     }
 
-    private fun makeRequestForCast(): JsonObjectRequest {
+    private fun makeRequestForCredits(castNb: Int, keysCrew: List<String>): JsonObjectRequest {
         val url = "https://api.themoviedb.org/3/movie/${this.movieId}/credits?api_key=$apiKey"
 
         return JsonObjectRequest(
             Request.Method.GET, url, null,
             Response.Listener { res ->
-                val cast = buildStringPairListFromJsonSArray(res.getJSONArray("cast"), "name", "character")
-                val crew = buildStringPairListFromJsonSArray(res.getJSONArray("crew"), "name", "job")
+                val cast = creditsFromJsonArray(res.getJSONArray("cast"), "character")
+                val crew = creditsFromJsonArray(res.getJSONArray("crew"), "job")
                 var castString = ""
-                for (c in cast) {
-                    castString += c + ","
+                for (i in 0..castNb) {
+                    if (i < cast.size) castString += cast[i].toString() + ", "
                 }
+                castString = castString.subSequence(0, castString.length - 2).toString()
+                castView.text = castString
+
                 var crewString = ""
                 for (c in crew) {
-                    crewString += c + ","
+                    if (keysCrew.contains(c.function)) crewString += c.toString() + ", "
                 }
-                castView.text = castString + "\n" + crewString
+                crewString = crewString.subSequence(0, crewString.length - 2).toString()
+                crewView.text = crewString
             },
             Response.ErrorListener { error ->
                 Log.println(Log.DEBUG, this.javaClass.name, "error in makeRequestForCast : $error")
@@ -286,20 +290,20 @@ class MovieDetails : Fragment() {
     private fun displayImgs(jsonArray: JSONArray, key: String, mv: ImageView, context: Context, idx: Int) {
         val res = jsonArray.getJSONObject(idx)
         val path = res.getString(key)
-        requestControler.getPosterImage(path, context, object : ServerCallback<Bitmap> {
+        requestController.getPosterImage(path, context, object : ServerCallback<Bitmap> {
             override fun onSuccess(result: Bitmap) {
                 mv.setImageBitmap(result)
             }
         })
     }
 
-    private fun buildStringPairListFromJsonSArray(jsonArray: JSONArray, key1: String, key2: String): ArrayList<String> {
-        val strings: ArrayList<String> = ArrayList()
+    private fun creditsFromJsonArray(jsonArray: JSONArray, keyFunction: String): ArrayList<Cast> {
+        val credits = ArrayList<Cast>()
         for (i in 0 until jsonArray.length()) {
             val res = jsonArray.getJSONObject(i)
-            strings.add(res.getString(key1) + " (" + res.getString(key2) + ")")
+            credits.add(Cast(res.getString("name"), res.getString(keyFunction)))
         }
-        return strings
+        return credits
     }
 
     private lateinit var viewModel: MovieDetailsViewModel
@@ -311,6 +315,7 @@ class MovieDetails : Fragment() {
         titleView = view.findViewById(R.id.original_title) as TextView
         descriptionView = view.findViewById(R.id.overview) as TextView
         castView = view.findViewById(R.id.cast) as TextView
+        crewView = view.findViewById(R.id.crew) as TextView
         imageView = view.findViewById(R.id.imgDetails) as ImageView
         genreNamesView = view.findViewById(R.id.genreNames) as LinearLayout
         popularityView = view.findViewById(R.id.popularity) as TextView
@@ -324,7 +329,8 @@ class MovieDetails : Fragment() {
         // Call http request for movie details
         HttpQueue.getInstance(view.context).addToRequestQueue(Common.setImage(urlImg, imageView, 500))
         HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForDetails())
-        HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForCast())
+        val crew = listOf("Producer", "Casting", "Music", "Writer", "Director")
+        HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForCredits(5, crew))
         HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForSimilarMovies())
         HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForVideos())
 
