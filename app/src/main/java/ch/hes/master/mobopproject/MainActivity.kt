@@ -1,6 +1,5 @@
 package ch.hes.master.mobopproject
 
-import android.app.Activity
 import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -45,7 +44,7 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
     fun getActualMovies() {
         var movies: ArrayList<Movie> = ArrayList()
         val url = "https://api.themoviedb.org/3/discover/movie?api_key=$apiKey&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1"
-        requestControler.VolleyRequest(url, this, object : ServerCallback<JSONObject> {
+        requestControler.volleyRequest(url, this, object : ServerCallback<JSONObject> {
             override fun onSuccess(response: JSONObject) {
                 val fragMovie = MovieFragment.newInstance(1, movies)
                 val results = response.getJSONArray("results")

@@ -3,6 +3,8 @@ package ch.hes.master.mobopproject
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.graphics.Color
+import android.media.Image
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -19,6 +21,7 @@ import ch.hes.master.mobopproject.data.MvDetails
 import com.google.android.youtube.player.YouTubeStandalonePlayer
 import org.json.JSONArray
 import org.json.JSONObject
+import android.widget.LinearLayout
 
 
 class MovieDetails : Fragment() {
@@ -60,7 +63,7 @@ class MovieDetails : Fragment() {
     private fun getMoreDetails(context: Context) {
         val url = "https://api.themoviedb.org/3/movie/${this.movieId}?api_key=$apiKey"
 
-        requestController.VolleyRequest(url, context, object : ServerCallback<JSONObject> {
+        requestController.volleyRequest(url, context, object : ServerCallback<JSONObject> {
             override fun onSuccess(res: JSONObject) {
 
                 val genresNames = buildStringListFromJsonSArray(res.getJSONArray("genres"), "name")
@@ -112,7 +115,7 @@ class MovieDetails : Fragment() {
     private fun getCredits(castNb: Int, keysCrew: List<String>, context: Context) {
         val url = "https://api.themoviedb.org/3/movie/${this.movieId}/credits?api_key=$apiKey"
 
-        requestController.VolleyRequest(url, context, object : ServerCallback<JSONObject> {
+        requestController.volleyRequest(url, context, object : ServerCallback<JSONObject> {
             override fun onSuccess(res: JSONObject) {
                 val cast = creditsFromJsonArray(res.getJSONArray("cast"), "character")
                 val crew = creditsFromJsonArray(res.getJSONArray("crew"), "job")
@@ -136,7 +139,7 @@ class MovieDetails : Fragment() {
     private fun getSimilarMovies(context: Context) {
         val url = "https://api.themoviedb.org/3/movie/${this.movieId}/similar?api_key=$apiKey"
 
-        requestController.VolleyRequest(url, context, object : ServerCallback<JSONObject> {
+        requestController.volleyRequest(url, context, object : ServerCallback<JSONObject> {
             override fun onSuccess(res: JSONObject) {
 
                 val similarMovies = buildStringListFromJsonSArray(res.getJSONArray("results"), "title")
@@ -208,7 +211,7 @@ class MovieDetails : Fragment() {
     private fun getVideos(context: Context) {
         val url = "https://api.themoviedb.org/3/movie/${this.movieId}/videos?api_key=$apiKey"
 
-        requestController.VolleyRequest(url, context, object : ServerCallback<JSONObject> {
+        requestController.volleyRequest(url, context, object : ServerCallback<JSONObject> {
             override fun onSuccess(response: JSONObject) {
                 val results = response.getJSONArray("results")
                 val videos: ArrayList<MovieYoutubeVideo> = ArrayList()
@@ -224,8 +227,10 @@ class MovieDetails : Fragment() {
 
                 for (video in videos) {
                     val videoView = LinearLayout(view?.context)
-                    val playButton = ImageButton(view?.context)
-                    playButton.setOnClickListener {
+                    val thumbnail = ImageView(view?.context)
+                    requestController.setYoutubeImageView(video.key, thumbnail, context)
+
+                    thumbnail.setOnClickListener {
                         try {
                             val intent = YouTubeStandalonePlayer.createVideoIntent(
                                 activity,
@@ -243,12 +248,40 @@ class MovieDetails : Fragment() {
                         }
 
                     }
-                    playButton.setImageResource(android.R.drawable.ic_media_play)
-                    playButton.minimumWidth = 250
-                    playButton.minimumHeight = 250
-                    videoView.addView(playButton)
+                    thumbnail.minimumWidth = 250
+                    thumbnail.minimumHeight = 250
+                    val lp = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    lp.setMargins(0, 0, 10, 0)
+                    thumbnail.layoutParams = lp
+
+                    val playButton = ImageView(context)
+
+                    playButton.setImageResource(R.drawable.ic_play_circle_outline_black_50dp)
+                    playButton.minimumWidth = 25
+                    playButton.minimumHeight = 25
+                    val lp2 = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    lp2.setMargins(55, 55, 0, 0)
+                    playButton.layoutParams = lp2
+
+                    val frame = FrameLayout(context)
+                    frame.addView(thumbnail)
+                    frame.addView(playButton)
+
+                    videoView.addView(frame)
 
                     val nameView = TextView(view?.context)
+                    val lp3 = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    lp3.setMargins(0, 20, 0, 0)
+                    nameView.layoutParams = lp3
                     val typeView = TextView(view?.context)
                     nameView.text = video.name
                     nameView.setTextColor(Color.BLACK)

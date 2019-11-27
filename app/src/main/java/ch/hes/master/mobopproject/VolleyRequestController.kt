@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import android.widget.ImageView
-import ch.hes.master.mobopproject.data.Movie
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.ImageRequest
@@ -12,7 +11,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import org.json.JSONObject
 
 class VolleyRequestController {
-    fun VolleyRequest(URL: String, context: Context, callback: ServerCallback<JSONObject>) {
+    fun volleyRequest(URL: String, context: Context, callback: ServerCallback<JSONObject>) {
         val jsonObjReq = JsonObjectRequest(Request.Method.GET, URL, null,
         Response.Listener { response ->
             callback.onSuccess(response) // call call back function here
@@ -37,6 +36,18 @@ class VolleyRequestController {
 
     fun setImageView(urlImg: String?, image: ImageView, width: Int, context: Context) {
         val url = "https://image.tmdb.org/t/p/w" + width + "/" + urlImg
+
+        val imgRequest = ImageRequest(url,
+            Response.Listener { response ->
+                val img = Bitmap.createBitmap(response)
+                image.setImageBitmap(img)
+            }, 0, 0, null, null)
+
+        HttpQueue.getInstance(context).addToRequestQueue(imgRequest)
+    }
+
+    fun setYoutubeImageView(youtubeId: String?, image: ImageView, context: Context) {
+        val url = "https://img.youtube.com/vi/" + youtubeId + "/1.jpg"
 
         val imgRequest = ImageRequest(url,
             Response.Listener { response ->
