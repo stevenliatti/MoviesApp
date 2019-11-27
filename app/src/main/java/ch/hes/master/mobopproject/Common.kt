@@ -8,14 +8,4 @@ import com.android.volley.toolbox.ImageRequest
 
 object Common {
 
-    fun setImage(urlImg: String?, image: ImageView, width: Int): ImageRequest {
-        val url = "https://image.tmdb.org/t/p/w" + width + "/" + urlImg
-
-        return ImageRequest(url,
-            Response.Listener { response ->
-                val img = Bitmap.createBitmap(response)
-                image.setImageBitmap(img)
-            }, 0, 0, null, null)
-
-    }
 }

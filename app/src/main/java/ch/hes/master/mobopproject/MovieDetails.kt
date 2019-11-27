@@ -2,7 +2,6 @@ package ch.hes.master.mobopproject
 
 import android.content.ActivityNotFoundException
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -17,11 +16,9 @@ import ch.hes.master.mobopproject.data.Constants
 import ch.hes.master.mobopproject.data.Cast
 import ch.hes.master.mobopproject.data.MovieYoutubeVideo
 import ch.hes.master.mobopproject.data.MvDetails
-import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.toolbox.JsonObjectRequest
 import com.google.android.youtube.player.YouTubeStandalonePlayer
 import org.json.JSONArray
+import org.json.JSONObject
 
 
 class MovieDetails : Fragment() {
@@ -60,12 +57,12 @@ class MovieDetails : Fragment() {
         }
     }
 
-    private fun makeRequestForDetails(): JsonObjectRequest {
+    private fun getMoreDetails(context: Context) {
         val url = "https://api.themoviedb.org/3/movie/${this.movieId}?api_key=$apiKey"
 
-        return JsonObjectRequest(
-            Request.Method.GET, url, null,
-            Response.Listener { res ->
+        requestController.VolleyRequest(url, context, object : ServerCallback<JSONObject> {
+            override fun onSuccess(res: JSONObject) {
+
                 val genresNames = buildStringListFromJsonSArray(res.getJSONArray("genres"), "name")
                 val popularity = res.getDouble("popularity")
                 val productionCountries = buildStringListFromJsonSArray(res.getJSONArray("production_countries"), "name")
@@ -73,7 +70,7 @@ class MovieDetails : Fragment() {
                 val subtitle = res.getString("tagline")
                 val voteCount = res.getInt("vote_count")
 
-                this.movieDetails = MvDetails(
+                movieDetails = MvDetails(
                     res.getInt("id"),
                     res.getString("title"),
                     res.getString("overview"),
@@ -87,13 +84,13 @@ class MovieDetails : Fragment() {
 
                 // TODO: use ViewModel instead
 
-                titleView.setText(this.movieDetails?.title)
-                descriptionView.setText(this.movieDetails?.overview)
+                titleView.setText(movieDetails?.title)
+                descriptionView.setText(movieDetails?.overview)
 
                 for (genre in genresNames) {
                     val genreView = TextView(view?.context)
                     genreView.text = genre
-                    this.genreNamesView.addView(genreView)
+                    genreNamesView.addView(genreView)
                 }
 
                 popularityView.setText("Popularity : " + popularity.toString())
@@ -101,26 +98,22 @@ class MovieDetails : Fragment() {
                 for (prodCount in productionCountries) {
                     val prodCountView = TextView(view?.context)
                     prodCountView.text = prodCount
-                    this.prodCountriesView.addView(prodCountView)
+                    prodCountriesView.addView(prodCountView)
                 }
 
                 releaseDateView.setText(releaseDate)
                 subtitleView.setText(subtitle)
                 voteCountView.setText("Vote count : " + voteCount.toString())
 
-            },
-            Response.ErrorListener { error ->
-                Log.println(Log.DEBUG, this.javaClass.name, "error in makeRequestForDetails : $error")
             }
-        )
+        })
     }
 
-    private fun makeRequestForCredits(castNb: Int, keysCrew: List<String>): JsonObjectRequest {
+    private fun getCredits(castNb: Int, keysCrew: List<String>, context: Context) {
         val url = "https://api.themoviedb.org/3/movie/${this.movieId}/credits?api_key=$apiKey"
 
-        return JsonObjectRequest(
-            Request.Method.GET, url, null,
-            Response.Listener { res ->
+        requestController.VolleyRequest(url, context, object : ServerCallback<JSONObject> {
+            override fun onSuccess(res: JSONObject) {
                 val cast = creditsFromJsonArray(res.getJSONArray("cast"), "character")
                 val crew = creditsFromJsonArray(res.getJSONArray("crew"), "job")
                 var castString = ""
@@ -136,27 +129,24 @@ class MovieDetails : Fragment() {
                 }
                 crewString = crewString.subSequence(0, crewString.length - 2).toString()
                 crewView.text = crewString
-            },
-            Response.ErrorListener { error ->
-                Log.println(Log.DEBUG, this.javaClass.name, "error in makeRequestForCast : $error")
             }
-        )
+        })
     }
 
-    private fun makeRequestForSimilarMovies(): JsonObjectRequest {
+    private fun getSimilarMovies(context: Context) {
         val url = "https://api.themoviedb.org/3/movie/${this.movieId}/similar?api_key=$apiKey"
 
-        return JsonObjectRequest(
-            Request.Method.GET, url, null,
-            Response.Listener { res ->
+        requestController.VolleyRequest(url, context, object : ServerCallback<JSONObject> {
+            override fun onSuccess(res: JSONObject) {
+
                 val similarMovies = buildStringListFromJsonSArray(res.getJSONArray("results"), "title")
                 val total = similarMovies.size
                 val columnsNumber = 3
                 var row = 0
                 var col = 0
 
-               this.similarMoviesGridView.setColumnCount(columnsNumber)
-               this.similarMoviesGridView.setRowCount(total / columnsNumber)
+                similarMoviesGridView.setColumnCount(columnsNumber)
+                similarMoviesGridView.setRowCount(total / columnsNumber)
                 var idx = 0
                 for (movie in similarMovies) {
                     if (col == columnsNumber) {
@@ -172,7 +162,8 @@ class MovieDetails : Fragment() {
                         rowSpan = GridLayout.spec(GridLayout.UNDEFINED, 2)
                     }
 
-                    val gridParam: GridLayout.LayoutParams = GridLayout.LayoutParams(rowSpan, colspan)
+                    val gridParam: GridLayout.LayoutParams =
+                        GridLayout.LayoutParams(rowSpan, colspan)
 
                     val movieView = TextView(view?.context)
                     movieView.text = movie
@@ -183,10 +174,12 @@ class MovieDetails : Fragment() {
                     //to get the MainLayout
                     val view: View = inflater.inflate(R.layout.movie_details_fragment, null)
 
-                    val inflatedLayout: View = inflater.inflate(R.layout.fragment_movie, view as ViewGroup, false)
+                    val inflatedLayout: View =
+                        inflater.inflate(R.layout.fragment_movie, view as ViewGroup, false)
 
-                    inflatedLayout.setLayoutParams(LinearLayout.LayoutParams
-                        (
+                    inflatedLayout.setLayoutParams(
+                        LinearLayout.LayoutParams
+                            (
                             LinearLayout.LayoutParams.WRAP_CONTENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT
                         )
@@ -196,31 +189,27 @@ class MovieDetails : Fragment() {
                     var mv = inflatedLayout.findViewById(R.id.img) as ImageView
 
                     //tit.setText(movie)
-                    displayImgs(res.getJSONArray("results"), "poster_path", mv, view.context, idx)
+
+                    val res = res.getJSONArray("results").getJSONObject(idx)
+                    val path = res.getString("poster_path")
+                    requestController.setImageView(path, mv, 300, view.context)
 
                     /******* inflate *************/
 
-                    this.similarMoviesGridView.addView(inflatedLayout, gridParam)
+                    similarMoviesGridView.addView(inflatedLayout, gridParam)
 
-
-
-                    // this.similarMoviesGridView.addView(movieView, gridParam)
                     col++
                     idx++
                 }
-            },
-            Response.ErrorListener { error ->
-                Log.println(Log.DEBUG, this.javaClass.name, "error in makeRequestForSimilarMovies : $error")
             }
-        )
+        })
     }
 
-    private fun makeRequestForVideos(): JsonObjectRequest {
+    private fun getVideos(context: Context) {
         val url = "https://api.themoviedb.org/3/movie/${this.movieId}/videos?api_key=$apiKey"
 
-        return JsonObjectRequest(
-            Request.Method.GET, url, null,
-            Response.Listener { response ->
+        requestController.VolleyRequest(url, context, object : ServerCallback<JSONObject> {
+            override fun onSuccess(response: JSONObject) {
                 val results = response.getJSONArray("results")
                 val videos: ArrayList<MovieYoutubeVideo> = ArrayList()
                 for (i in 0 until results.length()) {
@@ -244,15 +233,18 @@ class MovieDetails : Fragment() {
                                 video.key
                             )
                             startActivity(intent)
-                        }
-                        catch (e: ActivityNotFoundException) {
-                            val toast = Toast.makeText(view?.context, "You have to install YouTube app", Toast.LENGTH_LONG)
+                        } catch (e: ActivityNotFoundException) {
+                            val toast = Toast.makeText(
+                                view?.context,
+                                "You have to install YouTube app",
+                                Toast.LENGTH_LONG
+                            )
                             toast.show()
                         }
 
                     }
                     playButton.setImageResource(android.R.drawable.ic_media_play)
-                    playButton.minimumWidth= 250
+                    playButton.minimumWidth = 250
                     playButton.minimumHeight = 250
                     videoView.addView(playButton)
 
@@ -268,14 +260,11 @@ class MovieDetails : Fragment() {
                     infoView.addView(typeView)
 
                     videoView.addView(infoView)
-                    this.videosView.addView(videoView)
+                    videosView.addView(videoView)
                 }
 
-            },
-            Response.ErrorListener { error ->
-                Log.println(Log.DEBUG, this.javaClass.name, "error in makeRequestForVideos : $error")
             }
-        )
+        })
     }
 
     private fun buildStringListFromJsonSArray(jsonArray: JSONArray, key: String): ArrayList<String> {
@@ -285,16 +274,6 @@ class MovieDetails : Fragment() {
             strings.add(res.getString(key))
         }
         return strings
-    }
-
-    private fun displayImgs(jsonArray: JSONArray, key: String, mv: ImageView, context: Context, idx: Int) {
-        val res = jsonArray.getJSONObject(idx)
-        val path = res.getString(key)
-        requestController.getPosterImage(path, context, object : ServerCallback<Bitmap> {
-            override fun onSuccess(result: Bitmap) {
-                mv.setImageBitmap(result)
-            }
-        })
     }
 
     private fun creditsFromJsonArray(jsonArray: JSONArray, keyFunction: String): ArrayList<Cast> {
@@ -326,13 +305,13 @@ class MovieDetails : Fragment() {
         similarMoviesGridView = view.findViewById(R.id.similarMoviesGridLayout) as GridLayout
         videosView = view.findViewById(R.id.videos) as LinearLayout
 
-        // Call http request for movie details
-        HttpQueue.getInstance(view.context).addToRequestQueue(Common.setImage(urlImg, imageView, 500))
-        HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForDetails())
+        // Recuperation of movie details of TMDB
+        requestController.setImageView(urlImg, imageView, 500, view.context)
+        getMoreDetails(view.context)
         val crew = listOf("Producer", "Casting", "Music", "Writer", "Director")
-        HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForCredits(5, crew))
-        HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForSimilarMovies())
-        HttpQueue.getInstance(view.context).addToRequestQueue(makeRequestForVideos())
+        getCredits(5, crew, view.context)
+        getSimilarMovies(view .context)
+        getVideos(view.context)
 
         return view
     }

@@ -3,6 +3,7 @@ package ch.hes.master.mobopproject
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
+import android.widget.ImageView
 import ch.hes.master.mobopproject.data.Movie
 import com.android.volley.Request
 import com.android.volley.Response
@@ -29,6 +30,18 @@ class VolleyRequestController {
         val imgRequest = ImageRequest(url,
             Response.Listener { response ->
                 callback.onSuccess(Bitmap.createBitmap(response))
+            }, 0, 0, null, null)
+
+        HttpQueue.getInstance(context).addToRequestQueue(imgRequest)
+    }
+
+    fun setImageView(urlImg: String?, image: ImageView, width: Int, context: Context) {
+        val url = "https://image.tmdb.org/t/p/w" + width + "/" + urlImg
+
+        val imgRequest = ImageRequest(url,
+            Response.Listener { response ->
+                val img = Bitmap.createBitmap(response)
+                image.setImageBitmap(img)
             }, 0, 0, null, null)
 
         HttpQueue.getInstance(context).addToRequestQueue(imgRequest)
