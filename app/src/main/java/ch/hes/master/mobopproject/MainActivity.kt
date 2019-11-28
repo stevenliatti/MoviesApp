@@ -1,13 +1,11 @@
 package ch.hes.master.mobopproject
 
-import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import ch.hes.master.mobopproject.data.Constants
 import ch.hes.master.mobopproject.data.Movie
-import org.json.JSONObject
 
 class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractionListener {
 
@@ -44,22 +42,10 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
     fun getActualMovies() {
         var movies: ArrayList<Movie> = ArrayList()
         val url = "https://api.themoviedb.org/3/discover/movie?api_key=$apiKey&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1"
-        requestControler.volleyRequest(url, this, object : ServerCallback<JSONObject> {
-            override fun onSuccess(response: JSONObject) {
-                val fragMovie = MovieFragment.newInstance(1, movies)
-                val results = response.getJSONArray("results")
-                for (i in 0 until results.length()) {
-                    val res = results.getJSONObject(i)
-                    val movie = Movie(res.getInt("id"), res.getString("title"), res.getString("overview"), res.getString("poster_path"),null)
 
-                    requestControler.getPosterImage(movie.urlImg, applicationContext, object : ServerCallback<Bitmap> {
-                        override fun onSuccess(result: Bitmap) {
-                            movie.img = result
-                            fragMovie.updateCell(i)
-                        }
-                    })
-                    movies.add(movie)
-                }
+        requestControler.getMovies(url, this, object : ServerCallback<ArrayList<Movie>> {
+            override fun onSuccess(movies: ArrayList<Movie>) {
+                val fragMovie = MovieFragment.newInstance(1, movies)
                 setActiveFragment(fragMovie, "moviefragment")
             }
         })
