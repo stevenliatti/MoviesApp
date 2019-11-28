@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.fragment_container, frag, tag)
-            .addToBackStack(tag)
+            //.addToBackStack(tag)
             .commit()
     }
 
