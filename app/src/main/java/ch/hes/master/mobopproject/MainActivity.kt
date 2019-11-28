@@ -11,8 +11,8 @@ import org.json.JSONObject
 
 class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractionListener {
 
-    val apiKey = Constants.tmdbApiKey
-    val requestControler = VolleyRequestController()
+    private val apiKey = Constants.tmdbApiKey
+    val requestController = VolleyRequestController()
 
     override fun onListFragmentInteraction(item: Movie?) {
         Log.println(Log.DEBUG,"test", "test$item")
@@ -41,10 +41,10 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
         getActualMovies()
     }
 
-    fun getActualMovies() {
-        var movies: ArrayList<Movie> = ArrayList()
+    private fun getActualMovies() {
+        val movies: ArrayList<Movie> = ArrayList()
         val url = "https://api.themoviedb.org/3/discover/movie?api_key=$apiKey&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1"
-        requestControler.volleyRequest(url, this, object : ServerCallback<JSONObject> {
+        requestController.volleyRequest(url, this, object : ServerCallback<JSONObject> {
             override fun onSuccess(response: JSONObject) {
                 val fragMovie = MovieFragment.newInstance(1, movies)
                 val results = response.getJSONArray("results")
@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
                     val res = results.getJSONObject(i)
                     val movie = Movie(res.getInt("id"), res.getString("title"), res.getString("overview"), res.getString("poster_path"),null)
 
-                    requestControler.getPosterImage(movie.urlImg, applicationContext, object : ServerCallback<Bitmap> {
+                    requestController.getPosterImage(movie.urlImg, applicationContext, object : ServerCallback<Bitmap> {
                         override fun onSuccess(result: Bitmap) {
                             movie.img = result
                             fragMovie.updateCell(i)
@@ -65,4 +65,3 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
         })
     }
 }
-// Log.println(Log.DEBUG, this.javaClass.name, "makeRequest : $results")
