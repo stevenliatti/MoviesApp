@@ -2,6 +2,7 @@ package ch.hes.master.mobopproject
 
 import android.content.ActivityNotFoundException
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.media.Image
 import android.opengl.Visibility
@@ -14,14 +15,11 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.gridlayout.widget.GridLayout
 import androidx.lifecycle.ViewModelProviders
-import ch.hes.master.mobopproject.data.Constants
-import ch.hes.master.mobopproject.data.Cast
-import ch.hes.master.mobopproject.data.MovieYoutubeVideo
-import ch.hes.master.mobopproject.data.MvDetails
 import com.google.android.youtube.player.YouTubeStandalonePlayer
 import org.json.JSONArray
 import org.json.JSONObject
 import android.widget.LinearLayout
+import ch.hes.master.mobopproject.data.*
 
 
 class MovieDetails : Fragment() {
@@ -33,7 +31,7 @@ class MovieDetails : Fragment() {
 
     private var movieId : Int? = null
     private var urlImg : String? = null
-    private var movieDetails : MvDetails? = null
+    private lateinit var movieDetails : MvDetails
 
     private lateinit var titleView: TextView
     private lateinit var descriptionView: TextView
@@ -63,50 +61,33 @@ class MovieDetails : Fragment() {
     private fun getMoreDetails(context: Context) {
         val url = "https://api.themoviedb.org/3/movie/${this.movieId}?api_key=$apiKey"
 
-        requestController.volleyRequest(url, context, object : ServerCallback<JSONObject> {
-            override fun onSuccess(res: JSONObject) {
+        requestController.getMovieDetails(url, context, object : ServerCallback<MvDetails> {
+            override fun onSuccess(res: MvDetails) {
 
-                val genresNames = buildStringListFromJsonSArray(res.getJSONArray("genres"), "name")
-                val popularity = res.getDouble("popularity")
-                val productionCountries = buildStringListFromJsonSArray(res.getJSONArray("production_countries"), "name")
-                val releaseDate = res.getString("release_date")
-                val subtitle = res.getString("tagline")
-                val voteCount = res.getInt("vote_count")
-
-                movieDetails = MvDetails(
-                    res.getInt("id"),
-                    res.getString("title"),
-                    res.getString("overview"),
-                    genresNames,
-                    popularity,
-                    productionCountries,
-                    releaseDate,
-                    subtitle,
-                    voteCount
-                )
+                movieDetails = res
 
                 // TODO: use ViewModel instead
 
-                titleView.setText(movieDetails?.title)
+                titleView.setText(movieDetails.title)
                 descriptionView.setText(movieDetails?.overview)
 
-                for (genre in genresNames) {
+                for (genre in movieDetails.genresNames) {
                     val genreView = TextView(view?.context)
                     genreView.text = genre
                     genreNamesView.addView(genreView)
                 }
 
-                popularityView.setText("Popularity : " + popularity.toString())
+                popularityView.setText("Popularity : " + movieDetails.popularity)
 
-                for (prodCount in productionCountries) {
+                for (prodCount in movieDetails.productionCountries) {
                     val prodCountView = TextView(view?.context)
                     prodCountView.text = prodCount
                     prodCountriesView.addView(prodCountView)
                 }
 
-                releaseDateView.setText(releaseDate)
-                subtitleView.setText(subtitle)
-                voteCountView.setText("Vote count : " + voteCount.toString())
+                releaseDateView.setText(movieDetails.releaseDate)
+                subtitleView.setText(movieDetails.subtitle)
+                voteCountView.setText("Vote count : " + movieDetails.voteCount)
 
             }
         })
@@ -139,18 +120,16 @@ class MovieDetails : Fragment() {
     private fun getSimilarMovies(context: Context) {
         val url = "https://api.themoviedb.org/3/movie/${this.movieId}/similar?api_key=$apiKey"
 
-        requestController.volleyRequest(url, context, object : ServerCallback<JSONObject> {
-            override fun onSuccess(res: JSONObject) {
-
-                val similarMovies = buildStringListFromJsonSArray(res.getJSONArray("results"), "title")
+        requestController.getMovies(url, context, object : ServerCallback<ArrayList<Movie>> {
+            override fun onSuccess(similarMovies: ArrayList<Movie>) {
                 val total = similarMovies.size
                 val columnsNumber = 3
                 var row = 0
                 var col = 0
+                var idx = 0
 
                 similarMoviesGridView.setColumnCount(columnsNumber)
                 similarMoviesGridView.setRowCount(total / columnsNumber)
-                var idx = 0
                 for (movie in similarMovies) {
                     if (col == columnsNumber) {
                         col = 0
@@ -169,7 +148,7 @@ class MovieDetails : Fragment() {
                         GridLayout.LayoutParams(rowSpan, colspan)
 
                     val movieView = TextView(view?.context)
-                    movieView.text = movie
+                    movieView.text = movie.title
 
                     /******* inflate *************/
                     var inflater: LayoutInflater = LayoutInflater.from(context)
@@ -191,11 +170,12 @@ class MovieDetails : Fragment() {
                     var tit = inflatedLayout.findViewById(R.id.original_title) as TextView
                     var mv = inflatedLayout.findViewById(R.id.img) as ImageView
 
-                    //tit.setText(movie)
+                    tit.setText("SALUT")
+                    mv.setImageBitmap(movie.img)
 
-                    val res = res.getJSONArray("results").getJSONObject(idx)
-                    val path = res.getString("poster_path")
-                    requestController.setImageView(path, mv, 300, view.context)
+                    //val res = res.getJSONArray("results").getJSONObject(idx)
+                    // val path = res.getString("poster_path")
+                   // requestController.setImageView(path, mv, 300, view.context)
 
                     /******* inflate *************/
 
@@ -300,14 +280,6 @@ class MovieDetails : Fragment() {
         })
     }
 
-    private fun buildStringListFromJsonSArray(jsonArray: JSONArray, key: String): ArrayList<String> {
-        val strings: ArrayList<String> = ArrayList()
-        for (i in 0 until jsonArray.length()) {
-            val res = jsonArray.getJSONObject(i)
-            strings.add(res.getString(key))
-        }
-        return strings
-    }
 
     private fun creditsFromJsonArray(jsonArray: JSONArray, keyFunction: String): ArrayList<Cast> {
         val credits = ArrayList<Cast>()
