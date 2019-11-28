@@ -10,6 +10,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import ch.hes.master.mobopproject.data.Constants
 import ch.hes.master.mobopproject.data.Movie
+import android.app.Activity
+import androidx.core.app.ComponentActivity
+import androidx.core.app.ComponentActivity.ExtraData
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+
+
+
+
+
+
 
 
 class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractionListener {
@@ -38,7 +49,7 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.fragment_container, frag, tag)
-            //.addToBackStack(tag)
+            .addToBackStack(tag)
             .commit()
     }
 
@@ -66,6 +77,12 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
         return when (item.itemId) {
             R.id.search_button -> {
                 onSearchRequested()
+                true
+            }
+            R.id.home_button -> {
+                val intent = Intent(this, MainActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
                 true
             }
             else -> super.onOptionsItemSelected(item)
