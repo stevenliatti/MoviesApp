@@ -227,9 +227,10 @@
 
             <androidx.gridlayout.widget.GridLayout
                 android:id="@+id/similarMoviesGridLayout"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginStart="10dp">
+                android:layout_gravity="center"
+                android:layout_marginTop="10dp">
 
             </androidx.gridlayout.widget.GridLayout>
 

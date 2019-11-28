@@ -1,13 +1,10 @@
 package ch.hes.master.mobopproject
 
+import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
-import android.graphics.Bitmap
 import android.graphics.Color
-import android.media.Image
-import android.opengl.Visibility
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +16,7 @@ import com.google.android.youtube.player.YouTubeStandalonePlayer
 import org.json.JSONArray
 import org.json.JSONObject
 import android.widget.LinearLayout
+import androidx.core.view.marginLeft
 import ch.hes.master.mobopproject.data.*
 
 
@@ -126,7 +124,6 @@ class MovieDetails : Fragment() {
                 val columnsNumber = 3
                 var row = 0
                 var col = 0
-                var idx = 0
 
                 similarMoviesGridView.setColumnCount(columnsNumber)
                 similarMoviesGridView.setRowCount(total / columnsNumber)
@@ -138,54 +135,60 @@ class MovieDetails : Fragment() {
 
                     var rowSpan = GridLayout.spec(GridLayout.UNDEFINED, 1)
                     var colspan = GridLayout.spec(GridLayout.UNDEFINED, 1)
-                    if (row == 0 && col == 0) {
-                        Log.e("", "spec")
-                        colspan = GridLayout.spec(GridLayout.UNDEFINED, 2)
-                        rowSpan = GridLayout.spec(GridLayout.UNDEFINED, 2)
-                    }
+
 
                     val gridParam: GridLayout.LayoutParams =
                         GridLayout.LayoutParams(rowSpan, colspan)
 
-                    val movieView = TextView(view?.context)
-                    movieView.text = movie.title
-
-                    /******* inflate *************/
-                    var inflater: LayoutInflater = LayoutInflater.from(context)
-
-                    //to get the MainLayout
-                    val view: View = inflater.inflate(R.layout.movie_details_fragment, null)
-
-                    val inflatedLayout: View =
-                        inflater.inflate(R.layout.fragment_movie, view as ViewGroup, false)
-
-                    inflatedLayout.setLayoutParams(
-                        LinearLayout.LayoutParams
-                            (
+                    val textView = TextView(context)
+                    val iv = ImageView(context)
+                    val linearLayoutVertical = LinearLayout(context)
+                    linearLayoutVertical.layoutParams =
+                        LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.WRAP_CONTENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT
                         )
+                    linearLayoutVertical.orientation = LinearLayout.VERTICAL
+
+                    val lp = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
                     )
+                    lp.setMargins(10, 0, 10, 0)
+                    iv.layoutParams = lp
 
-                    var tit = inflatedLayout.findViewById(R.id.original_title) as TextView
-                    var mv = inflatedLayout.findViewById(R.id.img) as ImageView
+                    iv.setOnClickListener {
+                        val movieDetailsFragment = MovieDetails.newInstance(movie.id, movie.urlImg)
+                        var myNonNullActivity = activity!!
+                        myNonNullActivity.supportFragmentManager.beginTransaction()
+                            .replace(R.id.fragment_container, movieDetailsFragment, "movieDetailsFragment")
+                            .addToBackStack("movieDetailsFragment")
+                            .commit()
+                    }
 
-                    tit.setText("SALUT")
-                    mv.setImageBitmap(movie.img)
 
-                    //val res = res.getJSONArray("results").getJSONObject(idx)
-                    // val path = res.getString("poster_path")
-                   // requestController.setImageView(path, mv, 300, view.context)
 
-                    /******* inflate *************/
+                    textView.text = croptext(movie.title)
+                    iv.setImageBitmap(movie.img)
 
-                    similarMoviesGridView.addView(inflatedLayout, gridParam)
+
+                    linearLayoutVertical.addView(iv)
+                    linearLayoutVertical.addView(textView)
+
+
+                    similarMoviesGridView.addView(linearLayoutVertical, gridParam)
 
                     col++
-                    idx++
                 }
             }
         })
+    }
+
+    private fun croptext(txt: String): String {
+        val maxSize = 15
+        if(txt.length > maxSize)
+            return txt.substring(0, maxSize-3) + "..."
+        return txt
     }
 
     private fun getVideos(context: Context) {
@@ -338,3 +341,19 @@ class MovieDetails : Fragment() {
     }
 
 }
+
+
+/*
+/******* inflate example *************/
+var inflater: LayoutInflater = LayoutInflater.from(context)
+
+//to get the MainLayout
+val view: View = inflater.inflate(R.layout.movie_details_fragment, null)
+
+val inflatedLayout: View =
+    inflater.inflate(R.layout.fragment_movie, view as ViewGroup, false)
+
+// var tit = inflatedLayout.findViewById(R.id.original_title) as TextView
+// var mv = inflatedLayout.findViewById(R.id.img) as ImageView
+/******* inflate *************/
+*/

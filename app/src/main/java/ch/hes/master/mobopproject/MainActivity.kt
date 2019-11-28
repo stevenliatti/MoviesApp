@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
         //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    private fun setActiveFragment(frag: Fragment, tag: String) {
+    fun setActiveFragment(frag: Fragment, tag: String) {
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.fragment_container, frag, tag)
