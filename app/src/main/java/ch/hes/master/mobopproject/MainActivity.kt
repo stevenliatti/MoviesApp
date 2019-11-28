@@ -1,16 +1,25 @@
 package ch.hes.master.mobopproject
 
-import androidx.appcompat.app.AppCompatActivity
+import android.app.SearchManager
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import ch.hes.master.mobopproject.data.Constants
 import ch.hes.master.mobopproject.data.Movie
 
+
 class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractionListener {
 
-    val apiKey = Constants.tmdbApiKey
-    val requestControler = VolleyRequestController()
+    private val apiKey = Constants.tmdbApiKey
+    private val requestController = VolleyRequestController()
+
+    private val popularMoviesUrl = "https://api.themoviedb.org/3/discover/movie?api_key=$apiKey&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1"
+    private val searchUrl = "https://api.themoviedb.org/3/search/movie?api_key=$apiKey&language=en-US&page=1&include_adult=false&query="
+
 
     override fun onListFragmentInteraction(item: Movie?) {
         Log.println(Log.DEBUG,"test", "test$item")
@@ -36,14 +45,35 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        getActualMovies()
+
+        // Verify the action and get the query
+        if (Intent.ACTION_SEARCH == intent.action) {
+            intent.getStringExtra(SearchManager.QUERY)?.also { query ->
+                getActualMovies(searchUrl + query)
+            }
+        }
+        else {
+            getActualMovies(popularMoviesUrl)
+        }
     }
 
-    fun getActualMovies() {
-        var movies: ArrayList<Movie> = ArrayList()
-        val url = "https://api.themoviedb.org/3/discover/movie?api_key=$apiKey&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1"
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean { // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.menu, menu)
+        return true
+    }
 
-        requestControler.getMovies(url, this, object : ServerCallback<ArrayList<Movie>> {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean { // Handle item selection
+        return when (item.itemId) {
+            R.id.search_button -> {
+                onSearchRequested()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun getActualMovies(url: String) {
+        requestController.getMovies(url, this, object : ServerCallback<ArrayList<Movie>> {
             override fun onSuccess(movies: ArrayList<Movie>) {
                 val fragMovie = MovieFragment.newInstance(1, movies)
                 setActiveFragment(fragMovie, "moviefragment")
@@ -51,4 +81,3 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
         })
     }
 }
-// Log.println(Log.DEBUG, this.javaClass.name, "makeRequest : $results")

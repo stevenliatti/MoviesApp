@@ -9,4 +9,6 @@
     <string name="overview">Overview</string>
     <string name="cast">Cast</string>
     <string name="crew">Crew</string>
+    <string name="search">Search</string>
+    <string name="search_hint">Search movies</string>
 </resources>

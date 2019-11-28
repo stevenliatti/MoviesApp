@@ -12,6 +12,7 @@ import com.android.volley.toolbox.ImageRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import org.json.JSONArray
 import org.json.JSONObject
+import java.lang.Error
 
 class VolleyRequestController {
     fun volleyRequest(URL: String, context: Context, callback: ServerCallback<JSONObject>) {
@@ -81,7 +82,10 @@ class VolleyRequestController {
         val imgRequest = ImageRequest(url,
             Response.Listener { response ->
                 callback.onSuccess(Bitmap.createBitmap(response))
-            }, 0, 0, null, null)
+            }, 0, 0, null,
+            Response.ErrorListener { error ->
+                callback.onSuccess(Bitmap.createBitmap(42, 42, Bitmap.Config.ALPHA_8))
+            })
 
         HttpQueue.getInstance(context).addToRequestQueue(imgRequest)
     }
