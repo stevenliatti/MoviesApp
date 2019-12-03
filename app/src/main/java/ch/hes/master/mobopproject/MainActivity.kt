@@ -10,17 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import ch.hes.master.mobopproject.data.Constants
 import ch.hes.master.mobopproject.data.Movie
-import android.app.Activity
-import androidx.core.app.ComponentActivity
-import androidx.core.app.ComponentActivity.ExtraData
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-
-
-
-
-
-
 
 
 class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractionListener {
@@ -93,7 +82,8 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
         requestController.getMovies(url, this, object : ServerCallback<ArrayList<Movie>> {
             override fun onSuccess(movies: ArrayList<Movie>) {
                 val fragMovie = MovieFragment.newInstance(1, movies)
-                setActiveFragment(fragMovie, "moviefragment")
+                val fragTab = UserListFragment()
+                setActiveFragment(fragTab, "asdf")
             }
         })
     }

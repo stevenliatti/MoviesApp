@@ -52,11 +52,6 @@ class MovieFragment : Fragment() {
         return view
     }
 
-    public fun updateCell(pos: Int) {
-        my.notifyItemChanged(pos)
-        // my.notifyDataSetChanged()
-    }
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is OnListFragmentInteractionListener) {
