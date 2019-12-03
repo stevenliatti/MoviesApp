@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
@@ -59,8 +58,6 @@ class UserListPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
     }
 }
 
-private const val ARG_OBJECT = "object"
-
 // Instances of this class are fragments representing a single
 // object in our collection.
 class UserCardFragment(private var mytext: String) : Fragment() {
@@ -68,11 +65,7 @@ class UserCardFragment(private var mytext: String) : Fragment() {
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
-        val view = inflater.inflate(R.layout.fragment_movie_list, container, false)
-
-
-
-        return view
+        return inflater.inflate(R.layout.fragment_movie_list, container, false)
     }
 
 }

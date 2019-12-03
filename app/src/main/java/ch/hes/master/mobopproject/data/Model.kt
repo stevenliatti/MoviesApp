@@ -29,3 +29,5 @@ data class Cast(val name: String, val function: String) {
         return name + " (" + function + ")"
     }
 }
+
+data class User(val pseudo: String, val email: String, val password: String)

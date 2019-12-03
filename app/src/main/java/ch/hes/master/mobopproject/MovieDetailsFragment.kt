@@ -1,6 +1,5 @@
 package ch.hes.master.mobopproject
 
-import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.graphics.Color
@@ -8,19 +7,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.gridlayout.widget.GridLayout
-import androidx.lifecycle.ViewModelProviders
+import ch.hes.master.mobopproject.data.*
 import com.google.android.youtube.player.YouTubeStandalonePlayer
 import org.json.JSONArray
 import org.json.JSONObject
-import android.widget.LinearLayout
-import androidx.core.view.marginLeft
-import ch.hes.master.mobopproject.data.*
 
 
-class MovieDetails : Fragment() {
+class MovieDetailsFragment : Fragment() {
 
     private val apiKey = Constants.tmdbApiKey
     private val requestController = VolleyRequestController()
@@ -48,8 +48,8 @@ class MovieDetails : Fragment() {
 
     companion object {
         @JvmStatic
-        fun newInstance(id: Int?, urlImg: String?): MovieDetails {
-            return MovieDetails().apply {
+        fun newInstance(id: Int?, urlImg: String?): MovieDetailsFragment {
+            return MovieDetailsFragment().apply {
                 this.movieId = id
                 this.urlImg = urlImg
             }
@@ -158,7 +158,7 @@ class MovieDetails : Fragment() {
                     iv.layoutParams = lp
 
                     iv.setOnClickListener {
-                        val movieDetailsFragment = MovieDetails.newInstance(movie.id, movie.urlImg)
+                        val movieDetailsFragment = MovieDetailsFragment.newInstance(movie.id, movie.urlImg)
                         var myNonNullActivity = activity!!
                         myNonNullActivity.supportFragmentManager.beginTransaction()
                             .replace(R.id.fragment_container, movieDetailsFragment, "movieDetailsFragment")
@@ -293,11 +293,9 @@ class MovieDetails : Fragment() {
         return credits
     }
 
-    private lateinit var viewModel: MovieDetailsViewModel
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.movie_details_fragment, container, false)
+        val view = inflater.inflate(R.layout.fragment_movie_details, container, false)
 
         titleView = view.findViewById(R.id.original_title) as TextView
         descriptionView = view.findViewById(R.id.overview) as TextView
@@ -324,12 +322,6 @@ class MovieDetails : Fragment() {
         return view
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(MovieDetailsViewModel::class.java)
-        // TODO: Use the ViewModel
-    }
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         try {
@@ -341,19 +333,3 @@ class MovieDetails : Fragment() {
     }
 
 }
-
-
-/*
-/******* inflate example *************/
-var inflater: LayoutInflater = LayoutInflater.from(context)
-
-//to get the MainLayout
-val view: View = inflater.inflate(R.layout.movie_details_fragment, null)
-
-val inflatedLayout: View =
-    inflater.inflate(R.layout.fragment_movie, view as ViewGroup, false)
-
-// var tit = inflatedLayout.findViewById(R.id.original_title) as TextView
-// var mv = inflatedLayout.findViewById(R.id.img) as ImageView
-/******* inflate *************/
-*/

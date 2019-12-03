@@ -12,7 +12,7 @@ import ch.hes.master.mobopproject.data.Constants
 import ch.hes.master.mobopproject.data.Movie
 
 
-class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractionListener {
+class MainActivity : AppCompatActivity(), ListMoviesFragment.OnListFragmentInteractionListener {
 
     private val apiKey = Constants.tmdbApiKey
     private val requestController = VolleyRequestController()
@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
         val urlImg = item?.urlImg
 
 
-        val movieDetailsFragment = MovieDetails.newInstance(id, urlImg)
+        val movieDetailsFragment = MovieDetailsFragment.newInstance(id, urlImg)
 
         setActiveFragment(movieDetailsFragment, "moviedetailsfragment")
         //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -81,9 +81,9 @@ class MainActivity : AppCompatActivity(), MovieFragment.OnListFragmentInteractio
     private fun getActualMovies(url: String) {
         requestController.getMovies(url, this, object : ServerCallback<ArrayList<Movie>> {
             override fun onSuccess(movies: ArrayList<Movie>) {
-                val fragMovie = MovieFragment.newInstance(1, movies)
+                val fragMovie = ListMoviesFragment(movies)
                 val fragTab = UserListFragment()
-                setActiveFragment(fragTab, "asdf")
+                setActiveFragment(fragMovie, "moviefragment")
             }
         })
     }

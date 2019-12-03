@@ -1,0 +1,14 @@
+/*
+/******* inflate example *************/
+var inflater: LayoutInflater = LayoutInflater.from(context)
+
+//to get the MainLayout
+val view: View = inflater.inflate(R.layout.movie_details_fragment, null)
+
+val inflatedLayout: View =
+    inflater.inflate(R.layout.fragment_movie, view as ViewGroup, false)
+
+// var tit = inflatedLayout.findViewById(R.id.original_title) as TextView
+// var mv = inflatedLayout.findViewById(R.id.img) as ImageView
+/******* inflate *************/
+*/
