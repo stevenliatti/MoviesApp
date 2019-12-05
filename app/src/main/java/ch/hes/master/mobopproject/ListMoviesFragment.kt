@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import ch.hes.master.mobopproject.data.Movie
 
@@ -57,8 +58,12 @@ class ListMoviesFragment(var movies: ArrayList<Movie>) : Fragment() {
      * for more information.
      */
     interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        fun onListFragmentInteraction(item: Movie?)
+        fun onListFragmentInteraction(movie: Movie, view: View) {
+            val action =
+                ListMoviesFragmentDirections
+                    .actionListMoviesFragmentToMovieDetailsFragment(movie.id, movie.urlImg)
+            view.findNavController().navigate(action)
+        }
     }
 
 }

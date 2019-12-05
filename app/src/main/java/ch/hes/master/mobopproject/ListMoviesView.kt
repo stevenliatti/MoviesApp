@@ -20,7 +20,7 @@ class ListMoviesView(
     init {
         mOnClickListener = View.OnClickListener { v ->
             val item = v.tag as Movie
-            mListener?.onListFragmentInteraction(item)
+            mListener?.onListFragmentInteraction(item, v)
         }
     }
 

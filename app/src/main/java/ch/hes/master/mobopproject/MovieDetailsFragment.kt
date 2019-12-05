@@ -157,14 +157,14 @@ class MovieDetailsFragment : Fragment() {
                     lp.setMargins(10, 0, 10, 0)
                     iv.layoutParams = lp
 
-                    iv.setOnClickListener {
-                        val movieDetailsFragment = MovieDetailsFragment.newInstance(movie.id, movie.urlImg)
-                        var myNonNullActivity = activity!!
-                        myNonNullActivity.supportFragmentManager.beginTransaction()
-                            .replace(R.id.fragment_container, movieDetailsFragment, "movieDetailsFragment")
-                            .addToBackStack("movieDetailsFragment")
-                            .commit()
-                    }
+//                    iv.setOnClickListener {
+//                        val movieDetailsFragment = MovieDetailsFragment.newInstance(movie.id, movie.urlImg)
+//                        var myNonNullActivity = activity!!
+//                        myNonNullActivity.supportFragmentManager.beginTransaction()
+//                            .replace(R.id.fragment_container, movieDetailsFragment, "movieDetailsFragment")
+//                            .addToBackStack("movieDetailsFragment")
+//                            .commit()
+//                    }
 
 
 
