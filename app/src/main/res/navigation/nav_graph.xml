@@ -13,12 +13,14 @@
         <action
             android:id="@+id/action_listMoviesFragment_to_movieDetailsFragment"
             app:destination="@id/movieDetailsFragment" />
+        <action
+            android:id="@+id/action_listMoviesFragment_self"
+            app:destination="@+id/listMoviesFragment" />
         <argument
-            android:name="id"
-            app:argType="integer" />
-        <argument
-            android:name="urlImg"
-            app:argType="string" />
+            android:name="query"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
     <fragment
         android:id="@+id/movieDetailsFragment"

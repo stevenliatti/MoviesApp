@@ -55,8 +55,6 @@ class MovieDetailsFragment : Fragment() {
 
                 movieDetails = res
 
-                // TODO: use ViewModel instead
-
                 titleView.setText(movieDetails.title)
                 descriptionView.setText(movieDetails?.overview)
 
@@ -93,14 +91,18 @@ class MovieDetailsFragment : Fragment() {
                 for (i in 0..castNb) {
                     if (i < cast.size) castString += cast[i].toString() + ", "
                 }
-                castString = castString.subSequence(0, castString.length - 2).toString()
+                castString =
+                    if (castString.isNotEmpty()) castString.subSequence(0, castString.length - 2).toString()
+                    else ""
                 castView.text = castString
 
                 var crewString = ""
                 for (c in crew) {
                     if (keysCrew.contains(c.function)) crewString += c.toString() + ", "
                 }
-                crewString = crewString.subSequence(0, crewString.length - 2).toString()
+                crewString =
+                    if (crewString.isNotEmpty()) crewString.subSequence(0, crewString.length - 2).toString()
+                    else ""
                 crewView.text = crewString
             }
         })

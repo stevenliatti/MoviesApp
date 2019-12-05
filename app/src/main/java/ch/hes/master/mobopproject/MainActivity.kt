@@ -6,29 +6,20 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import ch.hes.master.mobopproject.data.Constants
-import ch.hes.master.mobopproject.data.Movie
+import androidx.navigation.findNavController
 
 
 class MainActivity : AppCompatActivity(), ListMoviesFragment.OnListFragmentInteractionListener {
-
-    private val apiKey = Constants.tmdbApiKey
-    private val requestController = VolleyRequestController()
-
-    private val popularMoviesUrl = "https://api.themoviedb.org/3/discover/movie?api_key=$apiKey&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1"
-    private val searchUrl = "https://api.themoviedb.org/3/search/movie?api_key=$apiKey&language=en-US&page=1&include_adult=false&query="
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
-
         // Verify the action and get the query
         if (Intent.ACTION_SEARCH == intent.action) {
             intent.getStringExtra(SearchManager.QUERY)?.also { query ->
-                getActualMovies(searchUrl + query)
+                val action = ListMoviesFragmentDirections.actionListMoviesFragmentSelf(query)
+                this.findNavController(R.id.nav_host_fragment).navigate(action)
             }
         }
     }
@@ -52,14 +43,5 @@ class MainActivity : AppCompatActivity(), ListMoviesFragment.OnListFragmentInter
             }
             else -> super.onOptionsItemSelected(item)
         }
-    }
-
-    private fun getActualMovies(url: String) {
-        requestController.getMovies(url, this, object : ServerCallback<ArrayList<Movie>> {
-            override fun onSuccess(movies: ArrayList<Movie>) {
-               // val fragMovie = ListMoviesFragment(movies)
-                val fragTab = UserListFragment()
-            }
-        })
     }
 }

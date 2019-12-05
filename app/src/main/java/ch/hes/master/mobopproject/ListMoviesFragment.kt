@@ -7,9 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import ch.hes.master.mobopproject.data.Constants
 import ch.hes.master.mobopproject.data.Movie
+import java.lang.Exception
+import kotlin.reflect.typeOf
 
 class ListMoviesFragment: Fragment() {
 
@@ -23,6 +26,7 @@ class ListMoviesFragment: Fragment() {
     private val popularMoviesUrl = "https://api.themoviedb.org/3/discover/movie?api_key=$apiKey&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1"
     private val searchUrl = "https://api.themoviedb.org/3/search/movie?api_key=$apiKey&language=en-US&page=1&include_adult=false&query="
 
+    private val args: ListMoviesFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,7 +37,9 @@ class ListMoviesFragment: Fragment() {
         // Set the adapter
         if (view is RecyclerView) {
             with(view) {
-                requestController.getMovies(popularMoviesUrl, view.context, object : ServerCallback<ArrayList<Movie>> {
+                val url = if (args.query != null) searchUrl + args.query else popularMoviesUrl
+
+                requestController.getMovies(url, view.context, object : ServerCallback<ArrayList<Movie>> {
                     override fun onSuccess(movies: ArrayList<Movie>) {
                         my = ListMoviesView(movies, listener)
                         adapter = my
