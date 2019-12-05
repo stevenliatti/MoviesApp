@@ -7,13 +7,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.gridlayout.widget.GridLayout
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.navArgs
 import ch.hes.master.mobopproject.data.*
 import com.google.android.youtube.player.YouTubeStandalonePlayer
 import org.json.JSONArray
@@ -31,6 +29,8 @@ class MovieDetailsFragment : Fragment() {
     private var urlImg : String? = null
     private lateinit var movieDetails : MvDetails
 
+    val args: MovieDetailsFragmentArgs by navArgs()
+
     private lateinit var titleView: TextView
     private lateinit var descriptionView: TextView
     private lateinit var castView: TextView
@@ -46,15 +46,6 @@ class MovieDetailsFragment : Fragment() {
     private lateinit var similarMoviesGridView: GridLayout
     private lateinit var videosView: LinearLayout
 
-    companion object {
-        @JvmStatic
-        fun newInstance(id: Int?, urlImg: String?): MovieDetailsFragment {
-            return MovieDetailsFragment().apply {
-                this.movieId = id
-                this.urlImg = urlImg
-            }
-        }
-    }
 
     private fun getMoreDetails(context: Context) {
         val url = "https://api.themoviedb.org/3/movie/${this.movieId}?api_key=$apiKey"
@@ -157,14 +148,12 @@ class MovieDetailsFragment : Fragment() {
                     lp.setMargins(10, 0, 10, 0)
                     iv.layoutParams = lp
 
-//                    iv.setOnClickListener {
-//                        val movieDetailsFragment = MovieDetailsFragment.newInstance(movie.id, movie.urlImg)
-//                        var myNonNullActivity = activity!!
-//                        myNonNullActivity.supportFragmentManager.beginTransaction()
-//                            .replace(R.id.fragment_container, movieDetailsFragment, "movieDetailsFragment")
-//                            .addToBackStack("movieDetailsFragment")
-//                            .commit()
-//                    }
+                    iv.setOnClickListener {
+                        val action =
+                            MovieDetailsFragmentDirections
+                                .actionListMoviesFragmentToMovieDetailsFragment(movie.id, movie.urlImg)
+                        view!!.findNavController().navigate(action)
+                    }
 
 
 
@@ -198,7 +187,8 @@ class MovieDetailsFragment : Fragment() {
             override fun onSuccess(response: JSONObject) {
                 val results = response.getJSONArray("results")
                 val videos: ArrayList<MovieYoutubeVideo> = ArrayList()
-                for (i in 0 until results.length()) {
+                val numberVideos = if(results.length() < 3) results.length() else 3
+                for (i in 0 until numberVideos) {
                     val video = results.getJSONObject(i)
                     if (video.getString("site").equals("YouTube", true)) {
                         val key = video.getString("key")
@@ -296,6 +286,9 @@ class MovieDetailsFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_movie_details, container, false)
+
+        movieId = args.id
+        urlImg = args.urlImg
 
         titleView = view.findViewById(R.id.original_title) as TextView
         descriptionView = view.findViewById(R.id.overview) as TextView

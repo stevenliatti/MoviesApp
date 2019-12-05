@@ -8,13 +8,21 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import ch.hes.master.mobopproject.data.Constants
 import ch.hes.master.mobopproject.data.Movie
 
-class ListMoviesFragment(var movies: ArrayList<Movie>) : Fragment() {
+class ListMoviesFragment: Fragment() {
 
     private lateinit var my: ListMoviesView
 
     private var listener: OnListFragmentInteractionListener? = null
+
+    private val apiKey = Constants.tmdbApiKey
+    private val requestController = VolleyRequestController()
+
+    private val popularMoviesUrl = "https://api.themoviedb.org/3/discover/movie?api_key=$apiKey&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1"
+    private val searchUrl = "https://api.themoviedb.org/3/search/movie?api_key=$apiKey&language=en-US&page=1&include_adult=false&query="
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -25,8 +33,12 @@ class ListMoviesFragment(var movies: ArrayList<Movie>) : Fragment() {
         // Set the adapter
         if (view is RecyclerView) {
             with(view) {
-                my = ListMoviesView(movies, listener)
-                adapter = my
+                requestController.getMovies(popularMoviesUrl, view.context, object : ServerCallback<ArrayList<Movie>> {
+                    override fun onSuccess(movies: ArrayList<Movie>) {
+                        my = ListMoviesView(movies, listener)
+                        adapter = my
+                    }
+                })
             }
         }
         return view
@@ -46,17 +58,7 @@ class ListMoviesFragment(var movies: ArrayList<Movie>) : Fragment() {
         listener = null
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     *
-     *
-     * See the Android Training lesson
-     * [Communicating with Other Fragments](http://developer.android.com/training/basics/fragments/communicating.html)
-     * for more information.
-     */
+
     interface OnListFragmentInteractionListener {
         fun onListFragmentInteraction(movie: Movie, view: View) {
             val action =
