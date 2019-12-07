@@ -14,8 +14,12 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import ch.hes.master.mobopproject.data.*
 import com.google.android.youtube.player.YouTubeStandalonePlayer
+import kotlinx.android.synthetic.main.fragment_movie_details.*
 import org.json.JSONArray
 import org.json.JSONObject
+import android.R.attr.button
+
+
 
 
 class MovieDetailsFragment : Fragment() {
@@ -302,6 +306,65 @@ class MovieDetailsFragment : Fragment() {
         })
     }
 
+    enum class AppreciationEndpoint {
+        LIKE, UNDO_LIKE, DISLIKE, UNDO_DISLIKE
+    }
+
+    private fun setAppreciation(context: Context, appreciationEndpoint: AppreciationEndpoint) {
+        // TODO: get actual user instead
+        val user = "fred"
+        val endpoint = when (appreciationEndpoint) {
+            AppreciationEndpoint.LIKE -> "likeMovie"
+            AppreciationEndpoint.UNDO_LIKE -> "undoLikeMovie"
+            AppreciationEndpoint.DISLIKE -> "dislikeMovie"
+            AppreciationEndpoint.UNDO_DISLIKE -> "undoDislikeMovie"
+        }
+
+        val url = "https://mobop.liatti.ch/user/$endpoint?pseudo=$user&idMovie=$movieId"
+        requestController.volleyRequest(url, context, object : ServerCallback<JSONObject> {
+            override fun onSuccess(response: JSONObject) {
+
+            }
+        })
+    }
+
+    private fun onAppreciationBoxesClicked(view: View) {
+        if (view is CheckBox) {
+            val checked: Boolean = view.isChecked
+
+            when (view.id) {
+                R.id.likeBox -> {
+                    when (checked) {
+                        true -> {
+                            dislikeBox.isClickable = false
+                            dislikeBox.setTextColor(Color.GRAY)
+                            setAppreciation(view.context, AppreciationEndpoint.LIKE)
+                        }
+                        false -> {
+                            dislikeBox.isClickable = true
+                            dislikeBox.setTextColor(Color.BLACK)
+                            setAppreciation(view.context, AppreciationEndpoint.UNDO_LIKE)
+                        }
+                    }
+                }
+                R.id.dislikeBox -> {
+                    when (checked) {
+                        true -> {
+                            likeBox.isClickable = false
+                            likeBox.setTextColor(Color.GRAY)
+                            setAppreciation(view.context, AppreciationEndpoint.DISLIKE)
+                        }
+                        false -> {
+                            likeBox.isClickable = true
+                            likeBox.setTextColor(Color.BLACK)
+                            setAppreciation(view.context, AppreciationEndpoint.UNDO_DISLIKE)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_movie_details, container, false)
@@ -333,6 +396,13 @@ class MovieDetailsFragment : Fragment() {
         getSimilarMovies(view .context)
         getVideos(view.context, 3)
         initAppreciationButtons(view.context)
+
+        likeBox.setOnClickListener { listenerView ->
+            onAppreciationBoxesClicked(listenerView)
+        }
+        dislikeBox.setOnClickListener { listenerView ->
+            onAppreciationBoxesClicked(listenerView)
+        }
 
         return view
     }
