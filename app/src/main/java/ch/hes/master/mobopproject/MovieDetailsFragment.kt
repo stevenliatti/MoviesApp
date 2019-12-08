@@ -14,12 +14,8 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import ch.hes.master.mobopproject.data.*
 import com.google.android.youtube.player.YouTubeStandalonePlayer
-import kotlinx.android.synthetic.main.fragment_movie_details.*
 import org.json.JSONArray
 import org.json.JSONObject
-import android.R.attr.button
-
-
 
 
 class MovieDetailsFragment : Fragment() {
@@ -31,7 +27,7 @@ class MovieDetailsFragment : Fragment() {
 
     private var movieId : Int? = null
     private var urlImg : String? = null
-    private lateinit var movieDetails : MvDetails
+    private lateinit var movieDetails : MovieDetails
 
     private val args: MovieDetailsFragmentArgs by navArgs()
 
@@ -55,8 +51,8 @@ class MovieDetailsFragment : Fragment() {
     private fun getMoreDetails(context: Context) {
         val url = "https://api.themoviedb.org/3/movie/${this.movieId}?api_key=$apiKey"
 
-        requestController.getMovieDetails(url, context, object : ServerCallback<MvDetails> {
-            override fun onSuccess(res: MvDetails) {
+        requestController.getMovieDetails(url, context, object : ServerCallback<MovieDetails> {
+            override fun onSuccess(res: MovieDetails) {
 
                 movieDetails = res
 

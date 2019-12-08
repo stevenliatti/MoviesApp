@@ -1,7 +1,6 @@
 package ch.hes.master.mobopproject
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,14 +8,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ch.hes.master.mobopproject.data.Constants
 import ch.hes.master.mobopproject.data.Movie
-import java.lang.Exception
-import kotlin.reflect.typeOf
 
 class ListMoviesFragment: Fragment() {
 
@@ -30,18 +26,13 @@ class ListMoviesFragment: Fragment() {
 
     private val args: ListMoviesFragmentArgs by navArgs()
 
-    class MyViewHolder : RecyclerView.ViewHolder, GenericAdapter.Binder<Movie> {
+    class ListMoviesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), GenericAdapter.Binder<Movie> {
 
-        var title: TextView
-        var overviewView: TextView
-        var img: ImageView
-        var view: View
-        constructor( itemView: View):super(itemView){
-            title = itemView.findViewById(R.id.original_title)
-            overviewView = itemView.findViewById(R.id.overview)
-            img = itemView.findViewById(R.id.img)
-            view = itemView
-        }
+        var title: TextView = itemView.findViewById(R.id.original_title)
+        var overviewView: TextView = itemView.findViewById(R.id.overview)
+        var img: ImageView = itemView.findViewById(R.id.img)
+        var view: View = itemView
+
         override fun bind(m: Movie, clickListener: View.OnClickListener) {
             title.text = m.title
             overviewView.text = m.overview
@@ -56,32 +47,30 @@ class ListMoviesFragment: Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_movie_list, container, false)
+        val view = inflater.inflate(R.layout.fragment_movies_list, container, false)
 
         // Set the adapter
         if (view is RecyclerView) {
-            with(view) {
-                val url = if (args.query != null) searchUrl + args.query else popularMoviesUrl
+            val url = if (args.query != null) searchUrl + args.query else popularMoviesUrl
 
-                requestController.getMovies(url, view.context, object : ServerCallback<ArrayList<Movie>> {
-                    override fun onSuccess(movies: ArrayList<Movie>) {
+            requestController.getMovies(url, view.context, object : ServerCallback<ArrayList<Movie>> {
+                override fun onSuccess(movies: ArrayList<Movie>) {
 
-                        val myAdapter = object : GenericAdapter<Movie>(movies, listener) {
-                            override fun getLayoutId(position: Int, obj: Movie): Int {
-                                return R.layout.fragment_movie
-                            }
-
-                            override fun getViewHolder(view: View, viewType: Int): RecyclerView.ViewHolder {
-                                return MyViewHolder(view)
-                            }
+                    val myAdapter = object : GenericAdapter<Movie>(movies, listener) {
+                        override fun getLayoutId(position: Int, obj: Movie): Int {
+                            return R.layout.fragment_movie
                         }
-                        view.layoutManager= LinearLayoutManager(view.context)
-                        view.setHasFixedSize(true)
-                        view.adapter=myAdapter
 
+                        override fun getViewHolder(view: View, viewType: Int): RecyclerView.ViewHolder {
+                            return ListMoviesViewHolder(view)
+                        }
                     }
-                })
-            }
+                    view.layoutManager= LinearLayoutManager(view.context)
+                    view.setHasFixedSize(true)
+                    view.adapter=myAdapter
+
+                }
+            })
         }
         return view
     }
@@ -99,17 +88,4 @@ class ListMoviesFragment: Fragment() {
         super.onDetach()
         listener = null
     }
-
-
-    interface OnListFragmentInteractionListener {
-        fun onListFragmentInteraction(item: Any, view: View) {
-            if (item is Movie) {
-                val action =
-                    ListMoviesFragmentDirections
-                        .actionListMoviesFragmentToMovieDetailsFragment(item.id, item.urlImg)
-                view.findNavController().navigate(action)
-            }
-        }
-    }
-
 }

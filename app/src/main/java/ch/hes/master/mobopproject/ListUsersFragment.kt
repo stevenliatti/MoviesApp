@@ -11,7 +11,7 @@ import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 
 
-class UserListFragment : Fragment() {
+class ListUsersFragment : Fragment() {
     // When requested, this adapter returns a DemoObjectFragment,
     // representing an object in the collection.
     private lateinit var demoCollectionPagerAdapter: UserListPagerAdapter
@@ -65,7 +65,7 @@ class UserCardFragment(private var mytext: String) : Fragment() {
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.fragment_movie_list, container, false)
+        return inflater.inflate(R.layout.fragment_movies_list, container, false)
     }
 
 }

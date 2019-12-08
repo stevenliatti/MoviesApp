@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 
 
-class MainActivity : AppCompatActivity(), ListMoviesFragment.OnListFragmentInteractionListener {
+class MainActivity : AppCompatActivity(), OnListFragmentInteractionListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

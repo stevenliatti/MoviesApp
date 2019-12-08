@@ -10,7 +10,7 @@ data class Movie(
     var img: Bitmap?
 )
 
-data class MvDetails(
+data class MovieDetails(
     val id: Int,
     val title: String,
     val overview: String,
@@ -29,5 +29,7 @@ data class Cast(val name: String, val function: String) {
         return name + " (" + function + ")"
     }
 }
+
+data class People(val id: Int, val name: String, val knowFor: String, val inMovies: List<Movie>, val urlImg: String, var img: Bitmap?)
 
 data class User(val pseudo: String, val email: String, val password: String)

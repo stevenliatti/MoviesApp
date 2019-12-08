@@ -3,9 +3,20 @@ package ch.hes.master.mobopproject
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ExpandableListView
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import ch.hes.master.mobopproject.ListMoviesFragment.OnListFragmentInteractionListener
+import ch.hes.master.mobopproject.data.Movie
+
+interface OnListFragmentInteractionListener {
+    fun onListFragmentInteraction(item: Any, view: View) {
+        if (item is Movie) {
+            val action =
+                ListMoviesFragmentDirections
+                    .actionListMoviesFragmentToMovieDetailsFragment(item.id, item.urlImg)
+            view.findNavController().navigate(action)
+        }
+    }
+}
 
 abstract class GenericAdapter<T>: RecyclerView.Adapter<RecyclerView.ViewHolder> {
 

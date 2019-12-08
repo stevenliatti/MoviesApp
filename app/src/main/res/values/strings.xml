@@ -14,4 +14,6 @@
     <string name="home">Home</string>
     <string name="like">Like</string>
     <string name="dislike">Dislike</string>
+    <string name="movieposter">MoviePoster</string>
+    <string name="peopleimg">peopleImg</string>
 </resources>
