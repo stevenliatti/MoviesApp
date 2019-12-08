@@ -14,8 +14,12 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import ch.hes.master.mobopproject.data.*
 import com.google.android.youtube.player.YouTubeStandalonePlayer
+import kotlinx.android.synthetic.main.fragment_movie_details.*
 import org.json.JSONArray
 import org.json.JSONObject
+import android.R.attr.button
+
+
 
 
 class MovieDetailsFragment : Fragment() {
@@ -29,7 +33,7 @@ class MovieDetailsFragment : Fragment() {
     private var urlImg : String? = null
     private lateinit var movieDetails : MvDetails
 
-    val args: MovieDetailsFragmentArgs by navArgs()
+    private val args: MovieDetailsFragmentArgs by navArgs()
 
     private lateinit var titleView: TextView
     private lateinit var descriptionView: TextView
@@ -45,7 +49,8 @@ class MovieDetailsFragment : Fragment() {
 
     private lateinit var similarMoviesGridView: GridLayout
     private lateinit var videosView: LinearLayout
-
+    private lateinit var likeBox: CheckBox
+    private lateinit var dislikeBox: CheckBox
 
     private fun getMoreDetails(context: Context) {
         val url = "https://api.themoviedb.org/3/movie/${this.movieId}?api_key=$apiKey"
@@ -118,16 +123,16 @@ class MovieDetailsFragment : Fragment() {
                 var row = 0
                 var col = 0
 
-                similarMoviesGridView.setColumnCount(columnsNumber)
-                similarMoviesGridView.setRowCount(total / columnsNumber)
+                similarMoviesGridView.columnCount = columnsNumber
+                similarMoviesGridView.rowCount = total / columnsNumber
                 for (movie in similarMovies) {
                     if (col == columnsNumber) {
                         col = 0
                         row++
                     }
 
-                    var rowSpan = GridLayout.spec(GridLayout.UNDEFINED, 1)
-                    var colspan = GridLayout.spec(GridLayout.UNDEFINED, 1)
+                    val rowSpan = GridLayout.spec(GridLayout.UNDEFINED, 1)
+                    val colspan = GridLayout.spec(GridLayout.UNDEFINED, 1)
 
 
                     val gridParam: GridLayout.LayoutParams =
@@ -157,18 +162,13 @@ class MovieDetailsFragment : Fragment() {
                         view!!.findNavController().navigate(action)
                     }
 
-
-
                     textView.text = croptext(movie.title)
                     iv.setImageBitmap(movie.img)
-
 
                     linearLayoutVertical.addView(iv)
                     linearLayoutVertical.addView(textView)
 
-
                     similarMoviesGridView.addView(linearLayoutVertical, gridParam)
-
                     col++
                 }
             }
@@ -182,14 +182,14 @@ class MovieDetailsFragment : Fragment() {
         return txt
     }
 
-    private fun getVideos(context: Context) {
+    private fun getVideos(context: Context, videosNb: Int) {
         val url = "https://api.themoviedb.org/3/movie/${this.movieId}/videos?api_key=$apiKey"
 
         requestController.volleyRequest(url, context, object : ServerCallback<JSONObject> {
             override fun onSuccess(response: JSONObject) {
                 val results = response.getJSONArray("results")
                 val videos: ArrayList<MovieYoutubeVideo> = ArrayList()
-                val numberVideos = if(results.length() < 3) results.length() else 3
+                val numberVideos = if(results.length() < videosNb) results.length() else videosNb
                 for (i in 0 until numberVideos) {
                     val video = results.getJSONObject(i)
                     if (video.getString("site").equals("YouTube", true)) {
@@ -275,7 +275,6 @@ class MovieDetailsFragment : Fragment() {
         })
     }
 
-
     private fun creditsFromJsonArray(jsonArray: JSONArray, keyFunction: String): ArrayList<Cast> {
         val credits = ArrayList<Cast>()
         for (i in 0 until jsonArray.length()) {
@@ -283,6 +282,87 @@ class MovieDetailsFragment : Fragment() {
             credits.add(Cast(res.getString("name"), res.getString(keyFunction)))
         }
         return credits
+    }
+
+    private fun initAppreciationButtons(context: Context) {
+        // TODO: get actual user instead
+        val user = "fred"
+        val url = "https://mobop.liatti.ch/user/movieAppreciation?pseudo=$user&idMovie=$movieId"
+        requestController.volleyRequest(url, context, object : ServerCallback<JSONObject> {
+            override fun onSuccess(response: JSONObject) {
+                when (response.getString("appreciation")) {
+                    "LIKE" -> {
+                        likeBox.isChecked = true
+                        dislikeBox.isClickable = false
+                        dislikeBox.setTextColor(Color.GRAY)
+                    }
+                    "DISLIKE" -> {
+                        dislikeBox.isChecked = true
+                        likeBox.isClickable = false
+                        likeBox.setTextColor(Color.GRAY)
+                    }
+                }
+            }
+        })
+    }
+
+    enum class AppreciationEndpoint {
+        LIKE, UNDO_LIKE, DISLIKE, UNDO_DISLIKE
+    }
+
+    private fun setAppreciation(context: Context, appreciationEndpoint: AppreciationEndpoint) {
+        // TODO: get actual user instead
+        val user = "fred"
+        val endpoint = when (appreciationEndpoint) {
+            AppreciationEndpoint.LIKE -> "likeMovie"
+            AppreciationEndpoint.UNDO_LIKE -> "undoLikeMovie"
+            AppreciationEndpoint.DISLIKE -> "dislikeMovie"
+            AppreciationEndpoint.UNDO_DISLIKE -> "undoDislikeMovie"
+        }
+
+        val url = "https://mobop.liatti.ch/user/$endpoint?pseudo=$user&idMovie=$movieId"
+        requestController.volleyRequest(url, context, object : ServerCallback<JSONObject> {
+            override fun onSuccess(response: JSONObject) {
+
+            }
+        })
+    }
+
+    private fun onAppreciationBoxesClicked(view: View) {
+        if (view is CheckBox) {
+            val checked: Boolean = view.isChecked
+
+            when (view.id) {
+                R.id.likeBox -> {
+                    when (checked) {
+                        true -> {
+                            dislikeBox.isClickable = false
+                            dislikeBox.setTextColor(Color.GRAY)
+                            setAppreciation(view.context, AppreciationEndpoint.LIKE)
+                        }
+                        false -> {
+                            dislikeBox.isClickable = true
+                            dislikeBox.setTextColor(Color.BLACK)
+                            setAppreciation(view.context, AppreciationEndpoint.UNDO_LIKE)
+                        }
+                    }
+                }
+                R.id.dislikeBox -> {
+                    when (checked) {
+                        true -> {
+                            likeBox.isClickable = false
+                            likeBox.setTextColor(Color.GRAY)
+                            setAppreciation(view.context, AppreciationEndpoint.DISLIKE)
+                        }
+                        false -> {
+                            likeBox.isClickable = true
+                            likeBox.setTextColor(Color.BLACK)
+                            setAppreciation(view.context, AppreciationEndpoint.UNDO_DISLIKE)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -305,6 +385,8 @@ class MovieDetailsFragment : Fragment() {
         voteCountView = view.findViewById(R.id.vote_count) as TextView
         similarMoviesGridView = view.findViewById(R.id.similarMoviesGridLayout) as GridLayout
         videosView = view.findViewById(R.id.videos) as LinearLayout
+        likeBox = view.findViewById(R.id.likeBox) as CheckBox
+        dislikeBox = view.findViewById(R.id.dislikeBox) as CheckBox
 
         // Recuperation of movie details of TMDB
         requestController.setImageView(urlImg, imageView, 500, view.context)
@@ -312,7 +394,15 @@ class MovieDetailsFragment : Fragment() {
         val crew = listOf("Producer", "Casting", "Music", "Writer", "Director")
         getCredits(5, crew, view.context)
         getSimilarMovies(view .context)
-        getVideos(view.context)
+        getVideos(view.context, 3)
+        initAppreciationButtons(view.context)
+
+        likeBox.setOnClickListener { listenerView ->
+            onAppreciationBoxesClicked(listenerView)
+        }
+        dislikeBox.setOnClickListener { listenerView ->
+            onAppreciationBoxesClicked(listenerView)
+        }
 
         return view
     }
