@@ -16,4 +16,6 @@
     <string name="dislike">Dislike</string>
     <string name="movieposter">MoviePoster</string>
     <string name="peopleimg">peopleImg</string>
+    <string name="biography">Biography</string>
+    <string name="in_movies">Movies</string>
 </resources>

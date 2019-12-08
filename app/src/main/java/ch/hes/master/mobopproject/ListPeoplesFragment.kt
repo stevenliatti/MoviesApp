@@ -53,8 +53,7 @@ class ListPeoplesFragment: Fragment() {
 
         // Set the adapter
         if (view is RecyclerView) {
-            //val url = if (args.query != null) searchUrl + args.query else popularPeopleUrl
-            val url = ""
+            val url = popularPeopleUrl
             requestController.getPeoples(url, view.context, object : ServerCallback<ArrayList<People>> {
                 override fun onSuccess(peoples: ArrayList<People>) {
 

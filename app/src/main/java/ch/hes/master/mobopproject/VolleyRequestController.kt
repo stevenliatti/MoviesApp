@@ -7,6 +7,7 @@ import android.widget.ImageView
 import ch.hes.master.mobopproject.data.People
 import ch.hes.master.mobopproject.data.Movie
 import ch.hes.master.mobopproject.data.MovieDetails
+import ch.hes.master.mobopproject.data.PeopleDetails
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.ImageRequest
@@ -25,7 +26,7 @@ class VolleyRequestController {
             callback.onSuccess(response) // call call back function here
         },
         Response.ErrorListener { error ->
-            Log.println(Log.DEBUG, this.javaClass.name, "error in makeRequest : $error")
+            Log.println(Log.DEBUG, this.javaClass.name, "error in makeRequest : $error,\n$URL\n$callback")
         })
 
         // Adding request to request queue
@@ -108,6 +109,26 @@ class VolleyRequestController {
                     res.getInt("vote_count")
                 )
                 callback.onSuccess(movieDetails)
+            }
+        })
+    }
+
+    fun getPeopleDetails(URL: String, context: Context, callback: ServerCallback<PeopleDetails>) {
+        volleyRequest(URL, context, object : ServerCallback<JSONObject> {
+            override fun onSuccess(res: JSONObject) {
+                val peopleDetails = PeopleDetails(
+                    res.getInt("id"),
+                    res.getString("name"),
+                    res.getString("biography"),
+                    res.getString("known_for_department"),
+                    res.getDouble("popularity"),
+                    res.getString("birthday"),
+                    res.getString("place_of_birth"),
+                    res.getString("deathday"),
+                    res.getString("gender"),
+                    res.getString("homepage")
+                )
+                callback.onSuccess(peopleDetails)
             }
         })
     }

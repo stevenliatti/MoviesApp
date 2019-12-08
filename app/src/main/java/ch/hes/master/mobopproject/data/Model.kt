@@ -32,4 +32,17 @@ data class Cast(val name: String, val function: String) {
 
 data class People(val id: Int, val name: String, val knowFor: String, val inMovies: List<Movie>, val urlImg: String, var img: Bitmap?)
 
+data class PeopleDetails(
+    val id: Int,
+    val name: String,
+    val biography: String,
+    val knownFor: String,
+    val popularity: Double,
+    val birthday: String,
+    val placeOfBirth: String,
+    val deathday: String,
+    val gender: String,
+    val homepage: String
+)
+
 data class User(val pseudo: String, val email: String, val password: String)
