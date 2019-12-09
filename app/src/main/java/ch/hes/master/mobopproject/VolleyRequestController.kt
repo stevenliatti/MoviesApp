@@ -33,11 +33,11 @@ class VolleyRequestController {
         HttpQueue.getInstance(context).addToRequestQueue(jsonObjReq)
     }
 
-    fun getMovies(URL: String, context: Context, callback: ServerCallback<ArrayList<Movie>>) {
+    fun getMovies(URL: String, resultsName: String, context: Context, callback: ServerCallback<ArrayList<Movie>>) {
         val movies: ArrayList<Movie> = ArrayList()
         volleyRequest(URL, context, object : ServerCallback<JSONObject> {
             override fun onSuccess(response: JSONObject) {
-                val jsArray = response.getJSONArray("results")
+                val jsArray = response.getJSONArray(resultsName)
                 for (i in 0 until jsArray.length()) {
                     val jsObj = jsArray.getJSONObject(i)
                     getPosterImage(jsObj.getString("poster_path"), context, object : ServerCallback<Bitmap> {

@@ -12,7 +12,7 @@ interface OnListFragmentInteractionListener {
     fun onListFragmentInteraction(item: Any, view: View) {
         val action = when (item) {
             is Movie  -> ListMoviesFragmentDirections.actionListMoviesFragmentToMovieDetailsFragment(item.id, item.urlImg)
-            is People -> ListPeoplesFragmentDirections.actionListPeoplesFragmentToPeopleDetailsFragment(item.id, item.urlImg)
+            is People -> ListPeoplesFragmentDirections.actionListPeoplesFragmentToPeopleDetailsFragment(item.id, item.urlImg, item.knowFor)
             else -> ListMoviesFragmentDirections.actionListMoviesFragmentSelf()
         }
         view.findNavController().navigate(action)

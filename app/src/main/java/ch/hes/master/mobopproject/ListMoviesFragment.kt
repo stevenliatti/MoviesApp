@@ -53,7 +53,7 @@ class ListMoviesFragment: Fragment() {
         if (view is RecyclerView) {
             val url = if (args.query != null) searchUrl + args.query else popularMoviesUrl
 
-            requestController.getMovies(url, view.context, object : ServerCallback<ArrayList<Movie>> {
+            requestController.getMovies(url, "results", view.context, object : ServerCallback<ArrayList<Movie>> {
                 override fun onSuccess(movies: ArrayList<Movie>) {
 
                     val myAdapter = object : GenericAdapter<Movie>(movies, listener) {

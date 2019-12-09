@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.gridlayout.widget.GridLayout
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import ch.hes.master.mobopproject.data.*
 import com.google.android.youtube.player.YouTubeStandalonePlayer
@@ -107,75 +106,6 @@ class MovieDetailsFragment : Fragment() {
                 crewView.text = crewString
             }
         })
-    }
-
-    private fun getSimilarMovies(context: Context) {
-        val url = "https://api.themoviedb.org/3/movie/${this.movieId}/similar?api_key=$apiKey"
-
-        requestController.getMovies(url, context, object : ServerCallback<ArrayList<Movie>> {
-            override fun onSuccess(similarMovies: ArrayList<Movie>) {
-                val total = similarMovies.size
-                val columnsNumber = 3
-                var row = 0
-                var col = 0
-
-                similarMoviesGridView.columnCount = columnsNumber
-                similarMoviesGridView.rowCount = total / columnsNumber
-                for (movie in similarMovies) {
-                    if (col == columnsNumber) {
-                        col = 0
-                        row++
-                    }
-
-                    val rowSpan = GridLayout.spec(GridLayout.UNDEFINED, 1)
-                    val colspan = GridLayout.spec(GridLayout.UNDEFINED, 1)
-
-
-                    val gridParam: GridLayout.LayoutParams =
-                        GridLayout.LayoutParams(rowSpan, colspan)
-
-                    val textView = TextView(context)
-                    val iv = ImageView(context)
-                    val linearLayoutVertical = LinearLayout(context)
-                    linearLayoutVertical.layoutParams =
-                        LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.WRAP_CONTENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                        )
-                    linearLayoutVertical.orientation = LinearLayout.VERTICAL
-
-                    val lp = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                    )
-                    lp.setMargins(10, 0, 10, 0)
-                    iv.layoutParams = lp
-
-                    iv.setOnClickListener {
-                        val action =
-                            MovieDetailsFragmentDirections
-                                .actionListMoviesFragmentToMovieDetailsFragment(movie.id, movie.urlImg)
-                        view!!.findNavController().navigate(action)
-                    }
-
-                    textView.text = croptext(movie.title)
-                    iv.setImageBitmap(movie.img)
-
-                    linearLayoutVertical.addView(iv)
-                    linearLayoutVertical.addView(textView)
-
-                    similarMoviesGridView.addView(linearLayoutVertical, gridParam)
-                    col++
-                }
-            }
-        })
-    }
-
-    private fun croptext(txt: String): String {
-        val maxSize = 15
-        if(txt.length > maxSize)
-            return txt.substring(0, maxSize-3) + "..."
-        return txt
     }
 
     private fun getVideos(context: Context, videosNb: Int) {
@@ -389,7 +319,11 @@ class MovieDetailsFragment : Fragment() {
         getMoreDetails(view.context)
         val crew = listOf("Producer", "Casting", "Music", "Writer", "Director")
         getCredits(5, crew, view.context)
-        getSimilarMovies(view .context)
+        Common.getGridMovies(
+            view,
+            "https://api.themoviedb.org/3/movie/${this.movieId}/similar?api_key=$apiKey",
+            "results",
+            similarMoviesGridView)
         getVideos(view.context, 3)
         initAppreciationButtons(view.context)
 
