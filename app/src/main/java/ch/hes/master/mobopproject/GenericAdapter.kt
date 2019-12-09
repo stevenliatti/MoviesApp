@@ -10,24 +10,18 @@ import ch.hes.master.mobopproject.data.People
 
 interface OnListFragmentInteractionListener {
     fun onListFragmentInteraction(item: Any, view: View) {
-        if (item is Movie) {
-            val action =
-                ListMoviesFragmentDirections
-                    .actionListMoviesFragmentToMovieDetailsFragment(item.id, item.urlImg)
-            view.findNavController().navigate(action)
+        val action = when (item) {
+            is Movie  -> ListMoviesFragmentDirections.actionListMoviesFragmentToMovieDetailsFragment(item.id, item.urlImg)
+            is People -> ListPeoplesFragmentDirections.actionListPeoplesFragmentToPeopleDetailsFragment(item.id, item.urlImg)
+            else -> ListMoviesFragmentDirections.actionListMoviesFragmentSelf()
         }
-        if (item is People) {
-            val action =
-                ListPeoplesFragmentDirections
-                    .actionListPeoplesFragmentToPeopleDetailsFragment(item.id, item.urlImg)
-            view.findNavController().navigate(action)
-        }
+        view.findNavController().navigate(action)
     }
 }
 
 abstract class GenericAdapter<T>: RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    var listItems: List<T>
+    private var listItems: List<T>
     private val mOnClickListener: View.OnClickListener
     private lateinit var mListener: OnListFragmentInteractionListener
 
@@ -38,11 +32,6 @@ abstract class GenericAdapter<T>: RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     constructor() {
         listItems = emptyList()
-    }
-
-   fun setItems(listItems: List<T>) {
-        this.listItems = listItems
-        notifyDataSetChanged()
     }
 
     init {
