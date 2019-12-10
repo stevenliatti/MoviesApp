@@ -6,14 +6,26 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LiveData
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import androidx.navigation.findNavController
+import androidx.navigation.ui.onNavDestinationSelected
+import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
 class MainActivity : AppCompatActivity(), ListMoviesFragment.OnListFragmentInteractionListener {
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_nav)
+        bottomNavigationView.setupWithNavController(Navigation.findNavController(this, R.id.nav_host_fragment))
+
 
         // Verify the action and get the query
         if (Intent.ACTION_SEARCH == intent.action) {
@@ -24,8 +36,8 @@ class MainActivity : AppCompatActivity(), ListMoviesFragment.OnListFragmentInter
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean { // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu, menu)
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean { // Inflate the top_menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.top_menu, menu)
         return true
     }
 
@@ -44,4 +56,19 @@ class MainActivity : AppCompatActivity(), ListMoviesFragment.OnListFragmentInter
             else -> super.onOptionsItemSelected(item)
         }
     }
+
+   /* private fun SetupBottomNavigationView(bottomNavigationView: BottomNavigationView) {
+        bottomNavigationView.setupWithNavController(Navigation.findNavController(this, R.id.nav_host_fragment))
+        bottomNavigationView.setOnNavigationItemSelectedListener { item -> changeTab(item.itemId) }
+    }
+
+    fun changeTab(integer: Int): Boolean {
+        when(integer) {
+           // R.id.home_bottom_button -> println("BTN HOME")
+            R.id.network_button -> println("BTN NETWORK")
+            R.id.my_movies -> println("BTN MOVIES")
+        }
+        return true
+    }*/
+
 }

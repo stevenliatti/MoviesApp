@@ -14,4 +14,6 @@
     <string name="home">Home</string>
     <string name="like">Like</string>
     <string name="dislike">Dislike</string>
+    <string name="network">Network</string>
+    <string name="my_movies">My movies</string>
 </resources>

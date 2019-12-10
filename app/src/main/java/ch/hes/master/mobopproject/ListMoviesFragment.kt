@@ -1,7 +1,6 @@
 package ch.hes.master.mobopproject
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,8 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ch.hes.master.mobopproject.data.Constants
 import ch.hes.master.mobopproject.data.Movie
-import java.lang.Exception
-import kotlin.reflect.typeOf
 
 class ListMoviesFragment: Fragment() {
 

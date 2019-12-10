@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/listMoviesFragment"
+        android:title="@string/home"
+        android:icon="@drawable/ic_home_white_100dp"
+        />
+    <item
+        android:id="@+id/network_button"
+        android:title="@string/network"
+        android:icon="@drawable/ic_search_white_100dp"
+        />
+    <item
+        android:id="@+id/my_movies"
+        android:title="@string/my_movies"
+        android:icon="@drawable/ic_search_white_100dp"
+        />
+
+</menu>
