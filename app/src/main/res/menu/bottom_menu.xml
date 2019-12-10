@@ -16,5 +16,10 @@
         android:title="@string/my_movies"
         android:icon="@drawable/ic_movies_white_100dp"
         />
+    <item
+        android:id="@+id/listPeoplesFragment"
+        android:title="@string/peoples"
+        android:icon="@drawable/ic_movies_white_100dp"
+        />
 
 </menu>
