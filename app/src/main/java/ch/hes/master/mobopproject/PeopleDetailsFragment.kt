@@ -1,6 +1,7 @@
 package ch.hes.master.mobopproject
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,8 @@ import androidx.fragment.app.Fragment
 import androidx.gridlayout.widget.GridLayout
 import androidx.navigation.fragment.navArgs
 import ch.hes.master.mobopproject.data.Constants
+import ch.hes.master.mobopproject.data.Movie
+import ch.hes.master.mobopproject.data.People
 import ch.hes.master.mobopproject.data.PeopleDetails
 
 
@@ -25,7 +28,7 @@ class PeopleDetailsFragment : Fragment() {
     private var urlImg : String? = null
     private var knownFor: String? = null
 
-    private lateinit var peopleDetails: PeopleDetails
+    private lateinit var details: PeopleDetails
 
     private val args: PeopleDetailsFragmentArgs by navArgs()
 
@@ -45,17 +48,17 @@ class PeopleDetailsFragment : Fragment() {
         val url = "https://api.themoviedb.org/3/person/${this.id}?api_key=$apiKey"
 
         requestController.getPeopleDetails(url, context, object : ServerCallback<PeopleDetails> {
-            override fun onSuccess(details: PeopleDetails) {
-                peopleDetails = details
-                name.text = details.name
-                biography.text = details.biography
-                knownForTextView.text = details.knownFor
-                birthday.text = details.birthday
-                deathday.text = details.deathday
-                placeOfBirth.text = details.placeOfBirth
-                gender.text = details.gender
-                popularity.text = details.popularity.toString()
-                homepage.text = details.homepage
+            override fun onSuccess(ds: PeopleDetails) {
+                details = ds
+                name.text = ds.name
+                biography.text = ds.biography
+                knownForTextView.text = ds.knownFor
+                birthday.text = ds.birthday
+                deathday.text = ds.deathday
+                placeOfBirth.text = ds.placeOfBirth
+                gender.text = ds.gender
+                popularity.text = ds.popularity.toString()
+                homepage.text = ds.homepage
             }
         })
     }
@@ -82,10 +85,12 @@ class PeopleDetailsFragment : Fragment() {
 
         requestController.setImageView(urlImg, imageView, 500, view.context)
         getDetails(view.context)
+        println(knownFor)
         Common.getGridMovies(
             view,
             "https://api.themoviedb.org/3/person/${this.id}/movie_credits?api_key=$apiKey",
-            if (knownFor == "Acting") "cast" else "crew",
+            People(42, "", Bitmap.createBitmap(42,42, Bitmap.Config.ALPHA_8), "", knownFor!!, listOf()),
+            Movie(42, "bob", Bitmap.createBitmap(42,42, Bitmap.Config.ALPHA_8), "", ""),
             inMoviesGridLayout)
 
         return view

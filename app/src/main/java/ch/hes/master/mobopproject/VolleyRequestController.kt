@@ -4,10 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import android.widget.ImageView
-import ch.hes.master.mobopproject.data.People
-import ch.hes.master.mobopproject.data.Movie
-import ch.hes.master.mobopproject.data.MovieDetails
-import ch.hes.master.mobopproject.data.PeopleDetails
+import ch.hes.master.mobopproject.data.*
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.ImageRequest
@@ -33,18 +30,41 @@ class VolleyRequestController {
         HttpQueue.getInstance(context).addToRequestQueue(jsonObjReq)
     }
 
-    fun getMovies(URL: String, resultsName: String, context: Context, callback: ServerCallback<ArrayList<Movie>>) {
-        val movies: ArrayList<Movie> = ArrayList()
-        volleyRequest(URL, context, object : ServerCallback<JSONObject> {
+    fun getItems(url: String, itemFrom: Item, itemTo: Item, context: Context, callback: ServerCallback<ArrayList<Item>>) {
+        val items: ArrayList<Item> = ArrayList()
+        volleyRequest(url, context, object : ServerCallback<JSONObject> {
             override fun onSuccess(response: JSONObject) {
+                val resultsName = when (itemFrom) {
+                    is People -> if (itemFrom.knowFor == "Acting") "cast" else "crew"
+                    else -> "results"
+                }
+
                 val jsArray = response.getJSONArray(resultsName)
                 for (i in 0 until jsArray.length()) {
                     val jsObj = jsArray.getJSONObject(i)
                     getPosterImage(jsObj.getString("poster_path"), context, object : ServerCallback<Bitmap> {
                         override fun onSuccess(img: Bitmap) {
-                            movies.add(Movie(jsObj.getInt("id"), jsObj.getString("title"), jsObj.getString("overview"), jsObj.getString("poster_path"), img))
+                            if (itemTo is Movie) {
+                                items.add(Movie(
+                                    jsObj.getInt("id"),
+                                    jsObj.getString("title"),
+                                    img,
+                                    jsObj.getString("poster_path"),
+                                    jsObj.getString("overview")
+                                ))
+                            }
+                            if (itemTo is People) {
+                                items.add(People(
+                                    jsObj.getInt("id"),
+                                    jsObj.getString("name"),
+                                    img,
+                                    jsObj.getString("profile_path"),
+                                    jsObj.getString("known_for_department"),
+                                    listOf()
+                                ))
+                            }
                             if(i == jsArray.length()-1) {
-                                callback.onSuccess(movies)
+                                callback.onSuccess(items)
                             }
                         }
                     })
@@ -70,19 +90,19 @@ class VolleyRequestController {
                                     knownFor.add(Movie(
                                         propsMovie.getInt("id"),
                                         propsMovie.getString("title"),
-                                        propsMovie.getString("overview"),
+                                        null,
                                         propsMovie.getString("poster_path"),
-                                        null))
+                                        propsMovie.getString("overview")))
                                 }
                             }
 
                             peoples.add(People(
                                 jsObj.getInt("id"),
                                 jsObj.getString("name"),
-                                jsObj.getString("known_for_department"),
-                                knownFor,
+                                img,
                                 jsObj.getString("profile_path"),
-                                img))
+                                jsObj.getString("known_for_department"),
+                                knownFor))
 
                             if(i == jsArray.length()-1) {
                                 callback.onSuccess(peoples)

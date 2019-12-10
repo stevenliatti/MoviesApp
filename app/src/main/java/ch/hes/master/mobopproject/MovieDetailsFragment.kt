@@ -2,6 +2,7 @@ package ch.hes.master.mobopproject
 
 import android.content.ActivityNotFoundException
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -26,7 +27,7 @@ class MovieDetailsFragment : Fragment() {
 
     private var movieId : Int? = null
     private var urlImg : String? = null
-    private lateinit var movieDetails : MovieDetails
+    private lateinit var details : MovieDetails
 
     private val args: MovieDetailsFragmentArgs by navArgs()
 
@@ -53,28 +54,28 @@ class MovieDetailsFragment : Fragment() {
         requestController.getMovieDetails(url, context, object : ServerCallback<MovieDetails> {
             override fun onSuccess(res: MovieDetails) {
 
-                movieDetails = res
+                details = res
 
-                titleView.setText(movieDetails.title)
-                descriptionView.setText(movieDetails?.overview)
+                titleView.setText(details.title)
+                descriptionView.setText(details?.overview)
 
-                for (genre in movieDetails.genresNames) {
+                for (genre in details.genresNames) {
                     val genreView = TextView(view?.context)
                     genreView.text = genre
                     genreNamesView.addView(genreView)
                 }
 
-                popularityView.setText("Popularity : " + movieDetails.popularity)
+                popularityView.setText("Popularity : " + details.popularity)
 
-                for (prodCount in movieDetails.productionCountries) {
+                for (prodCount in details.productionCountries) {
                     val prodCountView = TextView(view?.context)
                     prodCountView.text = prodCount
                     prodCountriesView.addView(prodCountView)
                 }
 
-                releaseDateView.setText(movieDetails.releaseDate)
-                subtitleView.setText(movieDetails.subtitle)
-                voteCountView.setText("Vote count : " + movieDetails.voteCount)
+                releaseDateView.setText(details.releaseDate)
+                subtitleView.setText(details.subtitle)
+                voteCountView.setText("Vote count : " + details.voteCount)
 
             }
         })
@@ -319,10 +320,12 @@ class MovieDetailsFragment : Fragment() {
         getMoreDetails(view.context)
         val crew = listOf("Producer", "Casting", "Music", "Writer", "Director")
         getCredits(5, crew, view.context)
+        val movie = Movie(42, "bob", Bitmap.createBitmap(42, 42, Bitmap.Config.ALPHA_8), "", "")
         Common.getGridMovies(
             view,
             "https://api.themoviedb.org/3/movie/${this.movieId}/similar?api_key=$apiKey",
-            "results",
+            movie,
+            movie,
             similarMoviesGridView)
         getVideos(view.context, 3)
         initAppreciationButtons(view.context)

@@ -2,13 +2,20 @@ package ch.hes.master.mobopproject.data
 
 import android.graphics.Bitmap
 
-data class Movie(
-    val id: Int,
-    val title: String,
-    val overview: String,
-    val urlImg: String,
-    var img: Bitmap?
+open class Item(
+    open val id: Int,
+    open val nameTitle: String,
+    open var img: Bitmap?,
+    open val urlImg: String
 )
+
+data class Movie(
+    override val id: Int,
+    override val nameTitle: String,
+    override var img: Bitmap?,
+    override val urlImg: String,
+    val overview: String
+) : Item(id, nameTitle, img, urlImg)
 
 data class MovieDetails(
     val id: Int,
@@ -30,7 +37,14 @@ data class Cast(val name: String, val function: String) {
     }
 }
 
-data class People(val id: Int, val name: String, val knowFor: String, val inMovies: List<Movie>, val urlImg: String, var img: Bitmap?)
+data class People(
+    override val id: Int,
+    override val nameTitle: String,
+    override var img: Bitmap?,
+    override val urlImg: String,
+    val knowFor: String,
+    val inMovies: List<Movie>
+) : Item(id, nameTitle, img, urlImg)
 
 data class PeopleDetails(
     val id: Int,

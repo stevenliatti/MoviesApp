@@ -6,15 +6,17 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.gridlayout.widget.GridLayout
 import androidx.navigation.findNavController
+import ch.hes.master.mobopproject.data.Item
 import ch.hes.master.mobopproject.data.Movie
+import ch.hes.master.mobopproject.data.People
 
 object Common {
 
     private val requestController = VolleyRequestController()
 
-    fun getGridMovies(view: View, url: String, resultsName: String, grid: GridLayout) {
-        requestController.getMovies(url, resultsName, view.context, object : ServerCallback<ArrayList<Movie>> {
-            override fun onSuccess(result: ArrayList<Movie>) {
+    fun getGridMovies(view: View, url: String, itemFrom: Item, itemTo: Item, grid: GridLayout) {
+        requestController.getItems(url, itemFrom, itemTo, view.context, object : ServerCallback<ArrayList<Item>> {
+            override fun onSuccess(result: ArrayList<Item>) {
                 val total = result.size
                 val columnsNumber = 3
                 var row = 0
@@ -52,18 +54,23 @@ object Common {
                     iv.layoutParams = lp
 
                     iv.setOnClickListener {
-                        // TODO: find a better way ...
                         val action =
-                            if (resultsName == "results") MovieDetailsFragmentDirections
-                                .actionListMoviesFragmentToMovieDetailsFragment(movie.id, movie.urlImg)
-                            else {
-                                PeopleDetailsFragmentDirections
-                                    .actionPeopleDetailsFragmentToMovieDetailsFragment(movie.id, movie.urlImg)
+                            when (itemFrom) {
+                                is People -> PeopleDetailsFragmentDirections
+                                    .actionPeopleDetailsFragmentToMovieDetailsFragment(
+                                        movie.id,
+                                        movie.urlImg
+                                    )
+                                else -> MovieDetailsFragmentDirections
+                                    .actionListMoviesFragmentToMovieDetailsFragment(
+                                        movie.id,
+                                        movie.urlImg
+                                    )
                             }
                         view.findNavController().navigate(action)
                     }
 
-                    textView.text = croptext(movie.title)
+                    textView.text = croptext(movie.nameTitle)
                     iv.setImageBitmap(movie.img)
 
                     linearLayoutVertical.addView(iv)

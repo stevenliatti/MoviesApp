@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ch.hes.master.mobopproject.data.Constants
@@ -35,9 +34,9 @@ class ListPeoplesFragment: Fragment() {
         var view: View = itemView
 
         override fun bind(p: People, clickListener: View.OnClickListener) {
-            nameView.text = p.name
+            nameView.text = p.nameTitle
             knownForView.text = p.knowFor
-            inMoviesView.text = "In movies: " + p.inMovies.map { m -> m.title }
+            inMoviesView.text = "In movies: " + p.inMovies.map { m -> m.nameTitle }
             imageView.setImageBitmap(p.img)
 
             view.tag = p

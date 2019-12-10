@@ -1,6 +1,7 @@
 package ch.hes.master.mobopproject
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ch.hes.master.mobopproject.data.Constants
+import ch.hes.master.mobopproject.data.Item
 import ch.hes.master.mobopproject.data.Movie
 
 class ListMoviesFragment: Fragment() {
@@ -34,7 +36,7 @@ class ListMoviesFragment: Fragment() {
         var view: View = itemView
 
         override fun bind(m: Movie, clickListener: View.OnClickListener) {
-            title.text = m.title
+            title.text = m.nameTitle
             overviewView.text = m.overview
             img.setImageBitmap(m.img)
 
@@ -53,11 +55,14 @@ class ListMoviesFragment: Fragment() {
         if (view is RecyclerView) {
             val url = if (args.query != null) searchUrl + args.query else popularMoviesUrl
 
-            requestController.getMovies(url, "results", view.context, object : ServerCallback<ArrayList<Movie>> {
-                override fun onSuccess(movies: ArrayList<Movie>) {
+            val movie = Movie(42, "bob", Bitmap.createBitmap(42,42, Bitmap.Config.ALPHA_8), "", "")
 
-                    val myAdapter = object : GenericAdapter<Movie>(movies, listener) {
-                        override fun getLayoutId(position: Int, obj: Movie): Int {
+
+            requestController.getItems(url, movie, movie, view.context, object : ServerCallback<ArrayList<Item>> {
+                override fun onSuccess(movies: ArrayList<Item>) {
+
+                    val myAdapter = object : GenericAdapter<Item>(movies, listener) {
+                        override fun getLayoutId(position: Int, obj: Item): Int {
                             return R.layout.fragment_movie
                         }
 
