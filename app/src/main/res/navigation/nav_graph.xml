@@ -21,6 +21,9 @@
             app:argType="string"
             app:nullable="true"
             android:defaultValue="@null" />
+        <action
+            android:id="@+id/action_listMoviesFragment_to_userListFragment"
+            app:destination="@id/userListFragment" />
     </fragment>
     <fragment
         android:id="@+id/movieDetailsFragment"
@@ -38,4 +41,8 @@
             app:argType="string" />
 
     </fragment>
+    <fragment
+        android:id="@+id/userListFragment"
+        android:name="ch.hes.master.mobopproject.UserListFragment"
+        android:label="UserListFragment" />
 </navigation>

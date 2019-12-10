@@ -6,7 +6,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/user_card"
+        android:id="@+id/userTxt"
         android:text="salut">
 
     </TextView>

@@ -7,14 +7,14 @@
         android:icon="@drawable/ic_home_white_100dp"
         />
     <item
-        android:id="@+id/network_button"
+        android:id="@+id/userListFragment"
         android:title="@string/network"
-        android:icon="@drawable/ic_search_white_100dp"
+        android:icon="@drawable/ic_network_white_100dp"
         />
     <item
         android:id="@+id/my_movies"
         android:title="@string/my_movies"
-        android:icon="@drawable/ic_search_white_100dp"
+        android:icon="@drawable/ic_movies_white_100dp"
         />
 
 </menu>

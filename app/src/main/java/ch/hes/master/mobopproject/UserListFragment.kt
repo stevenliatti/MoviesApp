@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
+import kotlinx.android.synthetic.main.user_card.*
 
 
 class UserListFragment : Fragment() {
@@ -65,7 +67,11 @@ class UserCardFragment(private var mytext: String) : Fragment() {
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.fragment_movie_list, container, false)
+
+        val view = inflater.inflate(R.layout.user_card, container, false)
+        val t: TextView = view.findViewById(R.id.userTxt)
+        t.setText(mytext)
+        return view
     }
 
 }
