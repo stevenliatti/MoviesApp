@@ -9,7 +9,7 @@
         android:id="@+id/listMoviesFragment"
         android:name="ch.hes.master.mobopproject.ListMoviesFragment"
         android:label="fragment_movie_list"
-        tools:layout="@layout/fragment_movie_list" >
+        tools:layout="@layout/fragment_movies_list" >
         <action
             android:id="@+id/action_listMoviesFragment_to_movieDetailsFragment"
             app:destination="@id/movieDetailsFragment" />
@@ -42,7 +42,35 @@
 
     </fragment>
     <fragment
+        android:id="@+id/listPeoplesFragment"
+        android:name="ch.hes.master.mobopproject.ListPeoplesFragment"
+        android:label="fragment_people_list"
+        tools:layout="@layout/fragment_peoples_list" >
+        <action
+            android:id="@+id/action_listPeoplesFragment_to_peopleDetailsFragment"
+            app:destination="@id/peopleDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/peopleDetailsFragment"
+        android:name="ch.hes.master.mobopproject.PeopleDetailsFragment"
+        android:label="fragment_people_details"
+        tools:layout="@layout/fragment_people_details">
+        <argument
+            android:name="id"
+            app:argType="integer" />
+        <argument
+            android:name="urlImg"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_peopleDetailsFragment_to_movieDetailsFragment"
+            app:destination="@id/movieDetailsFragment" />
+        <argument
+            android:name="knownFor"
+            app:argType="string" />
+    </fragment>
+    <fragment
         android:id="@+id/userListFragment"
-        android:name="ch.hes.master.mobopproject.UserListFragment"
+        android:name="ch.hes.master.mobopproject.ListUsersFragment"
         android:label="UserListFragment" />
+
 </navigation>

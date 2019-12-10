@@ -10,10 +10,9 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
-import kotlinx.android.synthetic.main.user_card.*
 
 
-class UserListFragment : Fragment() {
+class ListUsersFragment : Fragment() {
     // When requested, this adapter returns a DemoObjectFragment,
     // representing an object in the collection.
     private lateinit var demoCollectionPagerAdapter: UserListPagerAdapter

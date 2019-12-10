@@ -17,12 +17,12 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/img"
+                android:id="@+id/img_people"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
-                android:contentDescription="@string/movieposter"
+                android:contentDescription="@string/peopleimg"
                 android:scaleType="fitXY"
                 app:srcCompat="@color/colorAccent" />
 
@@ -35,18 +35,24 @@
                 android:weightSum="10">
 
                 <TextView
-                    android:id="@+id/original_title"
+                    android:id="@+id/name"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="7"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:textColor="#000000"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/overview"
+                    android:id="@+id/known_for"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/in_movies"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1" />
 
             </LinearLayout>

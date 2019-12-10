@@ -3,13 +3,25 @@ package ch.hes.master.mobopproject
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ExpandableListView
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import ch.hes.master.mobopproject.ListMoviesFragment.OnListFragmentInteractionListener
+import ch.hes.master.mobopproject.data.Movie
+import ch.hes.master.mobopproject.data.People
+
+interface OnListFragmentInteractionListener {
+    fun onListFragmentInteraction(item: Any, view: View) {
+        val action = when (item) {
+            is Movie  -> ListMoviesFragmentDirections.actionListMoviesFragmentToMovieDetailsFragment(item.id, item.urlImg)
+            is People -> ListPeoplesFragmentDirections.actionListPeoplesFragmentToPeopleDetailsFragment(item.id, item.urlImg, item.knowFor)
+            else -> ListMoviesFragmentDirections.actionListMoviesFragmentSelf()
+        }
+        view.findNavController().navigate(action)
+    }
+}
 
 abstract class GenericAdapter<T>: RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    var listItems: List<T>
+    private var listItems: List<T>
     private val mOnClickListener: View.OnClickListener
     private lateinit var mListener: OnListFragmentInteractionListener
 
@@ -20,11 +32,6 @@ abstract class GenericAdapter<T>: RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     constructor() {
         listItems = emptyList()
-    }
-
-   fun setItems(listItems: List<T>) {
-        this.listItems = listItems
-        notifyDataSetChanged()
     }
 
     init {

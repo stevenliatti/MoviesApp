@@ -4,15 +4,17 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import android.widget.ImageView
-import ch.hes.master.mobopproject.data.Movie
-import ch.hes.master.mobopproject.data.MvDetails
+import ch.hes.master.mobopproject.data.*
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.ImageRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import org.json.JSONArray
 import org.json.JSONObject
-import java.lang.Error
+
+interface ServerCallback<T> {
+    fun onSuccess(result: T)
+}
 
 class VolleyRequestController {
     fun volleyRequest(URL: String, context: Context, callback: ServerCallback<JSONObject>) {
@@ -21,25 +23,48 @@ class VolleyRequestController {
             callback.onSuccess(response) // call call back function here
         },
         Response.ErrorListener { error ->
-            Log.println(Log.DEBUG, this.javaClass.name, "error in makeRequest : $error")
+            Log.println(Log.DEBUG, this.javaClass.name, "error in makeRequest : $error,\n$URL\n$callback")
         })
 
         // Adding request to request queue
         HttpQueue.getInstance(context).addToRequestQueue(jsonObjReq)
     }
 
-    fun getMovies(URL: String, context: Context, callback: ServerCallback<ArrayList<Movie>>) {
-        val movies: ArrayList<Movie> = ArrayList()
-        volleyRequest(URL, context, object : ServerCallback<JSONObject> {
+    fun getItems(url: String, itemFrom: Item, itemTo: Item, context: Context, callback: ServerCallback<ArrayList<Item>>) {
+        val items: ArrayList<Item> = ArrayList()
+        volleyRequest(url, context, object : ServerCallback<JSONObject> {
             override fun onSuccess(response: JSONObject) {
-                val jsArray = response.getJSONArray("results")
+                val resultsName = when (itemFrom) {
+                    is People -> if (itemFrom.knowFor == "Acting") "cast" else "crew"
+                    else -> "results"
+                }
+
+                val jsArray = response.getJSONArray(resultsName)
                 for (i in 0 until jsArray.length()) {
                     val jsObj = jsArray.getJSONObject(i)
                     getPosterImage(jsObj.getString("poster_path"), context, object : ServerCallback<Bitmap> {
                         override fun onSuccess(img: Bitmap) {
-                            movies.add(Movie(jsObj.getInt("id"), jsObj.getString("title"), jsObj.getString("overview"), jsObj.getString("poster_path"), img))
+                            if (itemTo is Movie) {
+                                items.add(Movie(
+                                    jsObj.getInt("id"),
+                                    jsObj.getString("title"),
+                                    img,
+                                    jsObj.getString("poster_path"),
+                                    jsObj.getString("overview")
+                                ))
+                            }
+                            if (itemTo is People) {
+                                items.add(People(
+                                    jsObj.getInt("id"),
+                                    jsObj.getString("name"),
+                                    img,
+                                    jsObj.getString("profile_path"),
+                                    jsObj.getString("known_for_department"),
+                                    listOf()
+                                ))
+                            }
                             if(i == jsArray.length()-1) {
-                                callback.onSuccess(movies)
+                                callback.onSuccess(items)
                             }
                         }
                     })
@@ -48,10 +73,51 @@ class VolleyRequestController {
         })
     }
 
-    fun getMovieDetails(URL: String, context: Context, callback: ServerCallback<MvDetails>) {
+    fun getPeoples(URL: String, context: Context, callback: ServerCallback<ArrayList<People>>) {
+        val peoples: ArrayList<People> = ArrayList()
+        volleyRequest(URL, context, object : ServerCallback<JSONObject> {
+            override fun onSuccess(response: JSONObject) {
+                val jsArray = response.getJSONArray("results")
+                for (i in 0 until jsArray.length()) {
+                    val jsObj = jsArray.getJSONObject(i)
+                    getPosterImage(jsObj.getString("profile_path"), context, object : ServerCallback<Bitmap> {
+                        override fun onSuccess(img: Bitmap) {
+                            val knownForJson = jsObj.getJSONArray("known_for")
+                            val knownFor: ArrayList<Movie> = ArrayList()
+                            for (j in 0 until knownForJson.length()) {
+                                val propsMovie = knownForJson.getJSONObject(j)
+                                if (propsMovie.getString("media_type") == "movie") {
+                                    knownFor.add(Movie(
+                                        propsMovie.getInt("id"),
+                                        propsMovie.getString("title"),
+                                        null,
+                                        propsMovie.getString("poster_path"),
+                                        propsMovie.getString("overview")))
+                                }
+                            }
+
+                            peoples.add(People(
+                                jsObj.getInt("id"),
+                                jsObj.getString("name"),
+                                img,
+                                jsObj.getString("profile_path"),
+                                jsObj.getString("known_for_department"),
+                                knownFor))
+
+                            if(i == jsArray.length()-1) {
+                                callback.onSuccess(peoples)
+                            }
+                        }
+                    })
+                }
+            }
+        })
+    }
+
+    fun getMovieDetails(URL: String, context: Context, callback: ServerCallback<MovieDetails>) {
         volleyRequest(URL, context, object : ServerCallback<JSONObject> {
             override fun onSuccess(res: JSONObject) {
-                val mvDetails = MvDetails(
+                val movieDetails = MovieDetails(
                     res.getInt("id"),
                     res.getString("title"),
                     res.getString("overview"),
@@ -62,7 +128,27 @@ class VolleyRequestController {
                     res.getString("tagline"),
                     res.getInt("vote_count")
                 )
-                callback.onSuccess(mvDetails)
+                callback.onSuccess(movieDetails)
+            }
+        })
+    }
+
+    fun getPeopleDetails(URL: String, context: Context, callback: ServerCallback<PeopleDetails>) {
+        volleyRequest(URL, context, object : ServerCallback<JSONObject> {
+            override fun onSuccess(res: JSONObject) {
+                val peopleDetails = PeopleDetails(
+                    res.getInt("id"),
+                    res.getString("name"),
+                    res.getString("biography"),
+                    res.getString("known_for_department"),
+                    res.getDouble("popularity"),
+                    res.getString("birthday"),
+                    res.getString("place_of_birth"),
+                    res.getString("deathday"),
+                    res.getString("gender"),
+                    res.getString("homepage")
+                )
+                callback.onSuccess(peopleDetails)
             }
         })
     }
