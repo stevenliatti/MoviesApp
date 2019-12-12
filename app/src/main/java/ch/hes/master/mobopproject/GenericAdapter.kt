@@ -7,6 +7,7 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import ch.hes.master.mobopproject.data.Movie
 import ch.hes.master.mobopproject.data.People
+import ch.hes.master.mobopproject.data.User
 
 interface OnListFragmentInteractionListener {
     fun onListFragmentInteraction(item: Any, view: View) {
@@ -28,6 +29,10 @@ abstract class GenericAdapter<T>: RecyclerView.Adapter<RecyclerView.ViewHolder> 
     constructor(listItems: List<T>, mListener: OnListFragmentInteractionListener?) {
         this.listItems = listItems
         this.mListener = mListener!!
+    }
+
+    constructor(listItems: List<T>) {
+        this.listItems = listItems
     }
 
     constructor() {

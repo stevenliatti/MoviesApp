@@ -72,5 +72,9 @@
         android:id="@+id/userListFragment"
         android:name="ch.hes.master.mobopproject.ListUsersFragment"
         android:label="UserListFragment" />
+    <fragment
+        android:id="@+id/listLikesMoviesFragment"
+        android:name="ch.hes.master.mobopproject.ListLikesMoviesFragment"
+        android:label="ListLikesMoviesFragment" />
 
 </navigation>

@@ -5,6 +5,9 @@ import android.graphics.Bitmap
 import android.util.Log
 import android.widget.ImageView
 import ch.hes.master.mobopproject.data.*
+import ch.hes.master.mobopproject.data.Movie
+import ch.hes.master.mobopproject.data.MovieDetails
+import ch.hes.master.mobopproject.data.User
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.ImageRequest
@@ -149,6 +152,20 @@ class VolleyRequestController {
                     res.getString("homepage")
                 )
                 callback.onSuccess(peopleDetails)
+            }
+        })
+    }
+
+    fun getUsers(URL: String, context: Context, callback: ServerCallback<ArrayList<User>>) {
+        val users: ArrayList<User> = ArrayList()
+        volleyRequest(URL, context, object : ServerCallback<JSONObject> {
+            override fun onSuccess(response: JSONObject) {
+                val jsArray = response.getJSONArray("pseudos")
+                for (i in 0 until jsArray.length()) {
+                    val jsObj = jsArray.getString(i)
+                    users.add(User(jsObj, "", ""))
+                    callback.onSuccess(users)
+                }
             }
         })
     }

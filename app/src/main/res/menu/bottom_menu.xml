@@ -12,14 +12,14 @@
         android:icon="@drawable/ic_network_white_100dp"
         />
     <item
-        android:id="@+id/my_movies"
+        android:id="@+id/listLikesMoviesFragment"
         android:title="@string/my_movies"
         android:icon="@drawable/ic_movies_white_100dp"
         />
     <item
         android:id="@+id/listPeoplesFragment"
         android:title="@string/peoples"
-        android:icon="@drawable/ic_movies_white_100dp"
+        android:icon="@drawable/ic_person_white_100dp"
         />
 
 </menu>
