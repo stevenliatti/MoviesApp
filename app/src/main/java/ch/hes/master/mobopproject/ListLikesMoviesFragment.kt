@@ -75,7 +75,7 @@ class MovieLikesCardFragment(private var url: String) : Fragment() {
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
 
-        val view = inflater.inflate(R.layout.fragment_movies_list, container, false)
+        val view = inflater.inflate(R.layout.generic_list_items, container, false)
 
         val movie = Movie(42, "bob", Bitmap.createBitmap(42,42, Bitmap.Config.ALPHA_8), "", "")
 

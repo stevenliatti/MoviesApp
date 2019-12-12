@@ -30,7 +30,7 @@ class ListMoviesFragment: Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_movies_list, container, false)
+        val view = inflater.inflate(R.layout.generic_list_items, container, false)
 
         // Set the adapter
         if (view is RecyclerView) {

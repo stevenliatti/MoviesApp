@@ -9,7 +9,7 @@
         android:id="@+id/listMoviesFragment"
         android:name="ch.hes.master.mobopproject.ListMoviesFragment"
         android:label="fragment_movie_list"
-        tools:layout="@layout/fragment_movies_list" >
+        tools:layout="@layout/generic_list_items" >
         <action
             android:id="@+id/action_listMoviesFragment_to_movieDetailsFragment"
             app:destination="@id/movieDetailsFragment" />

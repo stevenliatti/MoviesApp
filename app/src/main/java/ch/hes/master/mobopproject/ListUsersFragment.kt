@@ -76,7 +76,7 @@ class UserCardFragment(private var url: String) : Fragment() {
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
 
-        val view = inflater.inflate(R.layout.fragment_movies_list, container, false)
+        val view = inflater.inflate(R.layout.generic_list_items, container, false)
 
         requestController.getUsers(url, view.context, object : ServerCallback<ArrayList<User>> {
             override fun onSuccess(users: ArrayList<User>) {
