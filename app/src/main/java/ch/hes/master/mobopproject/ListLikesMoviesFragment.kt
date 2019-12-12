@@ -1,6 +1,6 @@
 package ch.hes.master.mobopproject
 
-import android.graphics.Bitmap
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,9 +8,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
-import ch.hes.master.mobopproject.data.Item
 import ch.hes.master.mobopproject.data.Movie
 import com.google.android.material.tabs.TabLayout
 
@@ -77,14 +77,26 @@ class MovieLikesCardFragment(private var url: String) : Fragment() {
 
         val view = inflater.inflate(R.layout.generic_list_items, container, false)
 
-        val movie = Movie(42, "bob", Bitmap.createBitmap(42,42, Bitmap.Config.ALPHA_8), "", "")
-
-        requestController.getItems(url, movie, movie, view.context, object : ServerCallback<ArrayList<Item>> { // TODO: REVOIR CELA (Movie)
-            override fun onSuccess(movies: ArrayList<Item>) {
+        requestController.getMovies(url, "movies",view.context, object : ServerCallback<ArrayList<Movie>> {
+            override fun onSuccess(movies: ArrayList<Movie>) {
                 val lmv = ListMoviesRecyclerView()
-                lmv.setView(movies, view as RecyclerView, listener)
+                lmv.setViewMv(movies, view as RecyclerView, listener)
             }
         })
         return view
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnListFragmentInteractionListener) {
+            listener = context
+        } else {
+            throw RuntimeException(context.toString() + " must implement OnListFragmentInteractionListener")
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        listener = null
     }
 }

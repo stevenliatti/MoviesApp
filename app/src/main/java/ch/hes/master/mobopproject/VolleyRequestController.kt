@@ -174,6 +174,26 @@ class VolleyRequestController {
         })
     }
 
+    fun getMovies(URL: String, keyresult: String, context: Context, callback: ServerCallback<ArrayList<Movie>>) {
+        val movies: ArrayList<Movie> = ArrayList()
+        volleyRequest(URL, context, object : ServerCallback<JSONObject> {
+            override fun onSuccess(response: JSONObject) {
+                val jsArray = response.getJSONArray(keyresult)
+                for (i in 0 until jsArray.length()) {
+                    val jsObj = jsArray.getJSONObject(i)
+                    getPosterImage(jsObj.getString("urlPath"), context, object : ServerCallback<Bitmap> {
+                        override fun onSuccess(img: Bitmap) {
+                            movies.add(Movie(jsObj.getInt("id"), jsObj.getString("title"), img, jsObj.getString("urlPath"), jsObj.getString("overview")))
+                            if(i == jsArray.length()-1) {
+                                callback.onSuccess(movies)
+                            }
+                        }
+                    })
+                }
+            }
+        })
+    }
+
     private fun buildStringListFromJsonSArray(jsonArray: JSONArray, key: String): ArrayList<String> {
         val strings: ArrayList<String> = ArrayList()
         for (i in 0 until jsonArray.length()) {

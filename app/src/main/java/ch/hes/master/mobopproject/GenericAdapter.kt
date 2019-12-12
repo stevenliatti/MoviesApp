@@ -3,6 +3,7 @@ package ch.hes.master.mobopproject
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import ch.hes.master.mobopproject.data.Movie
@@ -11,11 +12,15 @@ import ch.hes.master.mobopproject.data.User
 
 interface OnListFragmentInteractionListener {
     fun onListFragmentInteraction(item: Any, view: View) {
-        val action = when (item) {
+        var action = when (item) {
             is Movie  -> ListMoviesFragmentDirections.actionListMoviesFragmentToMovieDetailsFragment(item.id, item.urlImg)
             is People -> ListPeoplesFragmentDirections.actionListPeoplesFragmentToPeopleDetailsFragment(item.id, item.urlImg, item.knowFor)
             else -> ListMoviesFragmentDirections.actionListMoviesFragmentSelf()
         }
+        if (view.findNavController().currentDestination!!.id == R.id.listLikesMoviesFragment && item is Movie){
+            action = ListLikesMoviesFragmentDirections.actionListLikesMoviesFragmentToMovieDetailsFragment(item.id, item.urlImg)
+        }
+
         view.findNavController().navigate(action)
     }
 }

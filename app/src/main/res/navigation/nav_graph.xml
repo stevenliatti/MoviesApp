@@ -78,6 +78,10 @@
     <fragment
         android:id="@+id/listLikesMoviesFragment"
         android:name="ch.hes.master.mobopproject.ListLikesMoviesFragment"
-        android:label="ListLikesMoviesFragment" />
+        android:label="ListLikesMoviesFragment" >
+        <action
+            android:id="@+id/action_listLikesMoviesFragment_to_movieDetailsFragment"
+            app:destination="@id/movieDetailsFragment" />
+    </fragment>
 
 </navigation>
