@@ -175,7 +175,7 @@ class MovieDetailsFragment : Fragment() {
 
     private fun initAppreciationButtons(context: Context) {
         // TODO: get actual user instead
-        val user = "fred"
+        val user = "max"
         val url = "https://mobop.liatti.ch/user/movieAppreciation?pseudo=$user&idMovie=$movieId"
         requestController.httpGet(url, context, object : ServerCallback<JSONObject> {
             override fun onSuccess(response: JSONObject) {
@@ -201,7 +201,7 @@ class MovieDetailsFragment : Fragment() {
 
     private fun setAppreciation(context: Context, ae: AppreciationEndpoint) {
         // TODO: get actual user instead
-        val user = "fred"
+        val user = "max"
 
         if (ae == AppreciationEndpoint.LIKE || ae == AppreciationEndpoint.DISLIKE) {
             val url = "https://mobop.liatti.ch/user/likeDislikeMovie"

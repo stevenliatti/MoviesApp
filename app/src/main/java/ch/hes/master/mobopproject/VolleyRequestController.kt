@@ -189,7 +189,7 @@ class VolleyRequestController {
 
     fun getMovies(URL: String, keyresult: String, context: Context, callback: ServerCallback<ArrayList<Movie>>) {
         val movies: ArrayList<Movie> = ArrayList()
-        volleyRequest(URL, context, object : ServerCallback<JSONObject> {
+        httpGet(URL, context, object : ServerCallback<JSONObject> {
             override fun onSuccess(response: JSONObject) {
                 val jsArray = response.getJSONArray(keyresult)
                 for (i in 0 until jsArray.length()) {
