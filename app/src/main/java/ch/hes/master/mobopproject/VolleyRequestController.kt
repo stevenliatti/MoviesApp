@@ -45,7 +45,11 @@ class VolleyRequestController {
                 val jsArray = response.getJSONArray(resultsName)
                 for (i in 0 until jsArray.length()) {
                     val jsObj = jsArray.getJSONObject(i)
-                    getPosterImage(jsObj.getString("poster_path"), context, object : ServerCallback<Bitmap> {
+                    val path = when (itemTo) {
+                        is People -> "profile_path"
+                        else -> "poster_path"
+                    }
+                    getPosterImage(jsObj.getString(path), context, object : ServerCallback<Bitmap> {
                         override fun onSuccess(img: Bitmap) {
                             if (itemTo is Movie) {
                                 items.add(Movie(
@@ -62,7 +66,7 @@ class VolleyRequestController {
                                     jsObj.getString("name"),
                                     img,
                                     jsObj.getString("profile_path"),
-                                    jsObj.getString("known_for_department"),
+                                    "",
                                     listOf()
                                 ))
                             }

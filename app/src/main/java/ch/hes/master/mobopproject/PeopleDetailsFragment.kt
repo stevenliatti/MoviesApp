@@ -86,7 +86,7 @@ class PeopleDetailsFragment : Fragment() {
         requestController.setImageView(urlImg, imageView, 500, view.context)
         getDetails(view.context)
         println(knownFor)
-        Common.getGridMovies(
+        Common.getGridItems(
             view,
             "https://api.themoviedb.org/3/person/${this.id}/movie_credits?api_key=$apiKey",
             People(42, "", Bitmap.createBitmap(42,42, Bitmap.Config.ALPHA_8), "", knownFor!!, listOf()),

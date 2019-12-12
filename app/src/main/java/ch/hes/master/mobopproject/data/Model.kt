@@ -6,7 +6,8 @@ open class Item(
     open val id: Int,
     open val nameTitle: String,
     open var img: Bitmap?,
-    open val urlImg: String
+    open val urlImg: String,
+    open val knowFor: String
 )
 
 data class Movie(
@@ -15,7 +16,7 @@ data class Movie(
     override var img: Bitmap?,
     override val urlImg: String,
     val overview: String
-) : Item(id, nameTitle, img, urlImg)
+) : Item(id, nameTitle, img, urlImg, "")
 
 data class MovieDetails(
     val id: Int,
@@ -42,9 +43,9 @@ data class People(
     override val nameTitle: String,
     override var img: Bitmap?,
     override val urlImg: String,
-    val knowFor: String,
+    override var knowFor: String,
     val inMovies: List<Movie>
-) : Item(id, nameTitle, img, urlImg)
+) : Item(id, nameTitle, img, urlImg, knowFor)
 
 data class PeopleDetails(
     val id: Int,
