@@ -33,8 +33,8 @@ class MovieDetailsFragment : Fragment() {
 
     private lateinit var titleView: TextView
     private lateinit var descriptionView: TextView
-    private lateinit var castView: TextView
-    private lateinit var crewView: TextView
+    private lateinit var castGridLayout: GridLayout
+    private lateinit var crewGridLayout: GridLayout
     private lateinit var imageView: ImageView
     private lateinit var genreNamesView: LinearLayout
     private lateinit var popularityView: TextView
@@ -43,7 +43,7 @@ class MovieDetailsFragment : Fragment() {
     private lateinit var subtitleView: TextView
     private lateinit var voteCountView: TextView
 
-    private lateinit var similarMoviesGridView: GridLayout
+    private lateinit var similarMoviesGridLayout: GridLayout
     private lateinit var videosView: LinearLayout
     private lateinit var likeBox: CheckBox
     private lateinit var dislikeBox: CheckBox
@@ -77,34 +77,6 @@ class MovieDetailsFragment : Fragment() {
                 subtitleView.setText(details.subtitle)
                 voteCountView.setText("Vote count : " + details.voteCount)
 
-            }
-        })
-    }
-
-    private fun getCredits(castNb: Int, keysCrew: List<String>, context: Context) {
-        val url = "https://api.themoviedb.org/3/movie/${this.movieId}/credits?api_key=$apiKey"
-
-        requestController.volleyRequest(url, context, object : ServerCallback<JSONObject> {
-            override fun onSuccess(res: JSONObject) {
-                val cast = creditsFromJsonArray(res.getJSONArray("cast"), "character")
-                val crew = creditsFromJsonArray(res.getJSONArray("crew"), "job")
-                var castString = ""
-                for (i in 0..castNb) {
-                    if (i < cast.size) castString += cast[i].toString() + ", "
-                }
-                castString =
-                    if (castString.isNotEmpty()) castString.subSequence(0, castString.length - 2).toString()
-                    else ""
-                castView.text = castString
-
-                var crewString = ""
-                for (c in crew) {
-                    if (keysCrew.contains(c.function)) crewString += c.toString() + ", "
-                }
-                crewString =
-                    if (crewString.isNotEmpty()) crewString.subSequence(0, crewString.length - 2).toString()
-                    else ""
-                crewView.text = crewString
             }
         })
     }
@@ -301,8 +273,8 @@ class MovieDetailsFragment : Fragment() {
 
         titleView = view.findViewById(R.id.original_title) as TextView
         descriptionView = view.findViewById(R.id.overview) as TextView
-        castView = view.findViewById(R.id.cast) as TextView
-        crewView = view.findViewById(R.id.crew) as TextView
+        castGridLayout = view.findViewById(R.id.cast) as GridLayout
+        crewGridLayout = view.findViewById(R.id.crew) as GridLayout
         imageView = view.findViewById(R.id.imgDetails) as ImageView
         genreNamesView = view.findViewById(R.id.genreNames) as LinearLayout
         popularityView = view.findViewById(R.id.popularity) as TextView
@@ -310,7 +282,7 @@ class MovieDetailsFragment : Fragment() {
         releaseDateView = view.findViewById(R.id.release_date) as TextView
         subtitleView = view.findViewById(R.id.subtitle) as TextView
         voteCountView = view.findViewById(R.id.vote_count) as TextView
-        similarMoviesGridView = view.findViewById(R.id.similarMoviesGridLayout) as GridLayout
+        similarMoviesGridLayout = view.findViewById(R.id.similarMoviesGridLayout) as GridLayout
         videosView = view.findViewById(R.id.videos) as LinearLayout
         likeBox = view.findViewById(R.id.likeBox) as CheckBox
         dislikeBox = view.findViewById(R.id.dislikeBox) as CheckBox
@@ -318,15 +290,47 @@ class MovieDetailsFragment : Fragment() {
         // Recuperation of movie details of TMDB
         requestController.setImageView(urlImg, imageView, 500, view.context)
         getMoreDetails(view.context)
-        val crew = listOf("Producer", "Casting", "Music", "Writer", "Director")
-        getCredits(5, crew, view.context)
+        //val crew = listOf("Producer", "Casting", "Music", "Writer", "Director")
+        //getCredits(5, crew, view.context)
         val movie = Movie(42, "bob", Bitmap.createBitmap(42, 42, Bitmap.Config.ALPHA_8), "", "")
-        Common.getGridMovies(
+        val people1 = People(
+            42,
+            "",
+            Bitmap.createBitmap(42,42, Bitmap.Config.ALPHA_8),
+            "",
+            "Acting",
+            listOf()
+        )
+        val people2 = People(
+            42,
+            "",
+            Bitmap.createBitmap(42,42, Bitmap.Config.ALPHA_8),
+            "",
+            "",
+            listOf()
+        )
+
+        Common.getGridItems(
+            view,
+            "https://api.themoviedb.org/3/movie/${this.movieId}/credits?api_key=$apiKey",
+            people1,
+            people1,
+            castGridLayout
+        )
+        Common.getGridItems(
+            view,
+            "https://api.themoviedb.org/3/movie/${this.movieId}/credits?api_key=$apiKey",
+            people2,
+            people2,
+            crewGridLayout
+        )
+
+        Common.getGridItems(
             view,
             "https://api.themoviedb.org/3/movie/${this.movieId}/similar?api_key=$apiKey",
             movie,
             movie,
-            similarMoviesGridView)
+            similarMoviesGridLayout)
         getVideos(view.context, 3)
         initAppreciationButtons(view.context)
 

@@ -39,6 +39,9 @@
         <argument
             android:name="urlImg"
             app:argType="string" />
+        <action
+            android:id="@+id/action_movieDetailsFragment_to_peopleDetailsFragment"
+            app:destination="@id/peopleDetailsFragment" />
 
     </fragment>
     <fragment

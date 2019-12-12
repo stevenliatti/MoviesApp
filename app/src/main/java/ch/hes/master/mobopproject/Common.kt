@@ -14,7 +14,7 @@ object Common {
 
     private val requestController = VolleyRequestController()
 
-    fun getGridMovies(view: View, url: String, itemFrom: Item, itemTo: Item, grid: GridLayout) {
+    fun getGridItems(view: View, url: String, itemFrom: Item, itemTo: Item, grid: GridLayout) {
         requestController.getItems(url, itemFrom, itemTo, view.context, object : ServerCallback<ArrayList<Item>> {
             override fun onSuccess(result: ArrayList<Item>) {
                 val total = result.size
@@ -24,7 +24,7 @@ object Common {
 
                 grid.columnCount = columnsNumber
                 grid.rowCount = total / columnsNumber
-                for (movie in result) {
+                for (item in result) {
                     if (col == columnsNumber) {
                         col = 0
                         row++
@@ -56,22 +56,33 @@ object Common {
                     iv.setOnClickListener {
                         val action =
                             when (itemFrom) {
-                                is People -> PeopleDetailsFragmentDirections
-                                    .actionPeopleDetailsFragmentToMovieDetailsFragment(
-                                        movie.id,
-                                        movie.urlImg
-                                    )
+                                is People ->
+                                    if (itemTo is Movie) {
+                                        PeopleDetailsFragmentDirections
+                                            .actionPeopleDetailsFragmentToMovieDetailsFragment(
+                                                item.id,
+                                                item.urlImg
+                                            )
+                                    }
+                                    else {
+                                        MovieDetailsFragmentDirections
+                                            .actionMovieDetailsFragmentToPeopleDetailsFragment(
+                                                item.id,
+                                                item.urlImg,
+                                                item.knowFor
+                                            )
+                                    }
                                 else -> MovieDetailsFragmentDirections
                                     .actionListMoviesFragmentToMovieDetailsFragment(
-                                        movie.id,
-                                        movie.urlImg
+                                        item.id,
+                                        item.urlImg
                                     )
                             }
                         view.findNavController().navigate(action)
                     }
 
-                    textView.text = croptext(movie.nameTitle)
-                    iv.setImageBitmap(movie.img)
+                    textView.text = croptext(item.nameTitle)
+                    iv.setImageBitmap(item.img)
 
                     linearLayoutVertical.addView(iv)
                     linearLayoutVertical.addView(textView)
