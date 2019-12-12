@@ -14,7 +14,6 @@ import androidx.gridlayout.widget.GridLayout
 import androidx.navigation.fragment.navArgs
 import ch.hes.master.mobopproject.data.*
 import com.google.android.youtube.player.YouTubeStandalonePlayer
-import org.json.JSONArray
 import org.json.JSONObject
 
 
@@ -84,7 +83,7 @@ class MovieDetailsFragment : Fragment() {
     private fun getVideos(context: Context, videosNb: Int) {
         val url = "https://api.themoviedb.org/3/movie/${this.movieId}/videos?api_key=$apiKey"
 
-        requestController.volleyRequest(url, context, object : ServerCallback<JSONObject> {
+        requestController.httpGet(url, context, object : ServerCallback<JSONObject> {
             override fun onSuccess(response: JSONObject) {
                 val results = response.getJSONArray("results")
                 val videos: ArrayList<MovieYoutubeVideo> = ArrayList()
@@ -174,20 +173,11 @@ class MovieDetailsFragment : Fragment() {
         })
     }
 
-    private fun creditsFromJsonArray(jsonArray: JSONArray, keyFunction: String): ArrayList<Cast> {
-        val credits = ArrayList<Cast>()
-        for (i in 0 until jsonArray.length()) {
-            val res = jsonArray.getJSONObject(i)
-            credits.add(Cast(res.getString("name"), res.getString(keyFunction)))
-        }
-        return credits
-    }
-
     private fun initAppreciationButtons(context: Context) {
         // TODO: get actual user instead
         val user = "fred"
         val url = "https://mobop.liatti.ch/user/movieAppreciation?pseudo=$user&idMovie=$movieId"
-        requestController.volleyRequest(url, context, object : ServerCallback<JSONObject> {
+        requestController.httpGet(url, context, object : ServerCallback<JSONObject> {
             override fun onSuccess(response: JSONObject) {
                 when (response.getString("appreciation")) {
                     "LIKE" -> {
@@ -206,25 +196,34 @@ class MovieDetailsFragment : Fragment() {
     }
 
     enum class AppreciationEndpoint {
-        LIKE, UNDO_LIKE, DISLIKE, UNDO_DISLIKE
+        LIKE, DISLIKE, UNDO
     }
 
-    private fun setAppreciation(context: Context, appreciationEndpoint: AppreciationEndpoint) {
+    private fun setAppreciation(context: Context, ae: AppreciationEndpoint) {
         // TODO: get actual user instead
         val user = "fred"
-        val endpoint = when (appreciationEndpoint) {
-            AppreciationEndpoint.LIKE -> "likeMovie"
-            AppreciationEndpoint.UNDO_LIKE -> "undoLikeMovie"
-            AppreciationEndpoint.DISLIKE -> "dislikeMovie"
-            AppreciationEndpoint.UNDO_DISLIKE -> "undoDislikeMovie"
+
+        if (ae == AppreciationEndpoint.LIKE || ae == AppreciationEndpoint.DISLIKE) {
+            val url = "https://mobop.liatti.ch/user/likeDislikeMovie"
+            val data = JSONObject()
+            data.put("pseudo", user)
+            data.put("id", movieId)
+            data.put("title", details.title)
+            data.put("overview", details.overview)
+            data.put("urlPath", urlImg)
+            val appreciation = if (ae == AppreciationEndpoint.LIKE) "LIKE" else "DISLIKE"
+            data.put("appreciation", appreciation)
+
+            requestController.httpPost(url, data, context, object : ServerCallback<JSONObject> {
+                override fun onSuccess(response: JSONObject) {}
+            })
         }
-
-        val url = "https://mobop.liatti.ch/user/$endpoint?pseudo=$user&idMovie=$movieId"
-        requestController.volleyRequest(url, context, object : ServerCallback<JSONObject> {
-            override fun onSuccess(response: JSONObject) {
-
-            }
-        })
+        else {
+            val url = "https://mobop.liatti.ch/user/undoLikeDislikeMovie?pseudo=$user&idMovie=$movieId"
+            requestController.httpGet(url, context, object : ServerCallback<JSONObject> {
+                override fun onSuccess(response: JSONObject) {}
+            })
+        }
     }
 
     private fun onAppreciationBoxesClicked(view: View) {
@@ -242,7 +241,7 @@ class MovieDetailsFragment : Fragment() {
                         false -> {
                             dislikeBox.isClickable = true
                             dislikeBox.setTextColor(Color.BLACK)
-                            setAppreciation(view.context, AppreciationEndpoint.UNDO_LIKE)
+                            setAppreciation(view.context, AppreciationEndpoint.UNDO)
                         }
                     }
                 }
@@ -256,7 +255,7 @@ class MovieDetailsFragment : Fragment() {
                         false -> {
                             likeBox.isClickable = true
                             likeBox.setTextColor(Color.BLACK)
-                            setAppreciation(view.context, AppreciationEndpoint.UNDO_DISLIKE)
+                            setAppreciation(view.context, AppreciationEndpoint.UNDO)
                         }
                     }
                 }

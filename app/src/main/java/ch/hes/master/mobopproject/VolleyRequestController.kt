@@ -20,14 +20,27 @@ interface ServerCallback<T> {
 }
 
 class VolleyRequestController {
-    fun volleyRequest(URL: String, context: Context, callback: ServerCallback<JSONObject>) {
+    fun httpGet(URL: String, context: Context, callback: ServerCallback<JSONObject>) {
         val jsonObjReq = JsonObjectRequest(Request.Method.GET, URL, null,
         Response.Listener { response ->
             callback.onSuccess(response) // call call back function here
         },
         Response.ErrorListener { error ->
-            Log.println(Log.DEBUG, this.javaClass.name, "error in makeRequest : $error,\n$URL\n$callback")
+            Log.println(Log.DEBUG, this.javaClass.name, "error in httpGet : $error,\n$URL\n$callback")
         })
+
+        // Adding request to request queue
+        HttpQueue.getInstance(context).addToRequestQueue(jsonObjReq)
+    }
+
+    fun httpPost(URL: String, jsonData: JSONObject, context: Context, callback: ServerCallback<JSONObject>) {
+        val jsonObjReq = JsonObjectRequest(Request.Method.POST, URL, jsonData,
+            Response.Listener { response ->
+                callback.onSuccess(response) // call call back function here
+            },
+            Response.ErrorListener { error ->
+                Log.println(Log.DEBUG, this.javaClass.name, "error in httpPost : $error,\n$URL\n$jsonData\n$callback")
+            })
 
         // Adding request to request queue
         HttpQueue.getInstance(context).addToRequestQueue(jsonObjReq)
@@ -35,7 +48,7 @@ class VolleyRequestController {
 
     fun getItems(url: String, itemFrom: Item, itemTo: Item, context: Context, callback: ServerCallback<ArrayList<Item>>) {
         val items: ArrayList<Item> = ArrayList()
-        volleyRequest(url, context, object : ServerCallback<JSONObject> {
+        httpGet(url, context, object : ServerCallback<JSONObject> {
             override fun onSuccess(response: JSONObject) {
                 val resultsName = when (itemFrom) {
                     is People -> if (itemFrom.knowFor == "Acting") "cast" else "crew"
@@ -82,7 +95,7 @@ class VolleyRequestController {
 
     fun getPeoples(URL: String, context: Context, callback: ServerCallback<ArrayList<People>>) {
         val peoples: ArrayList<People> = ArrayList()
-        volleyRequest(URL, context, object : ServerCallback<JSONObject> {
+        httpGet(URL, context, object : ServerCallback<JSONObject> {
             override fun onSuccess(response: JSONObject) {
                 val jsArray = response.getJSONArray("results")
                 for (i in 0 until jsArray.length()) {
@@ -122,7 +135,7 @@ class VolleyRequestController {
     }
 
     fun getMovieDetails(URL: String, context: Context, callback: ServerCallback<MovieDetails>) {
-        volleyRequest(URL, context, object : ServerCallback<JSONObject> {
+        httpGet(URL, context, object : ServerCallback<JSONObject> {
             override fun onSuccess(res: JSONObject) {
                 val movieDetails = MovieDetails(
                     res.getInt("id"),
@@ -141,7 +154,7 @@ class VolleyRequestController {
     }
 
     fun getPeopleDetails(URL: String, context: Context, callback: ServerCallback<PeopleDetails>) {
-        volleyRequest(URL, context, object : ServerCallback<JSONObject> {
+        httpGet(URL, context, object : ServerCallback<JSONObject> {
             override fun onSuccess(res: JSONObject) {
                 val peopleDetails = PeopleDetails(
                     res.getInt("id"),
@@ -162,7 +175,7 @@ class VolleyRequestController {
 
     fun getUsers(URL: String, context: Context, callback: ServerCallback<ArrayList<User>>) {
         val users: ArrayList<User> = ArrayList()
-        volleyRequest(URL, context, object : ServerCallback<JSONObject> {
+        httpGet(URL, context, object : ServerCallback<JSONObject> {
             override fun onSuccess(response: JSONObject) {
                 val jsArray = response.getJSONArray("pseudos")
                 for (i in 0 until jsArray.length()) {
