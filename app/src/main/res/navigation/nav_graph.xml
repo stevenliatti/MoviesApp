@@ -52,6 +52,14 @@
         <action
             android:id="@+id/action_listPeoplesFragment_to_peopleDetailsFragment"
             app:destination="@id/peopleDetailsFragment" />
+        <argument
+            android:name="query"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <action
+            android:id="@+id/action_listPeoplesFragment_self"
+            app:destination="@id/listPeoplesFragment" />
     </fragment>
     <fragment
         android:id="@+id/peopleDetailsFragment"
@@ -74,7 +82,16 @@
     <fragment
         android:id="@+id/userListFragment"
         android:name="ch.hes.master.mobopproject.ListUsersFragment"
-        android:label="UserListFragment" />
+        android:label="UserListFragment">
+        <argument
+            android:name="query"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <action
+            android:id="@+id/action_userListFragment_self"
+            app:destination="@id/userListFragment" />
+    </fragment>
     <fragment
         android:id="@+id/listLikesMoviesFragment"
         android:name="ch.hes.master.mobopproject.ListLikesMoviesFragment"
@@ -82,6 +99,25 @@
         <action
             android:id="@+id/action_listLikesMoviesFragment_to_movieDetailsFragment"
             app:destination="@id/movieDetailsFragment" />
+
+    </fragment>
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="ch.hes.master.mobopproject.SearchFragment"
+        android:label="fragment_search"
+        tools:layout="@layout/fragment_search" >
+        <action
+            android:id="@+id/action_searchFragment_to_listMoviesFragment"
+            app:destination="@id/listMoviesFragment" />
+        <action
+            android:id="@+id/action_searchFragment_to_userListFragment"
+            app:destination="@id/userListFragment" />
+        <action
+            android:id="@+id/action_searchFragment_to_listPeoplesFragment"
+            app:destination="@id/listPeoplesFragment" />
+        <action
+            android:id="@+id/action_searchFragment_self"
+            app:destination="@id/searchFragment" />
     </fragment>
 
 </navigation>

@@ -7,10 +7,5 @@
         android:title="@string/home"
         android:icon="@drawable/ic_home_white_100dp"
         app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/search_button"
-        android:title="@string/search"
-        android:icon="@drawable/ic_search_white_100dp"
-        app:showAsAction="ifRoom" />
 
 </menu>

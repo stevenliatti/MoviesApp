@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
@@ -20,6 +21,8 @@ class ListUsersFragment : Fragment() {
     // representing an object in the collection.
     private lateinit var demoCollectionPagerAdapter: UserListPagerAdapter
     private lateinit var viewPager: ViewPager
+
+    private val args: ListUsersFragmentArgs by navArgs()
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
