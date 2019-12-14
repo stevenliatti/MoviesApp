@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
@@ -39,23 +40,8 @@ class SearchFragment : Fragment() {
         radioUsers = view.findViewById(R.id.radio_users) as RadioButton
         submitButton = view.findViewById(R.id.search_button) as Button
 
-        submitButton.setOnClickListener { v ->
-            val query = inputSearch.text.toString()
-            val action = when (searchGroup.checkedRadioButtonId) {
-                radioMovies.id -> SearchFragmentDirections.actionSearchFragmentToListMoviesFragment(query)
-                radioPeoples.id -> SearchFragmentDirections.actionSearchFragmentToListPeoplesFragment(query)
-                radioUsers.id -> {
-                    val url = "https://mobop.liatti.ch/user/search?pseudo=$query"
-                    SearchFragmentDirections.actionSearchFragmentToUserCardFragment(url)
-                }
-                else -> SearchFragmentDirections.actionSearchFragmentToListMoviesFragment(query)
-            }
-
-            val imm: InputMethodManager = activity!!.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(view.windowToken, 0)
-            v.findNavController().navigate(action)
-        }
-
+        inputSearch.onSubmit { submit() }
+        submitButton.setOnClickListener { submit() }
         return view
     }
 
@@ -69,4 +55,27 @@ class SearchFragment : Fragment() {
         }
     }
 
+    private fun EditText.onSubmit(func: () -> Unit) {
+        setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) func()
+            true
+        }
+    }
+
+    private fun submit() {
+        val query = inputSearch.text.toString()
+        val action = when (searchGroup.checkedRadioButtonId) {
+            radioMovies.id -> SearchFragmentDirections.actionSearchFragmentToListMoviesFragment(query)
+            radioPeoples.id -> SearchFragmentDirections.actionSearchFragmentToListPeoplesFragment(query)
+            radioUsers.id -> {
+                val url = "https://mobop.liatti.ch/user/search?pseudo=$query"
+                SearchFragmentDirections.actionSearchFragmentToUserCardFragment(url)
+            }
+            else -> SearchFragmentDirections.actionSearchFragmentToListMoviesFragment(query)
+        }
+
+        val imm: InputMethodManager = activity!!.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view!!.windowToken, 0)
+        view!!.findNavController().navigate(action)
+    }
 }

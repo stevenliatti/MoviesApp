@@ -10,7 +10,9 @@
         android:id="@+id/input_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/search"/>
+        android:hint="@string/search"
+        android:singleLine="true"
+        android:imeOptions="actionDone"/>
 
     <RadioGroup
         android:id="@+id/group_search"
