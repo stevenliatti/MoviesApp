@@ -110,14 +110,24 @@
             android:id="@+id/action_searchFragment_to_listMoviesFragment"
             app:destination="@id/listMoviesFragment" />
         <action
-            android:id="@+id/action_searchFragment_to_userListFragment"
-            app:destination="@id/userListFragment" />
-        <action
             android:id="@+id/action_searchFragment_to_listPeoplesFragment"
             app:destination="@id/listPeoplesFragment" />
         <action
             android:id="@+id/action_searchFragment_self"
             app:destination="@id/searchFragment" />
+        <action
+            android:id="@+id/action_searchFragment_to_userCardFragment"
+            app:destination="@id/userCardFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/userCardFragment"
+        android:name="ch.hes.master.mobopproject.UserCardFragment"
+        android:label="UserCardFragment">
+        <argument
+            android:name="query"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
 
 </navigation>

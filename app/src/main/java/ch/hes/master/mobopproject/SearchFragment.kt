@@ -44,7 +44,10 @@ class SearchFragment : Fragment() {
             val action = when (searchGroup.checkedRadioButtonId) {
                 radioMovies.id -> SearchFragmentDirections.actionSearchFragmentToListMoviesFragment(query)
                 radioPeoples.id -> SearchFragmentDirections.actionSearchFragmentToListPeoplesFragment(query)
-                radioUsers.id -> SearchFragmentDirections.actionSearchFragmentToUserListFragment(query)
+                radioUsers.id -> {
+                    val url = "https://mobop.liatti.ch/user/search?pseudo=$query"
+                    SearchFragmentDirections.actionSearchFragmentToUserCardFragment(url)
+                }
                 else -> SearchFragmentDirections.actionSearchFragmentToListMoviesFragment(query)
             }
 
