@@ -99,7 +99,7 @@ class PeopleDetailsFragment : Fragment() {
         Common.getMoviesGrid(
             view,
             "https://api.themoviedb.org/3/person/${this.id}/movie_credits?api_key=$apiKey",
-            if (knownFor == "Acting") "cast" else "crew",
+            if (knownFor == "Directing") "crew" else "cast",
             "poster_path",
             inMoviesGridLayout,
             From.PEOPLE,
