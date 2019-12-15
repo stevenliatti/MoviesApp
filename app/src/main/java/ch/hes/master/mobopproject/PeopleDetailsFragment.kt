@@ -101,7 +101,9 @@ class PeopleDetailsFragment : Fragment() {
             "https://api.themoviedb.org/3/person/${this.id}/movie_credits?api_key=$apiKey",
             if (knownFor == "Acting") "cast" else "crew",
             "poster_path",
-            inMoviesGridLayout)
+            inMoviesGridLayout,
+            From.PEOPLE,
+            Common::makeGridMovieCell)
         return view
     }
 

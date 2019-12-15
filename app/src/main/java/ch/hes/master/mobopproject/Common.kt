@@ -8,8 +8,13 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.gridlayout.widget.GridLayout
 import androidx.navigation.findNavController
+import ch.hes.master.mobopproject.data.Item
 import ch.hes.master.mobopproject.data.Movie
 import org.json.JSONObject
+
+enum class From {
+    MOVIE, PEOPLE
+}
 
 object Common {
 
@@ -39,67 +44,72 @@ object Common {
         })
     }
 
-    fun getMoviesGrid(view: View, url: String, keyResult: String, keyPath: String, grid: GridLayout) {
+    fun makeGridMovieCell(view: View, item: Item, from: From): LinearLayout {
+        val linearLayoutVertical = LinearLayout(view.context)
+        linearLayoutVertical.layoutParams =
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        linearLayoutVertical.orientation = LinearLayout.VERTICAL
+
+        val lp = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        lp.setMargins(10, 0, 10, 0)
+
+        val iv = ImageView(view.context)
+        iv.layoutParams = lp
+        iv.setImageBitmap(item.img)
+        iv.setOnClickListener {
+            val action = when (from) {
+                From.MOVIE -> MovieDetailsFragmentDirections
+                    .actionListMoviesFragmentToMovieDetailsFragment(item.id, item.urlImg)
+                From.PEOPLE -> PeopleDetailsFragmentDirections
+                    .actionPeopleDetailsFragmentToMovieDetailsFragment(item.id, item.urlImg)
+            }
+            view.findNavController().navigate(action)
+        }
+
+        val name = TextView(view.context)
+        name.text = cropText(item.nameTitle)
+
+        linearLayoutVertical.addView(iv)
+        linearLayoutVertical.addView(name)
+
+        return linearLayoutVertical
+    }
+
+    fun makeGridOf(view: View, items: List<Item>, grid: GridLayout, from: From,
+                   makeCell: (view: View, item: Item, from: From) -> LinearLayout) {
+        val total = items.size
+        val columnsNumber = 3
+        var row = 0
+        var col = 0
+
+        grid.columnCount = columnsNumber
+        grid.rowCount = if (total / columnsNumber <= 0) 1 else total / columnsNumber
+        for (item in items) {
+            if (col == columnsNumber) {
+                col = 0
+                row++
+            }
+
+            val rowSpan = GridLayout.spec(GridLayout.UNDEFINED, 1)
+            val colSpan = GridLayout.spec(GridLayout.UNDEFINED, 1)
+            val gridParam: GridLayout.LayoutParams = GridLayout.LayoutParams(rowSpan, colSpan)
+
+            grid.addView(makeCell(view, item, from), gridParam)
+            col++
+        }
+    }
+
+    fun getMoviesGrid(view: View, url: String, keyResult: String, keyPath: String, grid: GridLayout,
+                      from: From, makeCell: (view: View, item: Item, from: From) -> LinearLayout) {
         getMovies(url, keyResult, keyPath, view.context, object : ServerCallback<ArrayList<Movie>> {
             override fun onSuccess(result: ArrayList<Movie>) {
-                val total = result.size
-                val columnsNumber = 3
-                var row = 0
-                var col = 0
-
-                grid.columnCount = columnsNumber
-                grid.rowCount = if (total / columnsNumber <= 0) 1 else total / columnsNumber
-                for (movie in result) {
-                    if (col == columnsNumber) {
-                        col = 0
-                        row++
-                    }
-
-                    val rowSpan = GridLayout.spec(GridLayout.UNDEFINED, 1)
-                    val colSpan = GridLayout.spec(GridLayout.UNDEFINED, 1)
-                    val gridParam: GridLayout.LayoutParams = GridLayout.LayoutParams(rowSpan, colSpan)
-
-                    val textView = TextView(view.context)
-                    val iv = ImageView(view.context)
-                    val linearLayoutVertical = LinearLayout(view.context)
-                    linearLayoutVertical.layoutParams =
-                        LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.WRAP_CONTENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                        )
-                    linearLayoutVertical.orientation = LinearLayout.VERTICAL
-
-                    val lp = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                    )
-                    lp.setMargins(10, 0, 10, 0)
-                    iv.layoutParams = lp
-
-                    iv.setOnClickListener {
-                        val action = if (keyResult == "cast" || keyResult == "crew") {
-                            PeopleDetailsFragmentDirections
-                                .actionPeopleDetailsFragmentToMovieDetailsFragment(
-                                    movie.id,
-                                    movie.urlImg
-                                )
-                        }
-                        else {
-                            MovieDetailsFragmentDirections
-                                .actionListMoviesFragmentToMovieDetailsFragment(movie.id, movie.urlImg)
-                        }
-                        view.findNavController().navigate(action)
-                    }
-
-                    textView.text = cropText(movie.nameTitle)
-                    iv.setImageBitmap(movie.img)
-
-                    linearLayoutVertical.addView(iv)
-                    linearLayoutVertical.addView(textView)
-
-                    grid.addView(linearLayoutVertical, gridParam)
-                    col++
-                }
+                makeGridOf(view, result, grid, from, makeCell)
             }
         })
     }

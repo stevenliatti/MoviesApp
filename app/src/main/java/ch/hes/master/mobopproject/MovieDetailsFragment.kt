@@ -356,71 +356,53 @@ class MovieDetailsFragment : Fragment() {
         })
     }
 
-    private fun makeGridOf(peoples: List<People>, grid: GridLayout) {
-        val total = peoples.size
-        val columnsNumber = 3
-        var row = 0
-        var col = 0
-
-        grid.columnCount = columnsNumber
-        grid.rowCount = if (total / columnsNumber <= 0) 1 else total / columnsNumber
-        for (item in peoples) {
-            if (col == columnsNumber) {
-                col = 0
-                row++
-            }
-
-            val rowSpan = GridLayout.spec(GridLayout.UNDEFINED, 1)
-            val colSpan = GridLayout.spec(GridLayout.UNDEFINED, 1)
-            val gridParam: GridLayout.LayoutParams = GridLayout.LayoutParams(rowSpan, colSpan)
-
-            val name = TextView(context)
-            val role = TextView(context)
-            val iv = ImageView(context)
-            val linearLayoutVertical = LinearLayout(context)
-            linearLayoutVertical.layoutParams =
-                LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                )
-            linearLayoutVertical.orientation = LinearLayout.VERTICAL
-
-            val lp = LinearLayout.LayoutParams(
+    private fun makeGridPeopleCell(view: View, item: Item, from: From): LinearLayout {
+        val linearLayoutVertical = LinearLayout(view.context)
+        linearLayoutVertical.layoutParams =
+            LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
-            lp.setMargins(10, 0, 10, 0)
-            iv.layoutParams = lp
+        linearLayoutVertical.orientation = LinearLayout.VERTICAL
 
-            iv.setOnClickListener {
-                val action = MovieDetailsFragmentDirections
-                    .actionMovieDetailsFragmentToPeopleDetailsFragment(item.id, item.urlImg, item.knowFor)
-                view!!.findNavController().navigate(action)
-            }
+        val lp = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        lp.setMargins(10, 0, 10, 0)
 
-            name.text = Common.cropText(item.nameTitle)
-            role.text = Common.cropText(item.knowFor)
-            iv.setImageBitmap(item.img)
-
-            linearLayoutVertical.addView(iv)
-            linearLayoutVertical.addView(name)
-            linearLayoutVertical.addView(role)
-
-            grid.addView(linearLayoutVertical, gridParam)
-            col++
+        val iv = ImageView(view.context)
+        iv.layoutParams = lp
+        iv.setImageBitmap(item.img)
+        iv.setOnClickListener {
+            val action = MovieDetailsFragmentDirections
+                .actionMovieDetailsFragmentToPeopleDetailsFragment(item.id, item.urlImg, item.knowFor)
+            view.findNavController().navigate(action)
         }
+
+        val name = TextView(view.context)
+        val role = TextView(view.context)
+        name.text = Common.cropText(item.nameTitle)
+        role.text = Common.cropText(item.knowFor)
+
+        linearLayoutVertical.addView(iv)
+        linearLayoutVertical.addView(name)
+        linearLayoutVertical.addView(role)
+
+        return linearLayoutVertical
     }
 
-    private fun makeCreditsGrids(castGrid: GridLayout, crewGrid: GridLayout, context: Context) {
+    private fun makeCreditsGrids(view: View, castGrid: GridLayout, crewGrid: GridLayout, context: Context,
+                                 from: From, makeCell: (view: View, item: Item, from: From) -> LinearLayout) {
         val url = "https://api.themoviedb.org/3/movie/$movieId/credits?api_key=$apiKey"
         getCreditsGrid(url, context, object : ServerCallback<ArrayList<People>> {
             override fun onSuccess(result: ArrayList<People>) {
-                makeGridOf(result, castGrid)
+                Common.makeGridOf(view, result, castGrid, from, makeCell)
             }
         }
         , object : ServerCallback<ArrayList<People>> {
             override fun onSuccess(result: ArrayList<People>) {
-                makeGridOf(result, crewGrid)
+                Common.makeGridOf(view, result, crewGrid, from, makeCell)
             }
         })
     }
@@ -456,9 +438,11 @@ class MovieDetailsFragment : Fragment() {
             "https://api.themoviedb.org/3/movie/${this.movieId}/similar?api_key=$apiKey",
             "results",
             "poster_path",
-            similarMoviesGridLayout
+            similarMoviesGridLayout,
+            From.MOVIE,
+            Common::makeGridMovieCell
         )
-        makeCreditsGrids(castGridLayout, crewGridLayout, view.context)
+        makeCreditsGrids(view, castGridLayout, crewGridLayout, view.context, From.MOVIE, this::makeGridPeopleCell)
 
         getVideos(view.context, 3)
         initAppreciationButtons(view.context)
