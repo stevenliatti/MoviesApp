@@ -14,9 +14,7 @@ import ch.hes.master.mobopproject.data.Movie
 import com.google.android.material.tabs.TabLayout
 
 class ListLikesMoviesFragment : Fragment() {
-    // When requested, this adapter returns a DemoObjectFragment,
-    // representing an object in the collection.
-    private lateinit var demoCollectionPagerAdapter: LikeMoviesPagerAdapter
+    private lateinit var collectionPagerAdapter: LikeMoviesPagerAdapter
     private lateinit var viewPager: ViewPager
 
     override fun onCreateView(inflater: LayoutInflater,
@@ -27,9 +25,9 @@ class ListLikesMoviesFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        demoCollectionPagerAdapter = LikeMoviesPagerAdapter(childFragmentManager)
+        collectionPagerAdapter = LikeMoviesPagerAdapter(childFragmentManager)
         viewPager = view.findViewById(R.id.pager)
-        viewPager.adapter = demoCollectionPagerAdapter
+        viewPager.adapter = collectionPagerAdapter
 
         val tabLayout = view.findViewById(R.id.tab_layout) as TabLayout
         tabLayout.setupWithViewPager(viewPager)
@@ -48,13 +46,12 @@ class LikeMoviesPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
         val text = when (i) {
             0 -> urlLikes
             1 -> urlDislikes
-            else -> "autre"
+            else -> "other"
         }
         return MovieLikesCardFragment(text)
     }
 
     override fun getPageTitle(position: Int): CharSequence {
-
         return when (position) {
             0 -> "Likes"
             1 -> "Dislikes"
@@ -63,11 +60,8 @@ class LikeMoviesPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
     }
 }
 
-// Instances of this class are fragments representing a single
-// object in our collection.
 class MovieLikesCardFragment(private var url: String) : Fragment() {
 
-    private val requestController = VolleyRequestController()
     private var listener: OnListFragmentInteractionListener? = null
 
     override fun onCreateView(inflater: LayoutInflater,
@@ -76,10 +70,10 @@ class MovieLikesCardFragment(private var url: String) : Fragment() {
 
         val view = inflater.inflate(R.layout.generic_list_items, container, false)
 
-        requestController.getMovies(url, "movies",view.context, object : ServerCallback<ArrayList<Movie>> {
-            override fun onSuccess(movies: ArrayList<Movie>) {
+        Common.getMovies(url, "movies", "urlPath", view.context, object : ServerCallback<ArrayList<Movie>> {
+            override fun onSuccess(result: ArrayList<Movie>) {
                 val lmv = ListMoviesRecyclerView()
-                lmv.setViewMv(movies, view as RecyclerView, listener)
+                lmv.setView(result, view as RecyclerView, listener)
             }
         })
         return view

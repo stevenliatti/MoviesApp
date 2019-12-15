@@ -1,7 +1,6 @@
 package ch.hes.master.mobopproject
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,13 +9,11 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import ch.hes.master.mobopproject.data.Constants
-import ch.hes.master.mobopproject.data.Item
 import ch.hes.master.mobopproject.data.Movie
 
 class ListMoviesFragment: Fragment() {
 
     private val apiKey = Constants.tmdbApiKey
-    private val requestController = VolleyRequestController()
 
     private val popularMoviesUrl = "https://api.themoviedb.org/3/discover/movie?api_key=$apiKey&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1"
     private val searchUrl = "https://api.themoviedb.org/3/search/movie?api_key=$apiKey&language=en-US&page=1&include_adult=false&query="
@@ -36,12 +33,10 @@ class ListMoviesFragment: Fragment() {
         if (view is RecyclerView) {
             val url = if (args.query != null) searchUrl + args.query else popularMoviesUrl
 
-            val movie = Movie(42, "bob", Bitmap.createBitmap(42,42, Bitmap.Config.ALPHA_8), "", "")
-
-            requestController.getItems(url, movie, movie, view.context, object : ServerCallback<ArrayList<Item>> {
-                override fun onSuccess(movies: ArrayList<Item>) {
+            Common.getMovies(url, "results", "poster_path", view.context, object : ServerCallback<ArrayList<Movie>> {
+                override fun onSuccess(result: ArrayList<Movie>) {
                     val lmv = ListMoviesRecyclerView()
-                    lmv.setView(movies, view, listener)
+                    lmv.setView(result, view, listener)
                 }
             })
         }
@@ -53,7 +48,7 @@ class ListMoviesFragment: Fragment() {
         if (context is OnListFragmentInteractionListener) {
             listener = context
         } else {
-            throw RuntimeException(context.toString() + " must implement OnListFragmentInteractionListener")
+            throw RuntimeException("$context must implement OnListFragmentInteractionListener")
         }
     }
 

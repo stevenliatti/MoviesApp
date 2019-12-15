@@ -1,7 +1,6 @@
 package ch.hes.master.mobopproject
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,8 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.gridlayout.widget.GridLayout
 import androidx.navigation.fragment.navArgs
 import ch.hes.master.mobopproject.data.Constants
-import ch.hes.master.mobopproject.data.Movie
-import ch.hes.master.mobopproject.data.People
 import ch.hes.master.mobopproject.data.PeopleDetails
 import org.json.JSONObject
 
@@ -38,7 +35,7 @@ class PeopleDetailsFragment : Fragment() {
     private lateinit var knownForTextView: TextView
     private lateinit var birthday: TextView
     private lateinit var placeOfBirth: TextView
-    private lateinit var deathday: TextView
+    private lateinit var deathDay: TextView
     private lateinit var imageView: ImageView
     private lateinit var gender: TextView
     private lateinit var popularity: TextView
@@ -68,7 +65,7 @@ class PeopleDetailsFragment : Fragment() {
                 biography.text = peopleDetails.biography
                 knownForTextView.text = peopleDetails.knownFor
                 birthday.text = peopleDetails.birthday
-                deathday.text = peopleDetails.deathday
+                deathDay.text = peopleDetails.deathday
                 placeOfBirth.text = peopleDetails.placeOfBirth
                 gender.text = peopleDetails.gender
                 popularity.text = peopleDetails.popularity.toString()
@@ -90,7 +87,7 @@ class PeopleDetailsFragment : Fragment() {
         knownForTextView = view.findViewById(R.id.known_for_details) as TextView
         birthday = view.findViewById(R.id.birthday) as TextView
         placeOfBirth = view.findViewById(R.id.place_of_birth) as TextView
-        deathday = view.findViewById(R.id.deathday) as TextView
+        deathDay = view.findViewById(R.id.deathday) as TextView
         imageView = view.findViewById(R.id.img_people_details) as ImageView
         gender = view.findViewById(R.id.gender) as TextView
         popularity = view.findViewById(R.id.popularity_people) as TextView
@@ -99,14 +96,12 @@ class PeopleDetailsFragment : Fragment() {
 
         requestController.setImageView(urlImg, imageView, 500, view.context)
         getPeopleDetails(view.context)
-        println(knownFor)
-        Common.getGridItems(
+        Common.getMoviesGrid(
             view,
             "https://api.themoviedb.org/3/person/${this.id}/movie_credits?api_key=$apiKey",
-            People(42, "", Bitmap.createBitmap(42,42, Bitmap.Config.ALPHA_8), "", knownFor!!, listOf()),
-            Movie(42, "bob", Bitmap.createBitmap(42,42, Bitmap.Config.ALPHA_8), "", ""),
+            if (knownFor == "Acting") "cast" else "crew",
+            "poster_path",
             inMoviesGridLayout)
-
         return view
     }
 

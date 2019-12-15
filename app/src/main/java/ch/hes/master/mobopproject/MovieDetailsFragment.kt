@@ -372,7 +372,6 @@ class MovieDetailsFragment : Fragment() {
 
             val rowSpan = GridLayout.spec(GridLayout.UNDEFINED, 1)
             val colSpan = GridLayout.spec(GridLayout.UNDEFINED, 1)
-
             val gridParam: GridLayout.LayoutParams = GridLayout.LayoutParams(rowSpan, colSpan)
 
             val name = TextView(context)
@@ -399,8 +398,8 @@ class MovieDetailsFragment : Fragment() {
                 view!!.findNavController().navigate(action)
             }
 
-            name.text = Common.croptext(item.nameTitle)
-            role.text = Common.croptext(item.knowFor)
+            name.text = Common.cropText(item.nameTitle)
+            role.text = Common.cropText(item.knowFor)
             iv.setImageBitmap(item.img)
 
             linearLayoutVertical.addView(iv)
@@ -452,14 +451,13 @@ class MovieDetailsFragment : Fragment() {
         // Recuperation of movie details of TMDB
         requestController.setImageView(urlImg, imageView, 500, view.context)
         getMovieDetails(view.context)
-        val movie = Movie(42, "bob", Bitmap.createBitmap(42, 42, Bitmap.Config.ALPHA_8), "", "")
-        Common.getGridItems(
+        Common.getMoviesGrid(
             view,
             "https://api.themoviedb.org/3/movie/${this.movieId}/similar?api_key=$apiKey",
-            movie,
-            movie,
-            similarMoviesGridLayout)
-
+            "results",
+            "poster_path",
+            similarMoviesGridLayout
+        )
         makeCreditsGrids(castGridLayout, crewGridLayout, view.context)
 
         getVideos(view.context, 3)
