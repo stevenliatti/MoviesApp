@@ -1,6 +1,7 @@
 package ch.hes.master.mobopproject
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +13,10 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ch.hes.master.mobopproject.data.Constants
+import ch.hes.master.mobopproject.data.Movie
 import ch.hes.master.mobopproject.data.People
+import org.json.JSONException
+import org.json.JSONObject
 
 class ListPeoplesFragment: Fragment() {
 
@@ -34,15 +38,64 @@ class ListPeoplesFragment: Fragment() {
         var imageView: ImageView = itemView.findViewById(R.id.img_people)
         var view: View = itemView
 
-        override fun bind(p: People, clickListener: View.OnClickListener) {
-            nameView.text = p.nameTitle
-            knownForView.text = p.knowFor
-            inMoviesView.text = "In movies: " + p.inMovies!!.map { m -> m.nameTitle }
-            imageView.setImageBitmap(p.img)
+        override fun bind(data: People, clickListener: View.OnClickListener) {
+            nameView.text = data.nameTitle
+            knownForView.text = data.knowFor
+            inMoviesView.text = "In movies: " + data.inMovies!!.map { m -> m.nameTitle }
+            imageView.setImageBitmap(data.img)
 
-            view.tag = p
+            view.tag = data
             view.setOnClickListener(clickListener)
         }
+    }
+
+    private fun getPeoples(url: String, context: Context, callback: ServerCallback<ArrayList<People>>) {
+        val peoples: ArrayList<People> = ArrayList()
+        requestController.httpGet(url, context, object : ServerCallback<JSONObject> {
+            override fun onSuccess(result: JSONObject) {
+                val jsArray = result.getJSONArray("results")
+                for (i in 0 until jsArray.length()) {
+                    val jsObj = jsArray.getJSONObject(i)
+                    requestController.getPosterImage(jsObj.getString("profile_path"), context, object : ServerCallback<Bitmap> {
+                        override fun onSuccess(img: Bitmap) {
+                            val knownFor: ArrayList<Movie> = ArrayList()
+
+                            try {
+                                val knownForJson = jsObj.getJSONArray("known_for")
+                                for (j in 0 until knownForJson.length()) {
+                                    val propsMovie = knownForJson.getJSONObject(j)
+                                    if (propsMovie.getString("media_type") == "movie") {
+                                        knownFor.add(
+                                            Movie(
+                                                propsMovie.getInt("id"),
+                                                propsMovie.getString("title"),
+                                                null,
+                                                propsMovie.getString("poster_path"),
+                                                propsMovie.getString("overview"))
+                                        )
+                                    }
+                                }
+                            }
+                            catch (e: JSONException) {
+                                println("$e, $url")
+                            }
+
+                            peoples.add(People(
+                                jsObj.getInt("id"),
+                                jsObj.getString("name"),
+                                img,
+                                jsObj.getString("profile_path"),
+                                jsObj.getString("known_for_department"),
+                                knownFor))
+
+                            if(i == jsArray.length()-1) {
+                                callback.onSuccess(peoples)
+                            }
+                        }
+                    })
+                }
+            }
+        })
     }
 
     override fun onCreateView(
@@ -55,10 +108,10 @@ class ListPeoplesFragment: Fragment() {
         if (view is RecyclerView) {
             val url = if (args.query != null) searchUrl + args.query else popularPeopleUrl
 
-            requestController.getPeoples(url, "results", "known_for_department", view.context, object : ServerCallback<ArrayList<People>> {
-                override fun onSuccess(peoples: ArrayList<People>) {
+            getPeoples(url, view.context, object : ServerCallback<ArrayList<People>> {
+                override fun onSuccess(result: ArrayList<People>) {
 
-                    val myAdapter = object : GenericAdapter<People>(peoples, listener) {
+                    val myAdapter = object : GenericAdapter<People>(result, listener) {
                         override fun getLayoutId(position: Int, obj: People): Int {
                             return R.layout.fragment_people
                         }
@@ -81,7 +134,7 @@ class ListPeoplesFragment: Fragment() {
         if (context is OnListFragmentInteractionListener) {
             listener = context
         } else {
-            throw RuntimeException(context.toString() + " must implement OnListFragmentInteractionListener")
+            throw RuntimeException("$context must implement OnListFragmentInteractionListener")
         }
     }
 

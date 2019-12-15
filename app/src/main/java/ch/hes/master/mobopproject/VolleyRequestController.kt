@@ -5,15 +5,10 @@ import android.graphics.Bitmap
 import android.util.Log
 import android.widget.ImageView
 import ch.hes.master.mobopproject.data.*
-import ch.hes.master.mobopproject.data.Movie
-import ch.hes.master.mobopproject.data.MovieDetails
-import ch.hes.master.mobopproject.data.User
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.ImageRequest
 import com.android.volley.toolbox.JsonObjectRequest
-import org.json.JSONArray
-import org.json.JSONException
 import org.json.JSONObject
 
 interface ServerCallback<T> {
@@ -94,106 +89,6 @@ class VolleyRequestController {
         })
     }
 
-    fun getPeoples(URL: String, keyResult: String, keyRole: String, context: Context, callback: ServerCallback<ArrayList<People>>) {
-        val peoples: ArrayList<People> = ArrayList()
-        httpGet(URL, context, object : ServerCallback<JSONObject> {
-            override fun onSuccess(result: JSONObject) {
-                val jsArray = result.getJSONArray(keyResult)
-                for (i in 0 until jsArray.length()) {
-                    val jsObj = jsArray.getJSONObject(i)
-                    getPosterImage(jsObj.getString("profile_path"), context, object : ServerCallback<Bitmap> {
-                        override fun onSuccess(img: Bitmap) {
-                            val knownFor: ArrayList<Movie> = ArrayList()
-
-                            try {
-                                val knownForJson = jsObj.getJSONArray("known_for")
-                                for (j in 0 until knownForJson.length()) {
-                                    val propsMovie = knownForJson.getJSONObject(j)
-                                    if (propsMovie.getString("media_type") == "movie") {
-                                        knownFor.add(Movie(
-                                            propsMovie.getInt("id"),
-                                            propsMovie.getString("title"),
-                                            null,
-                                            propsMovie.getString("poster_path"),
-                                            propsMovie.getString("overview")))
-                                    }
-                                }
-                            }
-                            catch (e: JSONException) {
-                                println("$e, $URL, $keyResult, $keyRole")
-                            }
-
-                            peoples.add(People(
-                                jsObj.getInt("id"),
-                                jsObj.getString("name"),
-                                img,
-                                jsObj.getString("profile_path"),
-                                jsObj.getString(keyRole),
-                                knownFor))
-
-                            if(i == jsArray.length()-1) {
-                                callback.onSuccess(peoples)
-                            }
-                        }
-                    })
-                }
-            }
-        })
-    }
-
-    fun getMovieDetails(URL: String, context: Context, callback: ServerCallback<MovieDetails>) {
-        httpGet(URL, context, object : ServerCallback<JSONObject> {
-            override fun onSuccess(res: JSONObject) {
-                val movieDetails = MovieDetails(
-                    res.getInt("id"),
-                    res.getString("title"),
-                    res.getString("overview"),
-                    buildStringListFromJsonSArray(res.getJSONArray("genres"), "name"),
-                    res.getDouble("popularity"),
-                    buildStringListFromJsonSArray(res.getJSONArray("production_countries"), "name"),
-                    res.getString("release_date"),
-                    res.getString("tagline"),
-                    res.getInt("vote_count")
-                )
-                callback.onSuccess(movieDetails)
-            }
-        })
-    }
-
-    fun getPeopleDetails(URL: String, context: Context, callback: ServerCallback<PeopleDetails>) {
-        httpGet(URL, context, object : ServerCallback<JSONObject> {
-            override fun onSuccess(res: JSONObject) {
-                val peopleDetails = PeopleDetails(
-                    res.getInt("id"),
-                    res.getString("name"),
-                    res.getString("biography"),
-                    res.getString("known_for_department"),
-                    res.getDouble("popularity"),
-                    res.getString("birthday"),
-                    res.getString("place_of_birth"),
-                    res.getString("deathday"),
-                    res.getString("gender"),
-                    res.getString("homepage")
-                )
-                callback.onSuccess(peopleDetails)
-            }
-        })
-    }
-
-    fun getUsers(URL: String, context: Context, callback: ServerCallback<ArrayList<User>>) {
-        val users: ArrayList<User> = ArrayList()
-        httpGet(URL, context, object : ServerCallback<JSONObject> {
-            override fun onSuccess(result: JSONObject) {
-                val jsArray = result.getJSONArray("pseudos")
-                for (i in 0 until jsArray.length()) {
-                    val jsObj = jsArray.getString(i)
-                    users.add(User(jsObj, "", ""))
-                    callback.onSuccess(users)
-                }
-            }
-        })
-    }
-
     fun getMovies(URL: String, keyResult: String, context: Context, callback: ServerCallback<ArrayList<Movie>>) {
         val movies: ArrayList<Movie> = ArrayList()
         httpGet(URL, context, object : ServerCallback<JSONObject> {
@@ -214,18 +109,8 @@ class VolleyRequestController {
         })
     }
 
-    private fun buildStringListFromJsonSArray(jsonArray: JSONArray, key: String): ArrayList<String> {
-        val strings: ArrayList<String> = ArrayList()
-        for (i in 0 until jsonArray.length()) {
-            val res = jsonArray.getJSONObject(i)
-            strings.add(res.getString(key))
-        }
-        return strings
-    }
-
-
     fun getPosterImage(posterPath: String, context: Context, callback: ServerCallback<Bitmap>) {
-        val url = "https://image.tmdb.org/t/p/w300" + posterPath
+        val url = "https://image.tmdb.org/t/p/w300$posterPath"
         val imgRequest = ImageRequest(url,
             Response.Listener { response ->
                 callback.onSuccess(Bitmap.createBitmap(response))
@@ -238,19 +123,7 @@ class VolleyRequestController {
     }
 
     fun setImageView(urlImg: String?, image: ImageView, width: Int, context: Context) {
-        val url = "https://image.tmdb.org/t/p/w" + width + "/" + urlImg
-
-        val imgRequest = ImageRequest(url,
-            Response.Listener { response ->
-                val img = Bitmap.createBitmap(response)
-                image.setImageBitmap(img)
-            }, 0, 0, null, null)
-
-        HttpQueue.getInstance(context).addToRequestQueue(imgRequest)
-    }
-
-    fun setYoutubeImageView(youtubeId: String?, image: ImageView, context: Context) {
-        val url = "https://img.youtube.com/vi/" + youtubeId + "/1.jpg"
+        val url = "https://image.tmdb.org/t/p/w$width/$urlImg"
 
         val imgRequest = ImageRequest(url,
             Response.Listener { response ->

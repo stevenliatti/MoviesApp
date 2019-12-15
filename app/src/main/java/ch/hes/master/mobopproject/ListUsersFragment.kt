@@ -1,5 +1,6 @@
 package ch.hes.master.mobopproject
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import ch.hes.master.mobopproject.data.User
 import com.google.android.material.tabs.TabLayout
+import org.json.JSONObject
 
 
 class ListUsersFragment : Fragment() {
@@ -68,6 +70,20 @@ class UserCardFragment : Fragment() {
     private val requestController = VolleyRequestController()
     private val args: UserCardFragmentArgs by navArgs()
 
+    private fun getUsers(URL: String, context: Context, callback: ServerCallback<ArrayList<User>>) {
+        val users: ArrayList<User> = ArrayList()
+        requestController.httpGet(URL, context, object : ServerCallback<JSONObject> {
+            override fun onSuccess(result: JSONObject) {
+                val jsArray = result.getJSONArray("pseudos")
+                for (i in 0 until jsArray.length()) {
+                    val jsObj = jsArray.getString(i)
+                    users.add(User(jsObj, "", ""))
+                    callback.onSuccess(users)
+                }
+            }
+        })
+    }
+
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -75,7 +91,7 @@ class UserCardFragment : Fragment() {
         val view = inflater.inflate(R.layout.generic_list_items, container, false)
 
         arguments?.getString("URL", args.query)?.let {
-            requestController.getUsers(it, view.context, object : ServerCallback<ArrayList<User>> {
+            getUsers(it, view.context, object : ServerCallback<ArrayList<User>> {
                 override fun onSuccess(result: ArrayList<User>) {
 
                     val myAdapter = object : GenericAdapter<User>(result) {

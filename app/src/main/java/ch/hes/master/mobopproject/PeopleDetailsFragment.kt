@@ -15,6 +15,7 @@ import ch.hes.master.mobopproject.data.Constants
 import ch.hes.master.mobopproject.data.Movie
 import ch.hes.master.mobopproject.data.People
 import ch.hes.master.mobopproject.data.PeopleDetails
+import org.json.JSONObject
 
 
 class PeopleDetailsFragment : Fragment() {
@@ -44,21 +45,34 @@ class PeopleDetailsFragment : Fragment() {
     private lateinit var homepage: TextView
     private lateinit var inMoviesGridLayout: GridLayout
 
-    private fun getDetails(context: Context) {
+    private fun getPeopleDetails(context: Context) {
         val url = "https://api.themoviedb.org/3/person/${this.id}?api_key=$apiKey"
 
-        requestController.getPeopleDetails(url, context, object : ServerCallback<PeopleDetails> {
-            override fun onSuccess(ds: PeopleDetails) {
-                details = ds
-                name.text = ds.name
-                biography.text = ds.biography
-                knownForTextView.text = ds.knownFor
-                birthday.text = ds.birthday
-                deathday.text = ds.deathday
-                placeOfBirth.text = ds.placeOfBirth
-                gender.text = ds.gender
-                popularity.text = ds.popularity.toString()
-                homepage.text = ds.homepage
+        requestController.httpGet(url, context, object : ServerCallback<JSONObject> {
+            override fun onSuccess(result: JSONObject) {
+                val peopleDetails = PeopleDetails(
+                    result.getInt("id"),
+                    result.getString("name"),
+                    result.getString("biography"),
+                    result.getString("known_for_department"),
+                    result.getDouble("popularity"),
+                    result.getString("birthday"),
+                    result.getString("place_of_birth"),
+                    result.getString("deathday"),
+                    result.getString("gender"),
+                    result.getString("homepage")
+                )
+
+                details = peopleDetails
+                name.text = peopleDetails.name
+                biography.text = peopleDetails.biography
+                knownForTextView.text = peopleDetails.knownFor
+                birthday.text = peopleDetails.birthday
+                deathday.text = peopleDetails.deathday
+                placeOfBirth.text = peopleDetails.placeOfBirth
+                gender.text = peopleDetails.gender
+                popularity.text = peopleDetails.popularity.toString()
+                homepage.text = peopleDetails.homepage
             }
         })
     }
@@ -84,7 +98,7 @@ class PeopleDetailsFragment : Fragment() {
         inMoviesGridLayout = view.findViewById(R.id.in_movies_grid) as GridLayout
 
         requestController.setImageView(urlImg, imageView, 500, view.context)
-        getDetails(view.context)
+        getPeopleDetails(view.context)
         println(knownFor)
         Common.getGridItems(
             view,

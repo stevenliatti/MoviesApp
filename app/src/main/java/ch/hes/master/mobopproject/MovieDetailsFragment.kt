@@ -14,6 +14,8 @@ import androidx.gridlayout.widget.GridLayout
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import ch.hes.master.mobopproject.data.*
+import com.android.volley.Response
+import com.android.volley.toolbox.ImageRequest
 import com.google.android.youtube.player.YouTubeStandalonePlayer
 import org.json.JSONArray
 import org.json.JSONObject
@@ -24,7 +26,7 @@ class MovieDetailsFragment : Fragment() {
     private val MAX_CAST = 9
     private val MAX_CREW = 5
 
-    val CREW_FILTER = listOf("Producer", "Casting", "Music", "Writer", "Director")
+    private val CREW_FILTER = listOf("Producer", "Casting", "Music", "Writer", "Director")
 
     private val apiKey = Constants.tmdbApiKey
     private val requestController = VolleyRequestController()
@@ -54,13 +56,33 @@ class MovieDetailsFragment : Fragment() {
     private lateinit var likeBox: CheckBox
     private lateinit var dislikeBox: CheckBox
 
-    private fun getMoreDetails(context: Context) {
+    private fun buildStringListFromJsonSArray(jsonArray: JSONArray, key: String): ArrayList<String> {
+        val strings: ArrayList<String> = ArrayList()
+        for (i in 0 until jsonArray.length()) {
+            val res = jsonArray.getJSONObject(i)
+            strings.add(res.getString(key))
+        }
+        return strings
+    }
+
+    private fun getMovieDetails(context: Context) {
         val url = "https://api.themoviedb.org/3/movie/${this.movieId}?api_key=$apiKey"
 
-        requestController.getMovieDetails(url, context, object : ServerCallback<MovieDetails> {
-            override fun onSuccess(result: MovieDetails) {
+        requestController.httpGet(url, context, object : ServerCallback<JSONObject> {
+            override fun onSuccess(result: JSONObject) {
+                val movieDetails = MovieDetails(
+                    result.getInt("id"),
+                    result.getString("title"),
+                    result.getString("overview"),
+                    buildStringListFromJsonSArray(result.getJSONArray("genres"), "name"),
+                    result.getDouble("popularity"),
+                    buildStringListFromJsonSArray(result.getJSONArray("production_countries"), "name"),
+                    result.getString("release_date"),
+                    result.getString("tagline"),
+                    result.getInt("vote_count")
+                )
 
-                details = result
+                details = movieDetails
 
                 titleView.text = details.title
                 descriptionView.text = details.overview
@@ -82,9 +104,20 @@ class MovieDetailsFragment : Fragment() {
                 releaseDateView.text = details.releaseDate
                 subtitleView.text = details.subtitle
                 voteCountView.text = "Vote count : " + details.voteCount
-
             }
         })
+    }
+
+    private fun setYoutubeImageView(youtubeId: String?, image: ImageView, context: Context) {
+        val url = "https://img.youtube.com/vi/$youtubeId/1.jpg"
+
+        val imgRequest = ImageRequest(url,
+            Response.Listener { response ->
+                val img = Bitmap.createBitmap(response)
+                image.setImageBitmap(img)
+            }, 0, 0, null, null)
+
+        HttpQueue.getInstance(context).addToRequestQueue(imgRequest)
     }
 
     private fun getVideos(context: Context, videosNb: Int) {
@@ -108,7 +141,7 @@ class MovieDetailsFragment : Fragment() {
                 for (video in videos) {
                     val videoView = LinearLayout(view?.context)
                     val thumbnail = ImageView(view?.context)
-                    requestController.setYoutubeImageView(video.key, thumbnail, context)
+                    setYoutubeImageView(video.key, thumbnail, context)
 
                     thumbnail.setOnClickListener {
                         try {
@@ -293,11 +326,11 @@ class MovieDetailsFragment : Fragment() {
         for (i in 0 until array.length()) {
             val jsObj = array.getJSONObject(i)
             requestController.getPosterImage(jsObj.getString("profile_path"), context, object : ServerCallback<Bitmap> {
-                override fun onSuccess(img: Bitmap) {
+                override fun onSuccess(result: Bitmap) {
                     cast.add(People(
                         jsObj.getInt("id"),
                         jsObj.getString("name"),
-                        img,
+                        result,
                         jsObj.getString("profile_path"),
                         jsObj.getString(role),
                         listOf()))
@@ -330,7 +363,7 @@ class MovieDetailsFragment : Fragment() {
         var col = 0
 
         grid.columnCount = columnsNumber
-        grid.rowCount = total / columnsNumber
+        grid.rowCount = if (total / columnsNumber <= 0) 1 else total / columnsNumber
         for (item in peoples) {
             if (col == columnsNumber) {
                 col = 0
@@ -340,8 +373,7 @@ class MovieDetailsFragment : Fragment() {
             val rowSpan = GridLayout.spec(GridLayout.UNDEFINED, 1)
             val colSpan = GridLayout.spec(GridLayout.UNDEFINED, 1)
 
-            val gridParam: GridLayout.LayoutParams =
-                GridLayout.LayoutParams(rowSpan, colSpan)
+            val gridParam: GridLayout.LayoutParams = GridLayout.LayoutParams(rowSpan, colSpan)
 
             val name = TextView(context)
             val role = TextView(context)
@@ -419,7 +451,7 @@ class MovieDetailsFragment : Fragment() {
 
         // Recuperation of movie details of TMDB
         requestController.setImageView(urlImg, imageView, 500, view.context)
-        getMoreDetails(view.context)
+        getMovieDetails(view.context)
         val movie = Movie(42, "bob", Bitmap.createBitmap(42, 42, Bitmap.Config.ALPHA_8), "", "")
         Common.getGridItems(
             view,

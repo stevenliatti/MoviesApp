@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
-import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import ch.hes.master.mobopproject.data.Movie
@@ -17,7 +16,7 @@ import com.google.android.material.tabs.TabLayout
 class ListLikesMoviesFragment : Fragment() {
     // When requested, this adapter returns a DemoObjectFragment,
     // representing an object in the collection.
-    private lateinit var demoCollectionPagerAdapter: LikeMoviestPagerAdapter
+    private lateinit var demoCollectionPagerAdapter: LikeMoviesPagerAdapter
     private lateinit var viewPager: ViewPager
 
     override fun onCreateView(inflater: LayoutInflater,
@@ -28,7 +27,7 @@ class ListLikesMoviesFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        demoCollectionPagerAdapter = LikeMoviestPagerAdapter(childFragmentManager)
+        demoCollectionPagerAdapter = LikeMoviesPagerAdapter(childFragmentManager)
         viewPager = view.findViewById(R.id.pager)
         viewPager.adapter = demoCollectionPagerAdapter
 
@@ -38,7 +37,7 @@ class ListLikesMoviesFragment : Fragment() {
 
 }
 
-class LikeMoviestPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+class LikeMoviesPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
     override fun getCount(): Int  = 2
 
@@ -91,7 +90,7 @@ class MovieLikesCardFragment(private var url: String) : Fragment() {
         if (context is OnListFragmentInteractionListener) {
             listener = context
         } else {
-            throw RuntimeException(context.toString() + " must implement OnListFragmentInteractionListener")
+            throw RuntimeException("$context must implement OnListFragmentInteractionListener")
         }
     }
 
