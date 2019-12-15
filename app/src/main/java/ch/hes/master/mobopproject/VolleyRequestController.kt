@@ -176,8 +176,8 @@ class VolleyRequestController {
     fun getUsers(URL: String, context: Context, callback: ServerCallback<ArrayList<User>>) {
         val users: ArrayList<User> = ArrayList()
         httpGet(URL, context, object : ServerCallback<JSONObject> {
-            override fun onSuccess(response: JSONObject) {
-                val jsArray = response.getJSONArray("pseudos")
+            override fun onSuccess(result: JSONObject) {
+                val jsArray = result.getJSONArray("pseudos")
                 for (i in 0 until jsArray.length()) {
                     val jsObj = jsArray.getString(i)
                     users.add(User(jsObj, "", ""))
@@ -187,11 +187,11 @@ class VolleyRequestController {
         })
     }
 
-    fun getMovies(URL: String, keyresult: String, context: Context, callback: ServerCallback<ArrayList<Movie>>) {
+    fun getMovies(URL: String, keyResult: String, context: Context, callback: ServerCallback<ArrayList<Movie>>) {
         val movies: ArrayList<Movie> = ArrayList()
         httpGet(URL, context, object : ServerCallback<JSONObject> {
             override fun onSuccess(response: JSONObject) {
-                val jsArray = response.getJSONArray(keyresult)
+                val jsArray = response.getJSONArray(keyResult)
                 for (i in 0 until jsArray.length()) {
                     val jsObj = jsArray.getJSONObject(i)
                     getPosterImage(jsObj.getString("urlPath"), context, object : ServerCallback<Bitmap> {

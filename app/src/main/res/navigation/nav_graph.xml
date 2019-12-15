@@ -52,6 +52,14 @@
         <action
             android:id="@+id/action_listPeoplesFragment_to_peopleDetailsFragment"
             app:destination="@id/peopleDetailsFragment" />
+        <argument
+            android:name="query"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <action
+            android:id="@+id/action_listPeoplesFragment_self"
+            app:destination="@id/listPeoplesFragment" />
     </fragment>
     <fragment
         android:id="@+id/peopleDetailsFragment"
@@ -78,6 +86,14 @@
         <action
             android:id="@+id/action_userListFragment_to_listLikesMoviesFragment"
             app:destination="@id/listLikesMoviesFragment" />
+        <argument
+            android:name="query"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <action
+            android:id="@+id/action_userListFragment_self"
+            app:destination="@id/userListFragment" />
     </fragment>
     <fragment
         android:id="@+id/listLikesMoviesFragment"
@@ -91,6 +107,34 @@
             app:argType="string"
             app:nullable="true"
             android:defaultValue="@null"/>
+    </fragment>
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="ch.hes.master.mobopproject.SearchFragment"
+        android:label="fragment_search"
+        tools:layout="@layout/fragment_search" >
+        <action
+            android:id="@+id/action_searchFragment_to_listMoviesFragment"
+            app:destination="@id/listMoviesFragment" />
+        <action
+            android:id="@+id/action_searchFragment_to_listPeoplesFragment"
+            app:destination="@id/listPeoplesFragment" />
+        <action
+            android:id="@+id/action_searchFragment_self"
+            app:destination="@id/searchFragment" />
+        <action
+            android:id="@+id/action_searchFragment_to_userCardFragment"
+            app:destination="@id/userCardFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/userCardFragment"
+        android:name="ch.hes.master.mobopproject.UserCardFragment"
+        android:label="UserCardFragment">
+        <argument
+            android:name="query"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"

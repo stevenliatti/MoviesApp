@@ -21,5 +21,9 @@
         android:title="@string/peoples"
         android:icon="@drawable/ic_person_white_100dp"
         />
+    <item
+        android:id="@+id/searchFragment"
+        android:title="@string/search"
+        android:icon="@drawable/ic_search_white_100dp"/>
 
 </menu>

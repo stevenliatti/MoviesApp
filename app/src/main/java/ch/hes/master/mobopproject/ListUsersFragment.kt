@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
@@ -17,9 +18,7 @@ import com.google.android.material.tabs.TabLayout
 
 
 class ListUsersFragment : Fragment() {
-    // When requested, this adapter returns a DemoObjectFragment,
-    // representing an object in the collection.
-    private lateinit var demoCollectionPagerAdapter: UserListPagerAdapter
+    private lateinit var collectionPagerAdapter: UserListPagerAdapter
     private lateinit var viewPager: ViewPager
 
     override fun onCreateView(inflater: LayoutInflater,
@@ -30,17 +29,15 @@ class ListUsersFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        demoCollectionPagerAdapter = UserListPagerAdapter(childFragmentManager)
+        collectionPagerAdapter = UserListPagerAdapter(childFragmentManager)
         viewPager = view.findViewById(R.id.pager)
-        viewPager.adapter = demoCollectionPagerAdapter
+        viewPager.adapter = collectionPagerAdapter
 
         val tabLayout = view.findViewById(R.id.tab_layout) as TabLayout
         tabLayout.setupWithViewPager(viewPager)
     }
 }
 
-// Since this is an object collection, use a FragmentStatePagerAdapter,
-// and NOT a FragmentPagerAdapter.
 class UserListPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
     override fun getCount(): Int  = 2
@@ -54,7 +51,7 @@ class UserListPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
             1 -> urlFollowers
             else -> "autre"
         }
-        return UserCardFragment(text)
+        return UserCardFragment.newInstance(text)
     }
 
     override fun getPageTitle(position: Int): CharSequence {
@@ -67,12 +64,12 @@ class UserListPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
     }
 }
 
-// Instances of this class are fragments representing a single
-// object in our collection.
-class UserCardFragment(private var url: String) : Fragment() {
+class UserCardFragment : Fragment() {
 
     private val requestController = VolleyRequestController()
     private var listener: OnListFragmentInteractionListener? = null
+
+    private val args: UserCardFragmentArgs by navArgs()
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
@@ -80,27 +77,39 @@ class UserCardFragment(private var url: String) : Fragment() {
 
         val view = inflater.inflate(R.layout.generic_list_items, container, false)
 
-        requestController.getUsers(url, view.context, object : ServerCallback<ArrayList<User>> {
-            override fun onSuccess(users: ArrayList<User>) {
+        arguments?.getString("URL", args.query)?.let {
+            requestController.getUsers(it, view.context, object : ServerCallback<ArrayList<User>> {
+                override fun onSuccess(result: ArrayList<User>) {
 
-                val myAdapter = object : GenericAdapter<User>(users, listener) {
-                    override fun getLayoutId(position: Int, obj: User): Int {
-                        return R.layout.user_card
+                    val myAdapter = object : GenericAdapter<User>(result, listener) {
+                        override fun getLayoutId(position: Int, obj: User): Int {
+                            return R.layout.user_card
+                        }
+
+                        override fun getViewHolder(view: View, viewType: Int): RecyclerView.ViewHolder {
+                            return UserViewHolder(view)
+                        }
+
                     }
 
-                    override fun getViewHolder(view: View, viewType: Int): RecyclerView.ViewHolder {
-                        return UserViewHolder(view)
+                    if (view is RecyclerView) {
+                        view.layoutManager = LinearLayoutManager(view.context)
+                        view.setHasFixedSize(true)
+                        view.adapter = myAdapter
                     }
                 }
-                if (view is RecyclerView) {
-                    view.layoutManager = LinearLayoutManager(view.context)
-                    view.setHasFixedSize(true)
-                    view.adapter = myAdapter
-                }
-
-            }
-        })
+            })
+        }
         return view
+    }
+
+    companion object {
+        fun newInstance(url: String) =
+            UserCardFragment().apply {
+                arguments = Bundle().apply {
+                    putString("URL", url)
+                }
+            }
     }
 
     override fun onAttach(context: Context) {
@@ -118,17 +127,14 @@ class UserCardFragment(private var url: String) : Fragment() {
     }
 }
 
-class UserViewHolder : RecyclerView.ViewHolder, GenericAdapter.Binder<User> {
+class UserViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), GenericAdapter.Binder<User> {
 
-    var pseudo: TextView
-    var view: View
-    constructor( itemView: View):super(itemView){
-        pseudo = itemView.findViewById(R.id.userName)
-        view = itemView
-    }
-    override fun bind(user: User, clickListener: View.OnClickListener) {
-        pseudo.text = user.pseudo
-        view.tag = user
+    private var pseudo: TextView = itemView.findViewById(R.id.userName)
+    var view: View = itemView
+
+    override fun bind(data: User, clickListener: View.OnClickListener) {
+        pseudo.text = data.pseudo
+        view.tag = data
         view.setOnClickListener(clickListener)
     }
 }

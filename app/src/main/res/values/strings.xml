@@ -21,7 +21,6 @@
     <string name="biography">Biography</string>
     <string name="in_movies">Movies</string>
     <string name="peoples">Peoples</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="users">Users</string>
+    <string name="submit">Submit</string>
 </resources>

@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ch.hes.master.mobopproject.data.Constants
@@ -23,7 +24,7 @@ class ListPeoplesFragment: Fragment() {
     private val popularPeopleUrl = "https://api.themoviedb.org/3/person/popular?api_key=$apiKey&language=en-US&page=1"
     private val searchUrl = "https://api.themoviedb.org/3/search/person?api_key=$apiKey&language=en-US&page=1&include_adult=false&query="
 
-    //private val args: ListPeoplesFragmentArgs by navArgs()
+    private val args: ListPeoplesFragmentArgs by navArgs()
 
     class ListPeopleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), GenericAdapter.Binder<People> {
 
@@ -52,7 +53,8 @@ class ListPeoplesFragment: Fragment() {
 
         // Set the adapter
         if (view is RecyclerView) {
-            val url = popularPeopleUrl
+            val url = if (args.query != null) searchUrl + args.query else popularPeopleUrl
+
             requestController.getPeoples(url, view.context, object : ServerCallback<ArrayList<People>> {
                 override fun onSuccess(peoples: ArrayList<People>) {
 
