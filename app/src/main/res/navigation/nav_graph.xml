@@ -144,11 +144,18 @@
         <action
             android:id="@+id/action_loginFragment_to_registerFragment"
             app:destination="@id/registerFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_listMoviesFragment"
+            app:destination="@id/listMoviesFragment" />
     </fragment>
     <fragment
         android:id="@+id/registerFragment"
         android:name="ch.hes.master.mobopproject.RegisterFragment"
         android:label="fragment_register"
-        tools:layout="@layout/fragment_register" />
+        tools:layout="@layout/fragment_register" >
+        <action
+            android:id="@+id/action_registerFragment_to_listMoviesFragment"
+            app:destination="@id/listMoviesFragment" />
+    </fragment>
 
 </navigation>

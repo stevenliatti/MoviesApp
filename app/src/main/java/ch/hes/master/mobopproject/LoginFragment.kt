@@ -19,6 +19,7 @@ class LoginFragment : Fragment() {
 
 
     // private var listener: OnFragmentInteractionListener? = null
+    val sharedPref = activity?.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
     private val requestController = VolleyRequestController()
     private val urlLogin = "https://mobop.liatti.ch/user/login"
 
@@ -38,9 +39,14 @@ class LoginFragment : Fragment() {
                 requestController.httpPost(urlLogin, data, view.context, object : ServerCallback<JSONObject> {
                     override fun onSuccess(res: JSONObject) {
                         if(res.getString("token") == "TOKKKEN") {
-                            val trucPersistant = res.getString("pseudo")
-                            println(trucPersistant)
-                            // navigate to home
+                            val pseudo = res.getString("pseudo")
+                            val token = res.getString("token")
+                            with (sharedPref!!.edit()) {
+                                putString(getString(R.string.pseudo), pseudo)
+                                putString(getString(R.string.token), token)
+                                commit()
+                            }
+                            view.findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToListMoviesFragment())
                         }
                     }
                 })
