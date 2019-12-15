@@ -23,4 +23,7 @@
     <string name="peoples">Peoples</string>
     <string name="users">Users</string>
     <string name="submit">Submit</string>
+    <string name="preference_file_key">authentication</string>
+    <string name="pseudo">pseudo</string>
+    <string name="token">token</string>
 </resources>

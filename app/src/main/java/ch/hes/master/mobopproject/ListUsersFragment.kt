@@ -68,6 +68,8 @@ class UserListPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 class UserCardFragment : Fragment() {
 
     private val requestController = VolleyRequestController()
+    private var listener: OnListFragmentInteractionListener? = null
+
     private val args: UserCardFragmentArgs by navArgs()
 
     private fun getUsers(URL: String, context: Context, callback: ServerCallback<ArrayList<User>>) {
@@ -94,7 +96,7 @@ class UserCardFragment : Fragment() {
             getUsers(it, view.context, object : ServerCallback<ArrayList<User>> {
                 override fun onSuccess(result: ArrayList<User>) {
 
-                    val myAdapter = object : GenericAdapter<User>(result) {
+                    val myAdapter = object : GenericAdapter<User>(result, listener) {
                         override fun getLayoutId(position: Int, obj: User): Int {
                             return R.layout.user_card
                         }
@@ -102,13 +104,14 @@ class UserCardFragment : Fragment() {
                         override fun getViewHolder(view: View, viewType: Int): RecyclerView.ViewHolder {
                             return UserViewHolder(view)
                         }
+
                     }
+
                     if (view is RecyclerView) {
                         view.layoutManager = LinearLayoutManager(view.context)
                         view.setHasFixedSize(true)
                         view.adapter = myAdapter
                     }
-
                 }
             })
         }
@@ -123,6 +126,20 @@ class UserCardFragment : Fragment() {
                 }
             }
     }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnListFragmentInteractionListener) {
+            listener = context
+        } else {
+            throw RuntimeException(context.toString() + " must implement OnListFragmentInteractionListener")
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        listener = null
+    }
 }
 
 class UserViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), GenericAdapter.Binder<User> {
@@ -133,5 +150,6 @@ class UserViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), Generi
     override fun bind(data: User, clickListener: View.OnClickListener) {
         pseudo.text = data.pseudo
         view.tag = data
+        view.setOnClickListener(clickListener)
     }
 }

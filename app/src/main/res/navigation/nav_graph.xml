@@ -82,7 +82,10 @@
     <fragment
         android:id="@+id/userListFragment"
         android:name="ch.hes.master.mobopproject.ListUsersFragment"
-        android:label="UserListFragment">
+        android:label="UserListFragment" >
+        <action
+            android:id="@+id/action_userListFragment_to_listLikesMoviesFragment"
+            app:destination="@id/listLikesMoviesFragment" />
         <argument
             android:name="query"
             app:argType="string"
@@ -99,7 +102,11 @@
         <action
             android:id="@+id/action_listLikesMoviesFragment_to_movieDetailsFragment"
             app:destination="@id/movieDetailsFragment" />
-
+        <argument
+            android:name="pseudo"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null"/>
     </fragment>
     <fragment
         android:id="@+id/searchFragment"
@@ -128,6 +135,27 @@
             app:argType="string"
             app:nullable="true"
             android:defaultValue="@null" />
+    </fragment>
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="ch.hes.master.mobopproject.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_loginFragment_to_registerFragment"
+            app:destination="@id/registerFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_listMoviesFragment"
+            app:destination="@id/listMoviesFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="ch.hes.master.mobopproject.RegisterFragment"
+        android:label="fragment_register"
+        tools:layout="@layout/fragment_register" >
+        <action
+            android:id="@+id/action_registerFragment_to_listMoviesFragment"
+            app:destination="@id/listMoviesFragment" />
     </fragment>
 
 </navigation>
