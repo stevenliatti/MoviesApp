@@ -94,7 +94,7 @@ object Common {
         })
     }
 
-    private fun croptext(txt: String): String {
+    fun croptext(txt: String): String {
         val maxSize = 15
         if (txt.length > maxSize)
             return txt.substring(0, maxSize - 3) + "..."

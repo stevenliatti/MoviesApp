@@ -13,6 +13,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.ImageRequest
 import com.android.volley.toolbox.JsonObjectRequest
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 
 interface ServerCallback<T> {
@@ -93,27 +94,33 @@ class VolleyRequestController {
         })
     }
 
-    fun getPeoples(URL: String, context: Context, callback: ServerCallback<ArrayList<People>>) {
+    fun getPeoples(URL: String, keyResult: String, keyRole: String, context: Context, callback: ServerCallback<ArrayList<People>>) {
         val peoples: ArrayList<People> = ArrayList()
         httpGet(URL, context, object : ServerCallback<JSONObject> {
-            override fun onSuccess(response: JSONObject) {
-                val jsArray = response.getJSONArray("results")
+            override fun onSuccess(result: JSONObject) {
+                val jsArray = result.getJSONArray(keyResult)
                 for (i in 0 until jsArray.length()) {
                     val jsObj = jsArray.getJSONObject(i)
                     getPosterImage(jsObj.getString("profile_path"), context, object : ServerCallback<Bitmap> {
                         override fun onSuccess(img: Bitmap) {
-                            val knownForJson = jsObj.getJSONArray("known_for")
                             val knownFor: ArrayList<Movie> = ArrayList()
-                            for (j in 0 until knownForJson.length()) {
-                                val propsMovie = knownForJson.getJSONObject(j)
-                                if (propsMovie.getString("media_type") == "movie") {
-                                    knownFor.add(Movie(
-                                        propsMovie.getInt("id"),
-                                        propsMovie.getString("title"),
-                                        null,
-                                        propsMovie.getString("poster_path"),
-                                        propsMovie.getString("overview")))
+
+                            try {
+                                val knownForJson = jsObj.getJSONArray("known_for")
+                                for (j in 0 until knownForJson.length()) {
+                                    val propsMovie = knownForJson.getJSONObject(j)
+                                    if (propsMovie.getString("media_type") == "movie") {
+                                        knownFor.add(Movie(
+                                            propsMovie.getInt("id"),
+                                            propsMovie.getString("title"),
+                                            null,
+                                            propsMovie.getString("poster_path"),
+                                            propsMovie.getString("overview")))
+                                    }
                                 }
+                            }
+                            catch (e: JSONException) {
+                                println(e)
                             }
 
                             peoples.add(People(
@@ -121,7 +128,7 @@ class VolleyRequestController {
                                 jsObj.getString("name"),
                                 img,
                                 jsObj.getString("profile_path"),
-                                jsObj.getString("known_for_department"),
+                                jsObj.getString(keyRole),
                                 knownFor))
 
                             if(i == jsArray.length()-1) {

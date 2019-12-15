@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.gridlayout.widget.GridLayout
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import ch.hes.master.mobopproject.data.*
 import com.google.android.youtube.player.YouTubeStandalonePlayer
@@ -51,12 +52,12 @@ class MovieDetailsFragment : Fragment() {
         val url = "https://api.themoviedb.org/3/movie/${this.movieId}?api_key=$apiKey"
 
         requestController.getMovieDetails(url, context, object : ServerCallback<MovieDetails> {
-            override fun onSuccess(res: MovieDetails) {
+            override fun onSuccess(result: MovieDetails) {
 
-                details = res
+                details = result
 
-                titleView.setText(details.title)
-                descriptionView.setText(details?.overview)
+                titleView.text = details.title
+                descriptionView.text = details.overview
 
                 for (genre in details.genresNames) {
                     val genreView = TextView(view?.context)
@@ -64,7 +65,7 @@ class MovieDetailsFragment : Fragment() {
                     genreNamesView.addView(genreView)
                 }
 
-                popularityView.setText("Popularity : " + details.popularity)
+                popularityView.text = "Popularity : " + details.popularity
 
                 for (prodCount in details.productionCountries) {
                     val prodCountView = TextView(view?.context)
@@ -72,9 +73,9 @@ class MovieDetailsFragment : Fragment() {
                     prodCountriesView.addView(prodCountView)
                 }
 
-                releaseDateView.setText(details.releaseDate)
-                subtitleView.setText(details.subtitle)
-                voteCountView.setText("Vote count : " + details.voteCount)
+                releaseDateView.text = details.releaseDate
+                subtitleView.text = details.subtitle
+                voteCountView.text = "Vote count : " + details.voteCount
 
             }
         })
@@ -84,8 +85,8 @@ class MovieDetailsFragment : Fragment() {
         val url = "https://api.themoviedb.org/3/movie/${this.movieId}/videos?api_key=$apiKey"
 
         requestController.httpGet(url, context, object : ServerCallback<JSONObject> {
-            override fun onSuccess(response: JSONObject) {
-                val results = response.getJSONArray("results")
+            override fun onSuccess(result: JSONObject) {
+                val results = result.getJSONArray("results")
                 val videos: ArrayList<MovieYoutubeVideo> = ArrayList()
                 val numberVideos = if(results.length() < videosNb) results.length() else videosNb
                 for (i in 0 until numberVideos) {
@@ -178,8 +179,8 @@ class MovieDetailsFragment : Fragment() {
         val user = "max"
         val url = "https://mobop.liatti.ch/user/movieAppreciation?pseudo=$user&idMovie=$movieId"
         requestController.httpGet(url, context, object : ServerCallback<JSONObject> {
-            override fun onSuccess(response: JSONObject) {
-                when (response.getString("appreciation")) {
+            override fun onSuccess(result: JSONObject) {
+                when (result.getString("appreciation")) {
                     "LIKE" -> {
                         likeBox.isChecked = true
                         dislikeBox.isClickable = false
@@ -215,13 +216,13 @@ class MovieDetailsFragment : Fragment() {
             data.put("appreciation", appreciation)
 
             requestController.httpPost(url, data, context, object : ServerCallback<JSONObject> {
-                override fun onSuccess(response: JSONObject) {}
+                override fun onSuccess(result: JSONObject) {}
             })
         }
         else {
             val url = "https://mobop.liatti.ch/user/undoLikeDislikeMovie?pseudo=$user&idMovie=$movieId"
             requestController.httpGet(url, context, object : ServerCallback<JSONObject> {
-                override fun onSuccess(response: JSONObject) {}
+                override fun onSuccess(result: JSONObject) {}
             })
         }
     }
@@ -263,6 +264,89 @@ class MovieDetailsFragment : Fragment() {
         }
     }
 
+    private fun filterCredits(peoples: List<People>, filterList: List<String>): List<People> {
+        return peoples.filter { p -> filterList.contains(p.knowFor) }
+    }
+
+    private fun reduceCredits(peoples: List<People>, nb: Int): List<People> {
+        return if (nb > peoples.size) peoples else peoples.subList(0, nb)
+    }
+
+    private fun makePeoples(peoples: List<People>, kind: Pair<String, String>, nb: Int, filterList: List<String>): List<People> {
+        return if (kind.first == "cast") reduceCredits(peoples, nb) else reduceCredits(filterCredits(peoples, filterList), nb)
+    }
+
+    private fun makeGridOf(kind: Pair<String, String>, nb: Int, filterList: List<String>, grid: GridLayout, context: Context) {
+        val url = "https://api.themoviedb.org/3/movie/$movieId/credits?api_key=$apiKey"
+        requestController.getPeoples(url, kind.first, kind.second, context, object : ServerCallback<ArrayList<People>> {
+            override fun onSuccess(result: ArrayList<People>) {
+                val peoples = makePeoples(result, kind, nb, filterList)
+
+                val total = peoples.size
+                val columnsNumber = 3
+                var row = 0
+                var col = 0
+
+                grid.columnCount = columnsNumber
+                grid.rowCount = total / columnsNumber
+                for (item in peoples) {
+                    if (col == columnsNumber) {
+                        col = 0
+                        row++
+                    }
+
+                    val rowSpan = GridLayout.spec(GridLayout.UNDEFINED, 1)
+                    val colSpan = GridLayout.spec(GridLayout.UNDEFINED, 1)
+
+                    val gridParam: GridLayout.LayoutParams =
+                        GridLayout.LayoutParams(rowSpan, colSpan)
+
+                    val name = TextView(context)
+                    val role = TextView(context)
+                    val iv = ImageView(context)
+                    val linearLayoutVertical = LinearLayout(context)
+                    linearLayoutVertical.layoutParams =
+                        LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        )
+                    linearLayoutVertical.orientation = LinearLayout.VERTICAL
+
+                    val lp = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    lp.setMargins(10, 0, 10, 0)
+                    iv.layoutParams = lp
+
+                    iv.setOnClickListener {
+                        val action = MovieDetailsFragmentDirections
+                            .actionMovieDetailsFragmentToPeopleDetailsFragment(item.id, item.urlImg, item.knowFor)
+                        view!!.findNavController().navigate(action)
+                    }
+
+                    name.text = Common.croptext(item.nameTitle)
+                    role.text = Common.croptext(item.knowFor)
+                    iv.setImageBitmap(item.img)
+
+                    linearLayoutVertical.addView(iv)
+                    linearLayoutVertical.addView(name)
+                    linearLayoutVertical.addView(role)
+
+                    grid.addView(linearLayoutVertical, gridParam)
+                    col++
+                }
+            }
+        })
+    }
+
+    private fun makeCreditsGrids(view: View) {
+        val creditsNb = 9
+        val crew = listOf("Producer", "Casting", "Music", "Writer", "Director")
+        makeGridOf(Pair("cast", "character"), creditsNb, crew, castGridLayout, view.context)
+        makeGridOf(Pair("crew", "job"), creditsNb, crew, crewGridLayout, view.context)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_movie_details, container, false)
@@ -289,47 +373,16 @@ class MovieDetailsFragment : Fragment() {
         // Recuperation of movie details of TMDB
         requestController.setImageView(urlImg, imageView, 500, view.context)
         getMoreDetails(view.context)
-        //val crew = listOf("Producer", "Casting", "Music", "Writer", "Director")
-        //getCredits(5, crew, view.context)
         val movie = Movie(42, "bob", Bitmap.createBitmap(42, 42, Bitmap.Config.ALPHA_8), "", "")
-        val people1 = People(
-            42,
-            "",
-            Bitmap.createBitmap(42,42, Bitmap.Config.ALPHA_8),
-            "",
-            "Acting",
-            listOf()
-        )
-        val people2 = People(
-            42,
-            "",
-            Bitmap.createBitmap(42,42, Bitmap.Config.ALPHA_8),
-            "",
-            "",
-            listOf()
-        )
-
-        Common.getGridItems(
-            view,
-            "https://api.themoviedb.org/3/movie/${this.movieId}/credits?api_key=$apiKey",
-            people1,
-            people1,
-            castGridLayout
-        )
-        Common.getGridItems(
-            view,
-            "https://api.themoviedb.org/3/movie/${this.movieId}/credits?api_key=$apiKey",
-            people2,
-            people2,
-            crewGridLayout
-        )
-
         Common.getGridItems(
             view,
             "https://api.themoviedb.org/3/movie/${this.movieId}/similar?api_key=$apiKey",
             movie,
             movie,
             similarMoviesGridLayout)
+
+        makeCreditsGrids(view)
+
         getVideos(view.context, 3)
         initAppreciationButtons(view.context)
 

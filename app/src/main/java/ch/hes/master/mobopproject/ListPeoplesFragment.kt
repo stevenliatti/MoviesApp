@@ -37,7 +37,7 @@ class ListPeoplesFragment: Fragment() {
         override fun bind(p: People, clickListener: View.OnClickListener) {
             nameView.text = p.nameTitle
             knownForView.text = p.knowFor
-            inMoviesView.text = "In movies: " + p.inMovies.map { m -> m.nameTitle }
+            inMoviesView.text = "In movies: " + p.inMovies!!.map { m -> m.nameTitle }
             imageView.setImageBitmap(p.img)
 
             view.tag = p
@@ -55,7 +55,7 @@ class ListPeoplesFragment: Fragment() {
         if (view is RecyclerView) {
             val url = if (args.query != null) searchUrl + args.query else popularPeopleUrl
 
-            requestController.getPeoples(url, view.context, object : ServerCallback<ArrayList<People>> {
+            requestController.getPeoples(url, "results", "known_for_department", view.context, object : ServerCallback<ArrayList<People>> {
                 override fun onSuccess(peoples: ArrayList<People>) {
 
                     val myAdapter = object : GenericAdapter<People>(peoples, listener) {

@@ -32,19 +32,13 @@ data class MovieDetails(
 
 data class MovieYoutubeVideo(val key: String, val name: String, val type: String)
 
-data class Cast(val name: String, val function: String) {
-    override fun toString(): String {
-        return name + " (" + function + ")"
-    }
-}
-
 data class People(
     override val id: Int,
     override val nameTitle: String,
     override var img: Bitmap?,
     override val urlImg: String,
     override var knowFor: String,
-    val inMovies: List<Movie>
+    val inMovies: List<Movie>?
 ) : Item(id, nameTitle, img, urlImg, knowFor)
 
 data class PeopleDetails(
