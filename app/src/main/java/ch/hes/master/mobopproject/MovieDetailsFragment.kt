@@ -15,10 +15,16 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import ch.hes.master.mobopproject.data.*
 import com.google.android.youtube.player.YouTubeStandalonePlayer
+import org.json.JSONArray
 import org.json.JSONObject
 
 
 class MovieDetailsFragment : Fragment() {
+
+    private val MAX_CAST = 9
+    private val MAX_CREW = 5
+
+    val CREW_FILTER = listOf("Producer", "Casting", "Music", "Writer", "Director")
 
     private val apiKey = Constants.tmdbApiKey
     private val requestController = VolleyRequestController()
@@ -264,87 +270,128 @@ class MovieDetailsFragment : Fragment() {
         }
     }
 
-    private fun filterCredits(peoples: List<People>, filterList: List<String>): List<People> {
-        return peoples.filter { p -> filterList.contains(p.knowFor) }
+    private fun filterCredits(array: JSONArray, filterList: List<String>): JSONArray {
+        val subArray = JSONArray()
+        for (i in 0 until array.length()) {
+            val c = array.getJSONObject(i)
+            if (filterList.contains(c.getString("job"))) subArray.put(c)
+        }
+        return subArray
     }
 
-    private fun reduceCredits(peoples: List<People>, nb: Int): List<People> {
-        return if (nb > peoples.size) peoples else peoples.subList(0, nb)
+    private fun reduceCredits(array: JSONArray, nb: Int): JSONArray {
+        return if (nb > array.length()) array
+        else {
+            val subArray = JSONArray()
+            for (i in 0 until nb) subArray.put(array.getJSONObject(i))
+            subArray
+        }
     }
 
-    private fun makePeoples(peoples: List<People>, kind: Pair<String, String>, nb: Int, filterList: List<String>): List<People> {
-        return if (kind.first == "cast") reduceCredits(peoples, nb) else reduceCredits(filterCredits(peoples, filterList), nb)
-    }
+    private fun processJsonArray(role: String, array: JSONArray, callback: ServerCallback<ArrayList<People>>, context: Context) {
+        val cast: ArrayList<People> = ArrayList()
+        for (i in 0 until array.length()) {
+            val jsObj = array.getJSONObject(i)
+            requestController.getPosterImage(jsObj.getString("profile_path"), context, object : ServerCallback<Bitmap> {
+                override fun onSuccess(img: Bitmap) {
+                    cast.add(People(
+                        jsObj.getInt("id"),
+                        jsObj.getString("name"),
+                        img,
+                        jsObj.getString("profile_path"),
+                        jsObj.getString(role),
+                        listOf()))
 
-    private fun makeGridOf(kind: Pair<String, String>, nb: Int, filterList: List<String>, grid: GridLayout, context: Context) {
-        val url = "https://api.themoviedb.org/3/movie/$movieId/credits?api_key=$apiKey"
-        requestController.getPeoples(url, kind.first, kind.second, context, object : ServerCallback<ArrayList<People>> {
-            override fun onSuccess(result: ArrayList<People>) {
-                val peoples = makePeoples(result, kind, nb, filterList)
-
-                val total = peoples.size
-                val columnsNumber = 3
-                var row = 0
-                var col = 0
-
-                grid.columnCount = columnsNumber
-                grid.rowCount = total / columnsNumber
-                for (item in peoples) {
-                    if (col == columnsNumber) {
-                        col = 0
-                        row++
+                    if (i == array.length()-1) {
+                        callback.onSuccess(cast)
                     }
-
-                    val rowSpan = GridLayout.spec(GridLayout.UNDEFINED, 1)
-                    val colSpan = GridLayout.spec(GridLayout.UNDEFINED, 1)
-
-                    val gridParam: GridLayout.LayoutParams =
-                        GridLayout.LayoutParams(rowSpan, colSpan)
-
-                    val name = TextView(context)
-                    val role = TextView(context)
-                    val iv = ImageView(context)
-                    val linearLayoutVertical = LinearLayout(context)
-                    linearLayoutVertical.layoutParams =
-                        LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.WRAP_CONTENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                        )
-                    linearLayoutVertical.orientation = LinearLayout.VERTICAL
-
-                    val lp = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                    )
-                    lp.setMargins(10, 0, 10, 0)
-                    iv.layoutParams = lp
-
-                    iv.setOnClickListener {
-                        val action = MovieDetailsFragmentDirections
-                            .actionMovieDetailsFragmentToPeopleDetailsFragment(item.id, item.urlImg, item.knowFor)
-                        view!!.findNavController().navigate(action)
-                    }
-
-                    name.text = Common.croptext(item.nameTitle)
-                    role.text = Common.croptext(item.knowFor)
-                    iv.setImageBitmap(item.img)
-
-                    linearLayoutVertical.addView(iv)
-                    linearLayoutVertical.addView(name)
-                    linearLayoutVertical.addView(role)
-
-                    grid.addView(linearLayoutVertical, gridParam)
-                    col++
                 }
+            })
+        }
+    }
+
+     private fun getCreditsGrid(url: String, context: Context, castCallback: ServerCallback<ArrayList<People>>,
+                               crewCallback: ServerCallback<ArrayList<People>>) {
+        requestController.httpGet(url, context, object : ServerCallback<JSONObject> {
+            override fun onSuccess(result: JSONObject) {
+                val castJsonArray = reduceCredits(result.getJSONArray("cast"), MAX_CAST)
+                val crewJsonArray = reduceCredits(filterCredits(result.getJSONArray("crew"), CREW_FILTER), MAX_CREW)
+
+                processJsonArray("character", castJsonArray, castCallback, context)
+                processJsonArray("job", crewJsonArray, crewCallback, context)
             }
         })
     }
 
-    private fun makeCreditsGrids(view: View) {
-        val creditsNb = 9
-        val crew = listOf("Producer", "Casting", "Music", "Writer", "Director")
-        makeGridOf(Pair("cast", "character"), creditsNb, crew, castGridLayout, view.context)
-        makeGridOf(Pair("crew", "job"), creditsNb, crew, crewGridLayout, view.context)
+    private fun makeGridOf(peoples: List<People>, grid: GridLayout) {
+        val total = peoples.size
+        val columnsNumber = 3
+        var row = 0
+        var col = 0
+
+        grid.columnCount = columnsNumber
+        grid.rowCount = total / columnsNumber
+        for (item in peoples) {
+            if (col == columnsNumber) {
+                col = 0
+                row++
+            }
+
+            val rowSpan = GridLayout.spec(GridLayout.UNDEFINED, 1)
+            val colSpan = GridLayout.spec(GridLayout.UNDEFINED, 1)
+
+            val gridParam: GridLayout.LayoutParams =
+                GridLayout.LayoutParams(rowSpan, colSpan)
+
+            val name = TextView(context)
+            val role = TextView(context)
+            val iv = ImageView(context)
+            val linearLayoutVertical = LinearLayout(context)
+            linearLayoutVertical.layoutParams =
+                LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+            linearLayoutVertical.orientation = LinearLayout.VERTICAL
+
+            val lp = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            lp.setMargins(10, 0, 10, 0)
+            iv.layoutParams = lp
+
+            iv.setOnClickListener {
+                val action = MovieDetailsFragmentDirections
+                    .actionMovieDetailsFragmentToPeopleDetailsFragment(item.id, item.urlImg, item.knowFor)
+                view!!.findNavController().navigate(action)
+            }
+
+            name.text = Common.croptext(item.nameTitle)
+            role.text = Common.croptext(item.knowFor)
+            iv.setImageBitmap(item.img)
+
+            linearLayoutVertical.addView(iv)
+            linearLayoutVertical.addView(name)
+            linearLayoutVertical.addView(role)
+
+            grid.addView(linearLayoutVertical, gridParam)
+            col++
+        }
+    }
+
+    private fun makeCreditsGrids(castGrid: GridLayout, crewGrid: GridLayout, context: Context) {
+        val url = "https://api.themoviedb.org/3/movie/$movieId/credits?api_key=$apiKey"
+        getCreditsGrid(url, context, object : ServerCallback<ArrayList<People>> {
+            override fun onSuccess(result: ArrayList<People>) {
+                makeGridOf(result, castGrid)
+            }
+        }
+        , object : ServerCallback<ArrayList<People>> {
+            override fun onSuccess(result: ArrayList<People>) {
+                makeGridOf(result, crewGrid)
+            }
+        })
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -381,7 +428,7 @@ class MovieDetailsFragment : Fragment() {
             movie,
             similarMoviesGridLayout)
 
-        makeCreditsGrids(view)
+        makeCreditsGrids(castGridLayout, crewGridLayout, view.context)
 
         getVideos(view.context, 3)
         initAppreciationButtons(view.context)

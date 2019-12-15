@@ -120,7 +120,7 @@ class VolleyRequestController {
                                 }
                             }
                             catch (e: JSONException) {
-                                println(e)
+                                println("$e, $URL, $keyResult, $keyRole")
                             }
 
                             peoples.add(People(
