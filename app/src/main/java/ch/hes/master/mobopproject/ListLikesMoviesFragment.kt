@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
-import androidx.navigation.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import ch.hes.master.mobopproject.data.Movie
@@ -17,6 +17,7 @@ import com.google.android.material.tabs.TabLayout
 class ListLikesMoviesFragment : Fragment() {
     // When requested, this adapter returns a DemoObjectFragment,
     // representing an object in the collection.
+    val args: ListLikesMoviesFragmentArgs by navArgs()
     private lateinit var demoCollectionPagerAdapter: LikeMoviestPagerAdapter
     private lateinit var viewPager: ViewPager
 
@@ -28,22 +29,23 @@ class ListLikesMoviesFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        demoCollectionPagerAdapter = LikeMoviestPagerAdapter(childFragmentManager)
+        val pseudo = if(args.pseudo != null) args.pseudo!! else "bob"
+        demoCollectionPagerAdapter = LikeMoviestPagerAdapter(childFragmentManager, pseudo)
         viewPager = view.findViewById(R.id.pager)
         viewPager.adapter = demoCollectionPagerAdapter
 
         val tabLayout = view.findViewById(R.id.tab_layout) as TabLayout
         tabLayout.setupWithViewPager(viewPager)
     }
-
 }
 
-class LikeMoviestPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+class LikeMoviestPagerAdapter(fm: FragmentManager, pseudo: String) : FragmentPagerAdapter(fm) {
+
+    private val user = pseudo
 
     override fun getCount(): Int  = 2
 
     override fun getItem(i: Int): Fragment {
-        val user = "max"
         val urlLikes = "https://mobop.liatti.ch/user/likes?pseudo=$user"
         val urlDislikes = "https://mobop.liatti.ch/user/dislikes?pseudo=$user"
         val text = when (i) {

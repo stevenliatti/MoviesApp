@@ -3,7 +3,6 @@ package ch.hes.master.mobopproject
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import ch.hes.master.mobopproject.data.Movie
@@ -15,6 +14,7 @@ interface OnListFragmentInteractionListener {
         var action = when (item) {
             is Movie  -> ListMoviesFragmentDirections.actionListMoviesFragmentToMovieDetailsFragment(item.id, item.urlImg)
             is People -> ListPeoplesFragmentDirections.actionListPeoplesFragmentToPeopleDetailsFragment(item.id, item.urlImg, item.knowFor)
+            is User -> ListUsersFragmentDirections.actionUserListFragmentToListLikesMoviesFragment(item.pseudo)
             else -> ListMoviesFragmentDirections.actionListMoviesFragmentSelf()
         }
         if (view.findNavController().currentDestination!!.id == R.id.listLikesMoviesFragment && item is Movie){

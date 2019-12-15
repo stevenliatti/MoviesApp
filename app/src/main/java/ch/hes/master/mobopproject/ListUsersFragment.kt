@@ -1,5 +1,6 @@
 package ch.hes.master.mobopproject
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -71,6 +72,7 @@ class UserListPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 class UserCardFragment(private var url: String) : Fragment() {
 
     private val requestController = VolleyRequestController()
+    private var listener: OnListFragmentInteractionListener? = null
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
@@ -81,7 +83,7 @@ class UserCardFragment(private var url: String) : Fragment() {
         requestController.getUsers(url, view.context, object : ServerCallback<ArrayList<User>> {
             override fun onSuccess(users: ArrayList<User>) {
 
-                val myAdapter = object : GenericAdapter<User>(users) {
+                val myAdapter = object : GenericAdapter<User>(users, listener) {
                     override fun getLayoutId(position: Int, obj: User): Int {
                         return R.layout.user_card
                     }
@@ -100,6 +102,20 @@ class UserCardFragment(private var url: String) : Fragment() {
         })
         return view
     }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnListFragmentInteractionListener) {
+            listener = context
+        } else {
+            throw RuntimeException(context.toString() + " must implement OnListFragmentInteractionListener")
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        listener = null
+    }
 }
 
 class UserViewHolder : RecyclerView.ViewHolder, GenericAdapter.Binder<User> {
@@ -113,5 +129,6 @@ class UserViewHolder : RecyclerView.ViewHolder, GenericAdapter.Binder<User> {
     override fun bind(user: User, clickListener: View.OnClickListener) {
         pseudo.text = user.pseudo
         view.tag = user
+        view.setOnClickListener(clickListener)
     }
 }
