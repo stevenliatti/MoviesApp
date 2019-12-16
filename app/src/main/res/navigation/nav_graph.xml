@@ -132,8 +132,8 @@
             android:id="@+id/action_searchFragment_self"
             app:destination="@id/searchFragment" />
         <action
-            android:id="@+id/action_searchFragment_to_userCardFragment"
-            app:destination="@id/userCardFragment" />
+            android:id="@+id/action_searchFragment_to_userListFragment"
+            app:destination="@id/userListFragment" />
     </fragment>
     <fragment
         android:id="@+id/userCardFragment"

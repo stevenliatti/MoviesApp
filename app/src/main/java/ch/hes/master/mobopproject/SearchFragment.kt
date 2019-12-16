@@ -69,7 +69,7 @@ class SearchFragment : Fragment() {
             radioPeoples.id -> SearchFragmentDirections.actionSearchFragmentToListPeoplesFragment(query)
             radioUsers.id -> {
                 val url = "https://mobop.liatti.ch/user/search?pseudo=$query"
-                SearchFragmentDirections.actionSearchFragmentToUserCardFragment(url)
+                SearchFragmentDirections.actionSearchFragmentToUserListFragment(url)
             }
             else -> SearchFragmentDirections.actionSearchFragmentToListMoviesFragment(query)
         }

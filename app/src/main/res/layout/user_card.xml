@@ -20,7 +20,7 @@
                 android:id="@+id/userImg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:srcCompat="@drawable/ic_person_greem_100dp" />
+                app:srcCompat="@drawable/ic_person_green_100dp" />
 
             <TextView
                 android:id="@+id/userName"

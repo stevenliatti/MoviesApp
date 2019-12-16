@@ -32,8 +32,8 @@ class ListLikesMoviesFragment : Fragment() {
         val auth = Common.getAuth((activity as MainActivity).
             getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE),
             view.context)
-        if(auth != null)
-            pseudo = auth.pseudo
+        if (args.pseudo != null) pseudo = args.pseudo!!
+        else if (auth != null) pseudo = auth.pseudo
         else {
             findNavController().navigate(ListLikesMoviesFragmentDirections.actionListLikesMoviesFragmentToLoginFragment())
             return
