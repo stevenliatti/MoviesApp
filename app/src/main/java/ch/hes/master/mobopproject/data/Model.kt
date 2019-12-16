@@ -55,3 +55,4 @@ data class PeopleDetails(
 )
 
 data class User(val pseudo: String, val email: String, val password: String)
+data class Auth(val pseudo: String, val email: String, val token: String)

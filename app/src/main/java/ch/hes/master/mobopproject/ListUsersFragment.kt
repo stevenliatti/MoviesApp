@@ -5,32 +5,48 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
+import ch.hes.master.mobopproject.data.Auth
 import ch.hes.master.mobopproject.data.User
 import com.google.android.material.tabs.TabLayout
 import org.json.JSONObject
+import org.w3c.dom.Text
 
 
 class ListUsersFragment : Fragment() {
     private lateinit var collectionPagerAdapter: UserListPagerAdapter
     private lateinit var viewPager: ViewPager
+    private lateinit var pseudo: String
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        return inflater.inflate(R.layout.fragment_user_list, container, false)
+        val view =  inflater.inflate(R.layout.fragment_user_list, container, false)
+
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        collectionPagerAdapter = UserListPagerAdapter(childFragmentManager)
+        val auth = Common.getAuth((activity as MainActivity).
+            getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE),
+            view.context)
+        if(auth != null)
+            pseudo = auth.pseudo
+        else {
+            findNavController().navigate(ListUsersFragmentDirections.actionUserListFragmentToLoginFragment())
+            return
+        }
+        collectionPagerAdapter = UserListPagerAdapter(childFragmentManager, pseudo)
         viewPager = view.findViewById(R.id.pager)
         viewPager.adapter = collectionPagerAdapter
 
@@ -39,19 +55,19 @@ class ListUsersFragment : Fragment() {
     }
 }
 
-class UserListPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+class UserListPagerAdapter(fm: FragmentManager, val pseudo: String) : FragmentPagerAdapter(fm) {
 
     override fun getCount(): Int  = 2
 
     override fun getItem(i: Int): Fragment {
-        val user = "max"
-        val urlFollowers = "https://mobop.liatti.ch/user/followers?pseudo=$user"
-        val urlFollowing = "https://mobop.liatti.ch/user/following?pseudo=$user"
+        val urlFollowers = "https://mobop.liatti.ch/user/followers?pseudo=$pseudo"
+        val urlFollowing = "https://mobop.liatti.ch/user/following?pseudo=$pseudo"
         val text = when (i) {
             0 -> urlFollowing
             1 -> urlFollowers
             else -> "autre"
         }
+
         return UserCardFragment.newInstance(text)
     }
 
@@ -95,7 +111,6 @@ class UserCardFragment : Fragment() {
         arguments?.getString("URL", args.query)?.let {
             getUsers(it, view.context, object : ServerCallback<ArrayList<User>> {
                 override fun onSuccess(result: ArrayList<User>) {
-
                     val myAdapter = object : GenericAdapter<User>(result, listener) {
                         override fun getLayoutId(position: Int, obj: User): Int {
                             return R.layout.user_card

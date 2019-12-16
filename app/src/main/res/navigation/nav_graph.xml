@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/listMoviesFragment"
         android:name="ch.hes.master.mobopproject.ListMoviesFragment"
-        android:label="fragment_movie_list"
+        android:label="Popular Movies"
         tools:layout="@layout/generic_list_items" >
         <action
             android:id="@+id/action_listMoviesFragment_to_movieDetailsFragment"
@@ -24,11 +24,14 @@
         <action
             android:id="@+id/action_listMoviesFragment_to_userListFragment"
             app:destination="@id/userListFragment" />
+        <action
+            android:id="@+id/action_listMoviesFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
     </fragment>
     <fragment
         android:id="@+id/movieDetailsFragment"
         android:name="ch.hes.master.mobopproject.MovieDetailsFragment"
-        android:label="fragment_movie_details"
+        android:label="Movie Details"
         tools:layout="@layout/fragment_movie_details">
         <action
             android:id="@+id/action_listMoviesFragment_to_movieDetailsFragment"
@@ -47,7 +50,7 @@
     <fragment
         android:id="@+id/listPeoplesFragment"
         android:name="ch.hes.master.mobopproject.ListPeoplesFragment"
-        android:label="fragment_people_list"
+        android:label="Peoples"
         tools:layout="@layout/fragment_peoples_list" >
         <action
             android:id="@+id/action_listPeoplesFragment_to_peopleDetailsFragment"
@@ -64,7 +67,7 @@
     <fragment
         android:id="@+id/peopleDetailsFragment"
         android:name="ch.hes.master.mobopproject.PeopleDetailsFragment"
-        android:label="fragment_people_details"
+        android:label="Pepol Details"
         tools:layout="@layout/fragment_people_details">
         <argument
             android:name="id"
@@ -82,7 +85,7 @@
     <fragment
         android:id="@+id/userListFragment"
         android:name="ch.hes.master.mobopproject.ListUsersFragment"
-        android:label="UserListFragment" >
+        android:label="Friends Network" >
         <action
             android:id="@+id/action_userListFragment_to_listLikesMoviesFragment"
             app:destination="@id/listLikesMoviesFragment" />
@@ -94,11 +97,14 @@
         <action
             android:id="@+id/action_userListFragment_self"
             app:destination="@id/userListFragment" />
+        <action
+            android:id="@+id/action_userListFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
     </fragment>
     <fragment
         android:id="@+id/listLikesMoviesFragment"
         android:name="ch.hes.master.mobopproject.ListLikesMoviesFragment"
-        android:label="ListLikesMoviesFragment" >
+        android:label="Likes" >
         <action
             android:id="@+id/action_listLikesMoviesFragment_to_movieDetailsFragment"
             app:destination="@id/movieDetailsFragment" />
@@ -107,11 +113,14 @@
             app:argType="string"
             app:nullable="true"
             android:defaultValue="@null"/>
+        <action
+            android:id="@+id/action_listLikesMoviesFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
     </fragment>
     <fragment
         android:id="@+id/searchFragment"
         android:name="ch.hes.master.mobopproject.SearchFragment"
-        android:label="fragment_search"
+        android:label="Search"
         tools:layout="@layout/fragment_search" >
         <action
             android:id="@+id/action_searchFragment_to_listMoviesFragment"
@@ -139,7 +148,7 @@
     <fragment
         android:id="@+id/loginFragment"
         android:name="ch.hes.master.mobopproject.LoginFragment"
-        android:label="fragment_login"
+        android:label="Login"
         tools:layout="@layout/fragment_login" >
         <action
             android:id="@+id/action_loginFragment_to_registerFragment"
@@ -151,7 +160,7 @@
     <fragment
         android:id="@+id/registerFragment"
         android:name="ch.hes.master.mobopproject.RegisterFragment"
-        android:label="fragment_register"
+        android:label="Register"
         tools:layout="@layout/fragment_register" >
         <action
             android:id="@+id/action_registerFragment_to_listMoviesFragment"

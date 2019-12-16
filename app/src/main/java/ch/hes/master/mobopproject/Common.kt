@@ -1,6 +1,7 @@
 package ch.hes.master.mobopproject
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.view.View
 import android.widget.ImageView
@@ -8,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.gridlayout.widget.GridLayout
 import androidx.navigation.findNavController
+import ch.hes.master.mobopproject.data.Auth
 import ch.hes.master.mobopproject.data.Item
 import ch.hes.master.mobopproject.data.Movie
 import org.json.JSONObject
@@ -119,5 +121,16 @@ object Common {
         if (txt.length > maxSize)
             return txt.substring(0, maxSize - 3) + "..."
         return txt
+    }
+
+    fun getAuth(sharedPref: SharedPreferences, context: Context): Auth? {
+        val defaultValue = ""
+        val pseudo = sharedPref.getString(context.getString(R.string.pseudo), defaultValue)
+        val email = sharedPref.getString(context.getString(R.string.email), defaultValue)
+        val token = sharedPref.getString(context.getString(R.string.token), defaultValue)
+        if(token != "" && pseudo != null && email != null) {
+            return Auth(pseudo, email, token!!)
+        }
+        return null
     }
 }

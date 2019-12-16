@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/loginFragment"
+            android:icon="@drawable/ic_person_greem_100dp"
+            android:title="@string/login" />
+        <item
+            android:id="@+id/registerFragment"
+            android:icon="@drawable/ic_person_add_black_100dp"
+            android:title="@string/register" />
+        <item
+            android:id="@+id/logoutAction"
+            android:icon="@drawable/ic_person_add_black_100dp"
+            android:title="@string/logout" />
+    </group>
+
+    <item android:title="Account">
+        <menu>
+            <item
+                android:id="@+id/listLikesMoviesFragment"
+                android:icon="@drawable/ic_movies_white_100dp"
+                android:title="My movies" />
+            <item
+                android:id="@+id/userListFragment"
+                android:icon="@drawable/ic_network_white_100dp"
+                android:title="My friends" />
+        </menu>
+    </item>
+
+</menu>

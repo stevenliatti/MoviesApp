@@ -25,5 +25,9 @@
     <string name="submit">Submit</string>
     <string name="preference_file_key">authentication</string>
     <string name="pseudo">pseudo</string>
+    <string name="email">email</string>
     <string name="token">token</string>
+    <string name="register">Register</string>
+    <string name="login">Login</string>
+    <string name="logout">Logout</string>
 </resources>

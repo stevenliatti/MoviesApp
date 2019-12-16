@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.gridlayout.widget.GridLayout
 import androidx.navigation.findNavController
@@ -55,6 +56,7 @@ class MovieDetailsFragment : Fragment() {
     private lateinit var videosView: LinearLayout
     private lateinit var likeBox: CheckBox
     private lateinit var dislikeBox: CheckBox
+    private var auth: Auth? = null
 
     private fun buildStringListFromJsonSArray(jsonArray: JSONArray, key: String): ArrayList<String> {
         val strings: ArrayList<String> = ArrayList()
@@ -214,25 +216,29 @@ class MovieDetailsFragment : Fragment() {
     }
 
     private fun initAppreciationButtons(context: Context) {
-        // TODO: get actual user instead
-        val user = "max"
-        val url = "https://mobop.liatti.ch/user/movieAppreciation?pseudo=$user&idMovie=$movieId"
-        requestController.httpGet(url, context, object : ServerCallback<JSONObject> {
-            override fun onSuccess(result: JSONObject) {
-                when (result.getString("appreciation")) {
-                    "LIKE" -> {
-                        likeBox.isChecked = true
-                        dislikeBox.isClickable = false
-                        dislikeBox.setTextColor(Color.GRAY)
-                    }
-                    "DISLIKE" -> {
-                        dislikeBox.isChecked = true
-                        likeBox.isClickable = false
-                        likeBox.setTextColor(Color.GRAY)
+        if(auth != null) {
+            val user = auth!!.pseudo
+            val url = "https://mobop.liatti.ch/user/movieAppreciation?pseudo=$user&idMovie=$movieId"
+            requestController.httpGet(url, context, object : ServerCallback<JSONObject> {
+                override fun onSuccess(result: JSONObject) {
+                    when (result.getString("appreciation")) {
+                        "LIKE" -> {
+                            likeBox.isChecked = true
+                            dislikeBox.isClickable = false
+                            dislikeBox.setTextColor(Color.GRAY)
+                        }
+                        "DISLIKE" -> {
+                            dislikeBox.isChecked = true
+                            likeBox.isClickable = false
+                            likeBox.setTextColor(Color.GRAY)
+                        }
                     }
                 }
-            }
-        })
+            })
+        } else {
+            likeBox.isVisible = false
+            dislikeBox.isVisible = false
+        }
     }
 
     enum class AppreciationEndpoint {
@@ -240,29 +246,29 @@ class MovieDetailsFragment : Fragment() {
     }
 
     private fun setAppreciation(context: Context, ae: AppreciationEndpoint) {
-        // TODO: get actual user instead
-        val user = "max"
+        if(auth != null) {
+            val user = auth!!.pseudo
+            if (ae == AppreciationEndpoint.LIKE || ae == AppreciationEndpoint.DISLIKE) {
+                val url = "https://mobop.liatti.ch/user/likeDislikeMovie"
+                val data = JSONObject()
+                data.put("pseudo", user)
+                data.put("id", movieId)
+                data.put("title", details.title)
+                data.put("overview", details.overview)
+                data.put("urlPath", urlImg)
+                val appreciation = if (ae == AppreciationEndpoint.LIKE) "LIKE" else "DISLIKE"
+                data.put("appreciation", appreciation)
 
-        if (ae == AppreciationEndpoint.LIKE || ae == AppreciationEndpoint.DISLIKE) {
-            val url = "https://mobop.liatti.ch/user/likeDislikeMovie"
-            val data = JSONObject()
-            data.put("pseudo", user)
-            data.put("id", movieId)
-            data.put("title", details.title)
-            data.put("overview", details.overview)
-            data.put("urlPath", urlImg)
-            val appreciation = if (ae == AppreciationEndpoint.LIKE) "LIKE" else "DISLIKE"
-            data.put("appreciation", appreciation)
-
-            requestController.httpPost(url, data, context, object : ServerCallback<JSONObject> {
-                override fun onSuccess(result: JSONObject) {}
-            })
-        }
-        else {
-            val url = "https://mobop.liatti.ch/user/undoLikeDislikeMovie?pseudo=$user&idMovie=$movieId"
-            requestController.httpGet(url, context, object : ServerCallback<JSONObject> {
-                override fun onSuccess(result: JSONObject) {}
-            })
+                requestController.httpPost(url, data, context, object : ServerCallback<JSONObject> {
+                    override fun onSuccess(result: JSONObject) {}
+                })
+            }
+            else {
+                val url = "https://mobop.liatti.ch/user/undoLikeDislikeMovie?pseudo=$user&idMovie=$movieId"
+                requestController.httpGet(url, context, object : ServerCallback<JSONObject> {
+                    override fun onSuccess(result: JSONObject) {}
+                })
+            }
         }
     }
 
@@ -410,6 +416,10 @@ class MovieDetailsFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_movie_details, container, false)
+
+        auth = Common.getAuth((activity as MainActivity).
+            getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE),
+            view.context)
 
         movieId = args.id
         urlImg = args.urlImg

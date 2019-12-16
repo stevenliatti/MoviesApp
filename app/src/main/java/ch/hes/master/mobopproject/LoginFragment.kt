@@ -1,15 +1,18 @@
 package ch.hes.master.mobopproject
 
+import android.app.Activity
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
+import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputLayout
 import org.json.JSONObject
 import org.w3c.dom.Text
@@ -19,7 +22,6 @@ class LoginFragment : Fragment() {
 
 
     // private var listener: OnFragmentInteractionListener? = null
-    val sharedPref = activity?.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
     private val requestController = VolleyRequestController()
     private val urlLogin = "https://mobop.liatti.ch/user/login"
 
@@ -38,14 +40,21 @@ class LoginFragment : Fragment() {
                 data.put("password", password.editText!!.text.toString())
                 requestController.httpPost(urlLogin, data, view.context, object : ServerCallback<JSONObject> {
                     override fun onSuccess(res: JSONObject) {
-                        if(res.getString("token") == "TOKKKEN") {
+                        if(res.getBoolean("success")) {
                             val pseudo = res.getString("pseudo")
+                            val email = res.getString("email")
                             val token = res.getString("token")
+                            val sharedPref = activity?.getSharedPreferences(getString(R.string.preference_file_key) ,Context.MODE_PRIVATE) ?: return
                             with (sharedPref!!.edit()) {
                                 putString(getString(R.string.pseudo), pseudo)
+                                putString(getString(R.string.email), email)
                                 putString(getString(R.string.token), token)
                                 commit()
                             }
+                            val navView: NavigationView = activity!!.findViewById(R.id.nav_view)
+                            (activity as MainActivity).setNavHeader(navView)
+                            val imm: InputMethodManager = activity!!.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+                            imm.hideSoftInputFromWindow(view!!.windowToken, 0)
                             view.findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToListMoviesFragment())
                         }
                     }

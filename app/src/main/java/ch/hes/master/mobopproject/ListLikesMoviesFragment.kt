@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
@@ -18,6 +19,7 @@ class ListLikesMoviesFragment : Fragment() {
     private lateinit var collectionPagerAdapter: LikeMoviesPagerAdapter
     private val args: ListLikesMoviesFragmentArgs by navArgs()
     private lateinit var viewPager: ViewPager
+    private lateinit var pseudo: String
 
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
@@ -27,7 +29,15 @@ class ListLikesMoviesFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val pseudo = if(args.pseudo != null) args.pseudo!! else "bob"
+        val auth = Common.getAuth((activity as MainActivity).
+            getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE),
+            view.context)
+        if(auth != null)
+            pseudo = auth.pseudo
+        else {
+            findNavController().navigate(ListLikesMoviesFragmentDirections.actionListLikesMoviesFragmentToLoginFragment())
+            return
+        }
         collectionPagerAdapter = LikeMoviesPagerAdapter(childFragmentManager, pseudo)
         viewPager = view.findViewById(R.id.pager)
         viewPager.adapter = collectionPagerAdapter
@@ -37,15 +47,13 @@ class ListLikesMoviesFragment : Fragment() {
     }
 }
 
-class LikeMoviesPagerAdapter(fm: FragmentManager, pseudo: String) : FragmentPagerAdapter(fm) {
-
-    private val user = pseudo
+class LikeMoviesPagerAdapter(fm: FragmentManager, val pseudo: String) : FragmentPagerAdapter(fm) {
 
     override fun getCount(): Int  = 2
 
     override fun getItem(i: Int): Fragment {
-        val urlLikes = "https://mobop.liatti.ch/user/likes?pseudo=$user"
-        val urlDislikes = "https://mobop.liatti.ch/user/dislikes?pseudo=$user"
+        val urlLikes = "https://mobop.liatti.ch/user/likes?pseudo=$pseudo"
+        val urlDislikes = "https://mobop.liatti.ch/user/dislikes?pseudo=$pseudo"
         val text = when (i) {
             0 -> urlLikes
             1 -> urlDislikes
