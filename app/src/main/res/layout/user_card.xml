@@ -28,9 +28,13 @@
                 android:layout_height="match_parent"
                 android:textAlignment="center"
                 android:textColor="#000000"
-                android:textSize="20sp">
+                android:textSize="20sp" />
 
-            </TextView>
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="@string/follow" />
+
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

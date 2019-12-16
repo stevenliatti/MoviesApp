@@ -21,6 +21,10 @@ interface OnListFragmentInteractionListener {
             action = ListLikesMoviesFragmentDirections.actionListLikesMoviesFragmentToMovieDetailsFragment(item.id, item.urlImg)
         }
 
+        if (view.findNavController().currentDestination!!.id == R.id.userCardFragment && item is User){
+            action = UserCardFragmentDirections.actionUserCardFragmentToListLikesMoviesFragment(item.pseudo)
+        }
+
         view.findNavController().navigate(action)
     }
 }

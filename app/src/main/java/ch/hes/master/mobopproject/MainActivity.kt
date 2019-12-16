@@ -53,7 +53,13 @@ class MainActivity : AppCompatActivity(), OnListFragmentInteractionListener {
 
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.loginFragment, R.id.registerFragment, R.id.listLikesMoviesFragment, R.id.userListFragment
+                R.id.loginFragment,
+                R.id.registerFragment,
+                R.id.listLikesMoviesFragment,
+                R.id.userListFragment,
+                R.id.listMoviesFragment,
+                R.id.listPeoplesFragment,
+                R.id.searchFragment
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)

@@ -18,16 +18,16 @@
             android:title="@string/logout" />
     </group>
 
-    <item android:title="Account">
+    <item android:title="@string/account">
         <menu>
             <item
                 android:id="@+id/listLikesMoviesFragment"
                 android:icon="@drawable/ic_movies_white_100dp"
-                android:title="My movies" />
+                android:title="@string/my_movies" />
             <item
                 android:id="@+id/userListFragment"
                 android:icon="@drawable/ic_network_white_100dp"
-                android:title="My friends" />
+                android:title="@string/network" />
         </menu>
     </item>
 

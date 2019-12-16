@@ -132,8 +132,8 @@
             android:id="@+id/action_searchFragment_self"
             app:destination="@id/searchFragment" />
         <action
-            android:id="@+id/action_searchFragment_to_userListFragment"
-            app:destination="@id/userListFragment" />
+            android:id="@+id/action_searchFragment_to_userCardFragment"
+            app:destination="@id/userCardFragment" />
     </fragment>
     <fragment
         android:id="@+id/userCardFragment"
@@ -144,6 +144,9 @@
             app:argType="string"
             app:nullable="true"
             android:defaultValue="@null" />
+        <action
+            android:id="@+id/action_userCardFragment_to_listLikesMoviesFragment"
+            app:destination="@id/listLikesMoviesFragment" />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
