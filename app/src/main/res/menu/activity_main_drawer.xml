@@ -14,7 +14,7 @@
             android:title="@string/register" />
         <item
             android:id="@+id/logoutAction"
-            android:icon="@drawable/ic_person_add_black_100dp"
+            android:icon="@drawable/ic_exit_to_app_white_24dp"
             android:title="@string/logout" />
     </group>
 
