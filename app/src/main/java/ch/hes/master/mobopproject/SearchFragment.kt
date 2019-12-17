@@ -14,6 +14,7 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
+import ch.hes.master.mobopproject.data.Auth
 
 
 class SearchFragment : Fragment() {
@@ -26,12 +27,17 @@ class SearchFragment : Fragment() {
     private lateinit var radioPeoples: RadioButton
     private lateinit var radioUsers: RadioButton
     private lateinit var submitButton: Button
+    private var auth: Auth? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_search, container, false)
+
+        auth = Common.getAuth((activity as MainActivity).
+            getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE),
+            view.context)
 
         inputSearch = view.findViewById(R.id.input_search) as EditText
         searchGroup = view.findViewById(R.id.group_search) as RadioGroup
@@ -68,7 +74,8 @@ class SearchFragment : Fragment() {
             radioMovies.id -> SearchFragmentDirections.actionSearchFragmentToListMoviesFragment(query)
             radioPeoples.id -> SearchFragmentDirections.actionSearchFragmentToListPeoplesFragment(query)
             radioUsers.id -> {
-                val url = "https://mobop.liatti.ch/user/search?pseudo=$query"
+                var url = "https://mobop.liatti.ch/user/search?pseudo=$query"
+                if (auth != null) url += "&from=${auth!!.pseudo}"
                 SearchFragmentDirections.actionSearchFragmentToUserCardFragment(url)
             }
             else -> SearchFragmentDirections.actionSearchFragmentToListMoviesFragment(query)

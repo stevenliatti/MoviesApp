@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
@@ -14,6 +16,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
+import ch.hes.master.mobopproject.data.Auth
 import ch.hes.master.mobopproject.data.User
 import com.google.android.material.tabs.TabLayout
 import org.json.JSONObject
@@ -28,9 +31,7 @@ class ListUsersFragment : Fragment() {
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        val view =  inflater.inflate(R.layout.fragment_user_list, container, false)
-
-        return view
+        return inflater.inflate(R.layout.fragment_user_list, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -62,7 +63,7 @@ class UserListPagerAdapter(fm: FragmentManager, val pseudo: String) : FragmentPa
         val text = when (i) {
             0 -> urlFollowing
             1 -> urlFollowers
-            else -> "autre"
+            else -> "other"
         }
 
         return UserCardFragment.newInstance(text)
@@ -84,6 +85,7 @@ class UserCardFragment : Fragment() {
     private var listener: OnListFragmentInteractionListener? = null
 
     private val args: UserCardFragmentArgs by navArgs()
+    private var auth: Auth? = null
 
     private fun getUsers(URL: String, context: Context, callback: ServerCallback<ArrayList<User>>) {
         val users: ArrayList<User> = ArrayList()
@@ -91,8 +93,8 @@ class UserCardFragment : Fragment() {
             override fun onSuccess(result: JSONObject) {
                 val jsArray = result.getJSONArray("pseudos")
                 for (i in 0 until jsArray.length()) {
-                    val jsObj = jsArray.getString(i)
-                    users.add(User(jsObj, "", ""))
+                    val jsObj = jsArray.getJSONObject(i)
+                    users.add(User(jsObj.getString("pseudo"), "", "", jsObj.getBoolean("followed")))
                     callback.onSuccess(users)
                 }
             }
@@ -104,6 +106,10 @@ class UserCardFragment : Fragment() {
                               savedInstanceState: Bundle?): View {
 
         val view = inflater.inflate(R.layout.generic_list_items, container, false)
+
+        auth = Common.getAuth((activity as MainActivity).
+            getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE),
+            view.context)
 
         arguments?.getString("URL", args.query)?.let {
             getUsers(it, view.context, object : ServerCallback<ArrayList<User>> {
@@ -157,10 +163,32 @@ class UserCardFragment : Fragment() {
 class UserViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), GenericAdapter.Binder<User> {
 
     private var pseudo: TextView = itemView.findViewById(R.id.userName)
+    private var followed: Button = itemView.findViewById(R.id.follow_button)
     var view: View = itemView
+
+    private var auth: Auth? = Common.getAuth((view.context as MainActivity).
+        getSharedPreferences(view.context.getString(R.string.preference_file_key), Context.MODE_PRIVATE),
+        view.context)
+    private val requestController = VolleyRequestController()
 
     override fun bind(data: User, clickListener: View.OnClickListener) {
         pseudo.text = data.pseudo
+        followed.text = if (data.followed) "Unfollow" else "Follow"
+        followed.isVisible = auth != null
+
+        followed.setOnClickListener {
+            val url =
+                if (data.followed) "https://mobop.liatti.ch/user/unfollow?pseudo=${auth!!.pseudo}&pseudoToUnfollow=${data.pseudo}"
+                else "https://mobop.liatti.ch/user/follow?pseudo=${auth!!.pseudo}&pseudoToFollow=${data.pseudo}"
+
+            requestController.httpGet(url, it.context, object : ServerCallback<JSONObject> {
+                override fun onSuccess(result: JSONObject) {
+                    followed.text = if (!data.followed) "Unfollow" else "Follow"
+                    data.followed = !data.followed
+                }
+            })
+        }
+
         view.tag = data
         view.setOnClickListener(clickListener)
     }

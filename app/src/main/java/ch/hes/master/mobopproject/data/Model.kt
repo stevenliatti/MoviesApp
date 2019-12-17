@@ -54,5 +54,5 @@ data class PeopleDetails(
     val homepage: String
 )
 
-data class User(val pseudo: String, val email: String, val password: String)
+data class User(val pseudo: String, val email: String, val password: String, var followed: Boolean = false)
 data class Auth(val pseudo: String, val email: String, val token: String)
