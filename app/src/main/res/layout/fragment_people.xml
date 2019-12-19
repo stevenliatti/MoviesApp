@@ -21,15 +21,16 @@
                 android:id="@+id/img_people"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginBottom="10dp"
                 android:contentDescription="@string/peopleimg"
                 android:scaleType="fitXY"
                 app:srcCompat="@color/colorAccent" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="150dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
                 android:orientation="vertical"
@@ -52,6 +53,10 @@
 
                 <TextView
                     android:id="@+id/in_movies"
+                    android:ellipsize="end"
+                    android:lines="6"
+                    android:justificationMode="inter_word"
+                    android:paddingRight="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
