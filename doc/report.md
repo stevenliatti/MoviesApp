@@ -211,15 +211,64 @@ fun httpGet(URL: String, context: Context, callback: ServerCallback<JSONObject>)
 Afin de rendre l'UI plus conviviale, nous avons implémenté un drawer (menu latéral dans la partie conception). Ce drawer repose également la dernière méthode proposée par la documentation d'Android.
 Explication........... 
 ## Bottom tabs
-En bas de l'écran, nous avons à disposition des onglets de navigation permettant de naviguer entre les vues principales de l'application, 
+En bas de l'écran, nous avons à disposition des onglets de navigation permettant de naviguer entre les vues principales de l'application, ces tabs ont été implémentés à l'aide d'un menu classique Android défini au niveau XLM. En basant l'identifiant de chaque items du menu sur les identifiants référencées dans le Navigation Graph, le graph de navigation se charge de rediriger automatiquement vers le bon fragement.
 ## View pager
+Pour les vues concernant les films appréciés/pas apprécies et les utilisateurs suivits/suivants il était intressant de pouvoir switcher entre les deux listes rapidement et efficacement. Nous avons donc mis en place des view pagers qui sont en quelque sorte des sous onglets permettant de switcher entre différents fragments assez rapidement.
 ## Search / input
+La recherche est un fragment qui contient au niveau XML uniquement un champ texte permettant de saisire les caractères de recherche et un radio boutton qui permet de séléctionner le type de recherche.
+Lorsque l'action de recherche est effectuée, une recycler view présentant les résutats de la recherche est affichée.
+La recycler view appleé est toujours la même nous avons juste le type des éléments affichés et le layout associé qui varie en fonction du type de la recherche (voir rubrique generic adapter).
+
 ## Shared preferences
+Afin de stocker la session d'un utilisateur connecté à l'application, nous avons fait usage des shard preferences qui sont un moyen très agréable de persister des information dans l'application et d'y accéder depuis les différents fragments.
+Voici un exemple de leurs utilisation afin de stokcer la session d'un utilisateur.
+Création des shared preferences
+```
+val sharedPref = activity?.getSharedPreferences(getString(R.string.preference_file_key) ,Context.MODE_PRIVATE) ?: return
+with (sharedPref!!.edit()) {
+    putString(getString(R.string.pseudo), pseudo)
+    putString(getString(R.string.email), email)
+    putString(getString(R.string.token), token)
+    commit()
+}
+```
+Verifications des shared preferences
+```
+val auth = Common.getAuth((activity as MainActivity).
+            getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE),
+            view.context)
+if (auth != null) {
+    ....
+}
+```
+Desctruction des shard preferences (logout)
+```
+with (pref!!.edit()) {
+    clear()
+    commit()
+}
+```
+Ce mechanisme permet également de vérifier qu'un utlisateur soit authentifé et de le rediriger vers la page de login dans le cas échéant.
+
 ## FAB
-## Callback
-## Generica adapter
+Pour la recherche, nous avons 
+## Generic adapter
 ## Relations entre les vues
+Voici un schema qui représente globalement les relations entre les différentes vue de l'application.
+==> SCHEMA AVEC RELATIONS ENTRE LES VUES
 
 # Conclusion
+Pour conclure ce projet nous a permis d'apprendre et mettre en pratique de nombreux concepts propre à la programmation Android. Nous nous sommes également familiarisé avec le langage "Kotlin" qui une fois pris en main simplifie et optimise grandement les opérations qui en Java sont plus complexes et fastidieuses.
+Enfin, nous restons sur un sentiment très satisfaisant de cette première expérience dans le mode du developpement Android.
 ## Problèmes rencontrés
+Les princiaples difficutés rencontrées durant le dévloppement de ce projet sont les suivantes :
+    - ???
+    - ???
 ## Améliorations
+En ce qui concerne les améliorations futures à apporter au projet nous avons pensé aux suivantes :
+    - L'interace graphique qui est toujours optimisable
+    - La mise en place d'un cache qui permettrait de ne pas réinteroger l'API pour chaque action effectuée et par conséquent limiter le traffic
+    - Interogation de l'API Netflix afin de savoir si le film est disponible sur leurs plateforme de streaming
+    - Afficher les films à la une en fonction des préférences de l'utilisateur qui serraient déduite de ses films appréciées
+    - Afficher les informations relatives aux horraires des cinemas les plus proches
+    - Notifier les utilisateurs lorsu'ils sont suivits par un autre utilisateur
