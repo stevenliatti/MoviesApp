@@ -161,10 +161,57 @@ Selon le cours et la documentation officiel d'Android, la méthode actuelle repo
 ===>  SCHEMMAA
 ## Navigation Graph
 Plusiereurs possibilités s'offraient à nous concernant la navigation entre les différents fragments. Nous avons choisi d'experimenter la nouvelle métohde proposée par la documentation officielle d'Android qui fut très interessante et efficace.
-Cette méthode repose sur un graph de navigation qui est éditable graphiquement ou au niveau du code XML. Une fois de graph de navigation défini, des clasees sont automatiquement générées, elles f
+Cette méthode repose sur un graph de navigation qui est éditable graphiquement ou au niveau du code XML. Il permet e définir les relations entre les différents fragments. Une fois de graph de navigation défini, des clasees sont automatiquement générées, elles représentent les liens entre les différents fragments et sont utilisés afin de naviguer depuis un fragment vers un autre.
+Voici le graph de navigation de notre application : 
+=========>>>> Screen NAVGRAPH
+
+Voici un exemple de code qui permet de naviguer depuis le graph de la liste des films vers les détails d'un film en utilisant cette fameuse classe générée automatiquement :
+`view.findNavController().navigate(ListMoviesFragmentDirections.actionListMoviesFragmentToMovieDetailsFragment(item.id, item.urlImg))`
+### Arguments
+Il est également possible de définir des arguments qui sont passable entre les fragments, dans ce cas la classe générée automatiquement prendra en compte ces derniers.
+Du côté du fragment qui sera appelé, Android met à disposition une méthode très pratique permettant de récéptionner ces arguments.
+Voici un exemple de code permettant cela :
+`private val args: MovieDetailsFragmentArgs by navArgs()`
+```
+movieId = args.id
+urlImg = args.urlImg
+```
+
 ## Volley requests
+Comme nous l'avons vu notre application est majoritairement composée d'appel HTTP à diverses APIs. Nous avons donc utilisé une librairie=???? Android permettant d'effectuer les différents cals HTTP.
+La librairie utilisée est donc volley request, voici un exemple de son utilisation : 
+```
+VIEUX CODE HTTP REQUEST 
+```
+
+### Assynchronicité
+Dans la majorité de cas, la logique de l'application requiert d'avoir recus certaines infos en provenances des API avant de pouvoir les afficher sur la vue. Nous avions donc besoin de garantir que l'integralité des données était récéptionnée avant de les afficher, mais tout cela avec la contrainte de ne pas bloquer l'exécution du code.
+Nous avons donc utilié le mechanisme de fonctions de call back permettant de prendre en compte cette contrainte.
+Son principe est simple, la fonction de callback sera appelée que lorsque la requête HTTP sera effectué et les données receptionnées.
+### Amélioration
+Etant donné le nombre d'appels HTTP effectués dans notre application, le code était rapidement polué par ce code long et répétitif nous avons donc simplifié cela en cérant une classe `VolleyRequestController` permettant de mettre à disposition les méthodes relatives à tous les appels HTTP.
+Voici un exemple d'une requête HTTP GET qui illustre cela : 
+
+```
+fun httpGet(URL: String, context: Context, callback: ServerCallback<JSONObject>) {
+    val jsonObjReq = JsonObjectRequest(Request.Method.GET, URL, null,
+    Response.Listener { response ->
+        callback.onSuccess(response) // call call back function here
+    },
+    Response.ErrorListener { error ->
+        Log.println(Log.DEBUG, this.javaClass.name, "error in httpGet : $error,\n$URL\n$callback")
+    })
+
+    // Adding request to request queue
+    HttpQueue.getInstance(context).addToRequestQueue(jsonObjReq)
+}
+```
+
 ## Drawer
+Afin de rendre l'UI plus conviviale, nous avons implémenté un drawer (menu latéral dans la partie conception). Ce drawer repose également la dernière méthode proposée par la documentation d'Android.
+Explication........... 
 ## Bottom tabs
+En bas de l'écran, nous avons à disposition des onglets de navigation permettant de naviguer entre les vues principales de l'application, 
 ## View pager
 ## Search / input
 ## Shared preferences
