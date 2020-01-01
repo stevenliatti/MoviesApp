@@ -181,7 +181,7 @@ urlImg = args.urlImg
 Comme nous l'avons vu notre application est majoritairement composée d'appel HTTP à diverses APIs. Nous avons donc utilisé une librairie=???? Android permettant d'effectuer les différents cals HTTP.
 La librairie utilisée est donc volley request, voici un exemple de son utilisation : 
 ```
-VIEUX CODE HTTP REQUEST 
+VIEUX CODE HTTP REQUEST
 ```
 
 ### Assynchronicité
@@ -208,8 +208,12 @@ fun httpGet(URL: String, context: Context, callback: ServerCallback<JSONObject>)
 ```
 
 ## Drawer
-Afin de rendre l'UI plus conviviale, nous avons implémenté un drawer (menu latéral dans la partie conception). Ce drawer repose également la dernière méthode proposée par la documentation d'Android.
-Explication........... 
+Afin de rendre l'UI plus conviviale, nous avons implémenté un drawer (menu latéral dans la partie conception). Ce drawer repose également sur la dernière méthode proposée par la documentation d'Android.
+
+L'interface graphique du drawer est définie dans le XML à l'aide d'un menu, et initalisée dans la main activity. L'id des différents items est nommé selon les identifiants référencés dans le graph de navigation ce qui permet de naviguer directemnt vers le bon fragment lors de l'interaction d'un utilisateur avec ces derniers.
+
+Pour ce faire, le layout de la main activity est de type `DrawerLayout`, elle inclut tout le contenu (top barre, fragments de navigation, et bottom tabs) ainsi que le drawer qui sera affiché.
+
 ## Bottom tabs
 En bas de l'écran, nous avons à disposition des onglets de navigation permettant de naviguer entre les vues principales de l'application, ces tabs ont été implémentés à l'aide d'un menu classique Android défini au niveau XLM. En basant l'identifiant de chaque items du menu sur les identifiants référencées dans le Navigation Graph, le graph de navigation se charge de rediriger automatiquement vers le bon fragement.
 ## View pager
@@ -251,8 +255,11 @@ with (pref!!.edit()) {
 Ce mechanisme permet également de vérifier qu'un utlisateur soit authentifé et de le rediriger vers la page de login dans le cas échéant.
 
 ## FAB
-Pour la recherche, nous avons 
+Un floating action button est disponible en bas de l'écrant à droite, une écouteur sur ce boutton est définit dans la main activity permettant d'intercepter les interactions des utilisateurs. Lorsqu'une interaction est detectée, une redirection vers le fragment dedié à la recherche est effectuée.
+===>>> petit schema boutton vers fragment
 ## Generic adapter
+Dans le cadre de cette application, nous travaillons très fréquament avec la recycler view qui permet d'afficher une liste Android. Afin de ne pas devoir recréer une recycler view par liste, nous avons choisi d'implémenter un adapter générique permettant de réutiliser la même liste mais avec des itmes de type différents. 
+==>>> Schema 
 ## Relations entre les vues
 Voici un schema qui représente globalement les relations entre les différentes vue de l'application.
 ==> SCHEMA AVEC RELATIONS ENTRE LES VUES
