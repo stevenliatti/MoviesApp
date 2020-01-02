@@ -16,12 +16,12 @@ class ListMoviesRecyclerView {
         var img: ImageView = itemView.findViewById(R.id.img)
         var view: View = itemView
 
-        override fun bind(m: Movie, clickListener: View.OnClickListener) {
-            title.text = m.nameTitle
-            overviewView.text = m.overview
-            img.setImageBitmap(m.img)
+        override fun bind(data: Movie, clickListener: View.OnClickListener) {
+            title.text = data.nameTitle
+            overviewView.text = data.overview
+            img.setImageBitmap(data.img)
 
-            view.tag = m
+            view.tag = data
             view.setOnClickListener(clickListener)
         }
     }
