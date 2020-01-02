@@ -5,8 +5,8 @@ import android.graphics.Bitmap
 import android.util.LruCache
 import com.android.volley.Request
 import com.android.volley.RequestQueue
-import com.android.volley.toolbox.ImageLoader
-import com.android.volley.toolbox.Volley
+import com.android.volley.toolbox.*
+import java.io.File
 
 class HttpQueue constructor(context: Context) {
     companion object {
@@ -31,11 +31,20 @@ class HttpQueue constructor(context: Context) {
                 }
             })
     }
-    val requestQueue: RequestQueue by lazy {
-        // applicationContext is key, it keeps you from leaking the
-        // Activity or BroadcastReceiver if someone passes one in.
-        Volley.newRequestQueue(context.applicationContext)
+
+    val cacheDir = File("cache")
+
+    // Instantiate the cache
+    val cache = DiskBasedCache(cacheDir, 1024 * 1024) // 1MB cap
+
+    // Set up the network to use HttpURLConnection as the HTTP client.
+    val network = BasicNetwork(HurlStack())
+
+    // Instantiate the RequestQueue with the cache and network. Start the queue.
+    val requestQueue = RequestQueue(cache, network).apply {
+        start()
     }
+
     fun <T> addToRequestQueue(req: Request<T>) {
         requestQueue.add(req)
     }

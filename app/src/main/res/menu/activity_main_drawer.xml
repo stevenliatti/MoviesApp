@@ -6,7 +6,7 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/loginFragment"
-            android:icon="@drawable/ic_person_green_100dp"
+            android:icon="@drawable/ic_person_blue_100dp"
             android:title="@string/login" />
         <item
             android:id="@+id/registerFragment"

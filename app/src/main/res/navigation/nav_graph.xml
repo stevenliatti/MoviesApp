@@ -67,7 +67,7 @@
     <fragment
         android:id="@+id/peopleDetailsFragment"
         android:name="ch.hes.master.mobopproject.PeopleDetailsFragment"
-        android:label="Pepol Details"
+        android:label="Peoples Details"
         tools:layout="@layout/fragment_people_details">
         <argument
             android:name="id"
