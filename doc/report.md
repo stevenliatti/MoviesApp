@@ -143,6 +143,8 @@ Dans cette partie concernant l'implémentation, nous allons présenter les diff�
 
 Pour échanger les informations requises, notre application interagit avec des APIs externes permettant d'obtenir et persister les données nécessaires aux différentes fonctionnalités proposées.
 
+![APIs usage](img/schemas/APIs.png){width=40%}
+
 ### API TMDb
 
 L'API principalement utilisée dans notre projet est celle proposée par ["The Movie Database" (TMDb)](https://www.themoviedb.org/) qui offre toutes les informations sur les films et les acteurs. Nous avons également considéré ["The Open Movie Database" (OMDb API)](https://www.omdbapi.com/), mais elle offre beaucoup moins de possibilités. Nous interagissons avec cette API en envoyant des requêtes HTTP en fonctions des besoins, nous recevons en retour les informations au format JSON.
@@ -185,7 +187,8 @@ Les routes mises à disposition par cette API REST nous permettent de persister 
 <!-- TODO: je donnerai même pas autant de détails, mais si tu y tiens ^^ -->
 Etant donné que l'aspect persistance des données sort du cadre du cours d'Android, nous avons choisi de mettre en place une implémentation dite "in memory" qui substitue de manière abstraite une technologie quelconque de persistance. Les données sont donc stockées en RAM.
 Cette implémentation est faite à l'aide d'une Map Scala (table de hachage) qui fait parfaitement l'affaire pour ce genre de situations.
-===>  PETIT SCHEMA
+
+![Map scala as a DB](img/schemas/ScalaMap.png){width=40%}
 
 ### API REST YouTube
 
@@ -203,7 +206,8 @@ Toutes les vues de l'application sont implémentées à l'aide de fragments. Cha
 ## Single Activity
 
 Selon le cours et la documentation officielle d'Android, l'architecture actuelle conseillée pour le développement d'une application repose sur le principe de n'utiliser qu'une seule activité composée de fragments, représentant les vues de l'application.
-===>  SCHEMMAA
+
+![Single Activity concept](img/schemas/Single_Activity.png){width=40%}
 
 ## Navigation Graph
 
@@ -212,7 +216,9 @@ Cette méthode repose sur un graphe de navigation qui est éditable graphiquemen
 
 Il permet e définir les relations entre les différents fragments. Une fois de graph de navigation défini, des clasees sont automatiquement générées, elles représentent les liens entre les différents fragments et sont utilisés afin de naviguer depuis un fragment vers un autre.
 Voici le graph de navigation de notre application : 
-=========>>>> Screen NAVGRAPH
+
+![Graph de navigation](img/screenshots/nav_graph.png){width=40%}
+
 
 Voici un exemple de code qui permet de naviguer depuis le graph de la liste des films vers les détails d'un film en utilisant cette fameuse classe générée automatiquement :
 
@@ -245,6 +251,8 @@ Dans la majorité de cas, la logique de l'application requiert d'avoir recus cer
 Nous avons donc utilié le mechanisme de fonctions de call back permettant de prendre en compte cette contrainte.
 Son principe est simple, la fonction de callback sera appelée que lorsque la requête HTTP sera effectué et les données receptionnées.
 
+![Asynchronicité schema](img/schemas/Asynchronicité2.png){width=40%}
+
 ### Amélioration
 
 Etant donné le nombre d'appels HTTP effectués dans notre application, le code était rapidement polué par ce code long et répétitif nous avons donc simplifié cela en cérant une classe `VolleyRequestController` permettant de mettre à disposition les méthodes relatives à tous les appels HTTP.
@@ -273,19 +281,27 @@ L'interface graphique du drawer est définie dans le XML à l'aide d'un menu, et
 
 Pour ce faire, le layout de la main activity est de type `DrawerLayout`, elle inclut tout le contenu (top barre, fragments de navigation, et bottom tabs) ainsi que le drawer qui sera affiché.
 
+![Drawer - screenshot](img/screenshots/Drawer.png){width=40%}
+
 ## Bottom tabs
 
 En bas de l'écran, nous avons à disposition des onglets de navigation permettant de naviguer entre les vues principales de l'application, ces tabs ont été implémentés à l'aide d'un menu classique Android défini au niveau XLM. En basant l'identifiant de chaque items du menu sur les identifiants référencées dans le Navigation Graph, le graph de navigation se charge de rediriger automatiquement vers le bon fragement.
 
+![Bottom tabs - screenshot](img/screenshots/Bottom_Tabs.png){width=40%}
+
 ## View pager
 
 Pour les vues concernant les films appréciés/pas apprécies et les utilisateurs suivits/suivants il était intressant de pouvoir switcher entre les deux listes rapidement et efficacement. Nous avons donc mis en place des view pagers qui sont en quelque sorte des sous onglets permettant de switcher entre différents fragments assez rapidement.
+![View pagers - screenshot](img/screenshots/likes.png){width=40%}
+
 
 ## Search / input
 
 La recherche est un fragment qui contient au niveau XML uniquement un champ texte permettant de saisire les caractères de recherche et un radio boutton qui permet de séléctionner le type de recherche.
 Lorsque l'action de recherche est effectuée, une recycler view présentant les résutats de la recherche est affichée.
 La recycler view appleé est toujours la même nous avons juste le type des éléments affichés et le layout associé qui varie en fonction du type de la recherche (voir rubrique generic adapter).
+
+![Serch - screenshot](img/screenshots/search.png){width=40%}
 
 ## Shared preferences
 
@@ -322,17 +338,22 @@ Ce mechanisme permet également de vérifier qu'un utlisateur soit authentifé e
 ## FAB
 
 Un floating action button est disponible en bas de l'écrant à droite, une écouteur sur ce boutton est définit dans la main activity permettant d'intercepter les interactions des utilisateurs. Lorsqu'une interaction est detectée, une redirection vers le fragment dedié à la recherche est effectuée.
-===>>> petit schema boutton vers fragment
+
+![FAB - schema](img/schemas/FAB.png){width=40%}
 
 ## Generic adapter
 
 Dans le cadre de cette application, nous travaillons très fréquament avec la recycler view qui permet d'afficher une liste Android. Afin de ne pas devoir recréer une recycler view par liste, nous avons choisi d'implémenter un adapter générique permettant de réutiliser la même liste mais avec des itmes de type différents. 
-==>>> Schema 
+
+![Generic adapter - schema](img/schemas/Generic_Adapter.png){width=40%}
 
 ## Relations entre les vues
 
 Voici un schema qui représente globalement les relations entre les différentes vue de l'application.
-==> SCHEMA AVEC RELATIONS ENTRE LES VUES
+
+![Graph de navigation](img/screenshots/nav_graph.png){width=40%}
+Eventuellement a refaire ?? 
+
 
 # Conclusion
 
