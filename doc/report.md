@@ -209,18 +209,16 @@ Selon le cours et la documentation officielle d'Android, l'architecture actuelle
 
 ![Single Activity concept](img/schemas/Single_Activity.png){width=40%}
 
-## Navigation Graph
+## Navigation component
 
-Plusieurs possibilités s'offraient à nous concernant la navigation entre les différents fragments. Nous avons choisi d'experimenter la nouvelle méthode proposée par la documentation officielle d'Android qui est très intéressante et efficace.
-Cette méthode repose sur un graphe de navigation qui est éditable graphiquement ou en XML. 
-
-Il permet e définir les relations entre les différents fragments. Une fois de graph de navigation défini, des clasees sont automatiquement générées, elles représentent les liens entre les différents fragments et sont utilisés afin de naviguer depuis un fragment vers un autre.
+Plusieurs possibilités s'offraient à nous concernant la navigation entre les différents fragments. Nous avons choisi d'expérimenter la nouvelle méthode proposée par la documentation officielle d'Android qui est très intéressante et efficace.
+Cette méthode repose sur un graphe de navigation qui est éditable graphiquement ou en XML, comme décrit à la figure XXXXX. Les noeuds de ce graphe sont les relations entre les différents fragments de l'application et les arcs symbolisent les actions de navigation d'un fragment à un autre avec des éventuelles données passées en arguments de ces actions. Ce composant de navigation génère ainsi le code des actions de navigation en fonction de ce qui a été décrit en XML.
 Voici le graph de navigation de notre application : 
 
 ![Graph de navigation](img/screenshots/nav_graph.png){width=40%}
 
 
-Voici un exemple de code qui permet de naviguer depuis le graph de la liste des films vers les détails d'un film en utilisant cette fameuse classe générée automatiquement :
+Voici un exemple de code qui permet de naviguer de la liste des films vers les détails d'un film en utilisant cette fameuse classe générée automatiquement :
 
 ```kotlin
 view.findNavController().navigate(ListMoviesFragmentDirections.actionListMoviesFragmentToMovieDetailsFragment(item.id, item.urlImg))
@@ -228,46 +226,45 @@ view.findNavController().navigate(ListMoviesFragmentDirections.actionListMoviesF
 
 ### Arguments
 
-Il est également possible de définir des arguments qui sont passable entre les fragments, dans ce cas la classe générée automatiquement prendra en compte ces derniers.
-Du côté du fragment qui sera appelé, Android met à disposition une méthode très pratique permettant de récéptionner ces arguments.
-Voici un exemple de code permettant cela :
-`private val args: MovieDetailsFragmentArgs by navArgs()`
-```
+Il est également possible de définir des arguments transmissibles entre fragments, la classe générée automatiquement prendra en compte ces derniers.
+Du côté du fragment qui sera appelé, une méthode très pratique est à disposition, permettant de réceptionner ces arguments, comme décrit dans le listing XXXXX.
+
+```kotlin
+private val args: MovieDetailsFragmentArgs by navArgs()
 movieId = args.id
 urlImg = args.urlImg
 ```
 
-## Volley requests
+## Volley
 
-Comme nous l'avons vu notre application est majoritairement composée d'appel HTTP à diverses APIs. Nous avons donc utilisé une librairie=???? Android permettant d'effectuer les différents cals HTTP.
-La librairie utilisée est donc volley request, voici un exemple de son utilisation : 
+### Généralités
+
+Notre application est majoritairement composée d'appels HTTP à diverses APIs. Nous avons utilisé la librairie Android conseillée dans la documentation officielle, Volley. Elle supporte nativement les requêtes sur des chaines de caractères bruts, des images ou du JSON. Le listing XY décrit un exemple d'utilisation : tout d'abord il faut instancier une queue de requêtes, ensuite définir deux *callbacks* traitant les cas de réussite ou d'échec de la requête, enfin ajouter ces *callbacks* à la queue de requêtes. Volley exécute ensuite les requêtes se trouvant dans la queue de manière asynchrone (sans bloquer le *thread* principal d'affichage) et transparente pour l'utilisateur. Il est conseillé de déclarer une seule instance de Volley avec le *pattern* singleton.
+
 ```
 VIEUX CODE HTTP REQUEST
 ```
 
-### Assynchronicité
+### Asynchronisme
 
-Dans la majorité de cas, la logique de l'application requiert d'avoir recus certaines infos en provenances des API avant de pouvoir les afficher sur la vue. Nous avions donc besoin de garantir que l'integralité des données était récéptionnée avant de les afficher, mais tout cela avec la contrainte de ne pas bloquer l'exécution du code.
-Nous avons donc utilié le mechanisme de fonctions de call back permettant de prendre en compte cette contrainte.
-Son principe est simple, la fonction de callback sera appelée que lorsque la requête HTTP sera effectué et les données receptionnées.
+Dans la majorité des cas, la logique de l'application requiert d'avoir reçu certaines informations en provenance des APIs avant de pouvoir les afficher sur la vue. Nous avons besoin de garantir que l'intégralité des données soient réceptionnées avant de les afficher, mais tout cela avec la contrainte de ne pas bloquer l'affichage.
+Nous avons donc utilisé le mécanisme de fonctions de *callback*. Le principe est simple, la fonction de *callback* n'est appelée que lorsque la requête HTTP est effectué et les données réceptionnées.
 
-![Asynchronicité schema](img/schemas/Asynchronicité2.png){width=40%}
+![Asynchronisme schema](img/schemas/Asynchronisme2.png){width=40%}
 
 ### Amélioration
 
-Etant donné le nombre d'appels HTTP effectués dans notre application, le code était rapidement polué par ce code long et répétitif nous avons donc simplifié cela en cérant une classe `VolleyRequestController` permettant de mettre à disposition les méthodes relatives à tous les appels HTTP.
-Voici un exemple d'une requête HTTP GET qui illustre cela : 
+Etant donné le nombre d'appels HTTP important dans notre application, le code devient rapidement "pollué" par ce code long et répétitif de requête HTTP. Nous avons suivi les bonnes pratiques et simplifié cela en créant une classe `VolleyRequestController` offrant les méthodes relatives à tous les appels HTTP. Un exemple d'une requête HTTP GET utilisant cette classe est visible au listing XYZ.
 
 ```
 fun httpGet(URL: String, context: Context, callback: ServerCallback<JSONObject>) {
     val jsonObjReq = JsonObjectRequest(Request.Method.GET, URL, null,
     Response.Listener { response ->
-        callback.onSuccess(response) // call call back function here
+        callback.onSuccess(response) // callback function here
     },
     Response.ErrorListener { error ->
         Log.println(Log.DEBUG, this.javaClass.name, "error in httpGet : $error,\n$URL\n$callback")
     })
-
     // Adding request to request queue
     HttpQueue.getInstance(context).addToRequestQueue(jsonObjReq)
 }
@@ -275,39 +272,39 @@ fun httpGet(URL: String, context: Context, callback: ServerCallback<JSONObject>)
 
 ## Drawer
 
-Afin de rendre l'UI plus conviviale, nous avons implémenté un drawer (menu latéral dans la partie conception). Ce drawer repose également sur la dernière méthode proposée par la documentation d'Android.
+Afin de rendre l'interface utilisateur plus conviviale, nous avons implémenté un *drawer* (menu latéral dans la partie conception). Ce *drawer* repose également sur la dernière méthode proposée par la documentation d'Android.
 
-L'interface graphique du drawer est définie dans le XML à l'aide d'un menu, et initalisée dans la main activity. L'id des différents items est nommé selon les identifiants référencés dans le graph de navigation ce qui permet de naviguer directemnt vers le bon fragment lors de l'interaction d'un utilisateur avec ces derniers.
+L'interface graphique du *drawer* est définie dans le XML à l'aide d'un menu, et initialisée dans la *main activity*. L'identifiant des différents items est nommé selon les identifiants référencés dans le graphe de navigation ce qui permet de naviguer directemnt vers le bon fragment lors de l'interaction d'un utilisateur avec ces derniers.
 
-Pour ce faire, le layout de la main activity est de type `DrawerLayout`, elle inclut tout le contenu (top barre, fragments de navigation, et bottom tabs) ainsi que le drawer qui sera affiché.
+Pour ce faire, le layout de la *main activity* est de type `DrawerLayout`, elle inclut tout le contenu (*top bar*, fragments de navigation, et *bottom tabs*) ainsi que le *drawer* qui sera affiché.
 
 ![Drawer - screenshot](img/screenshots/Drawer.png){width=40%}
 
 ## Bottom tabs
 
-En bas de l'écran, nous avons à disposition des onglets de navigation permettant de naviguer entre les vues principales de l'application, ces tabs ont été implémentés à l'aide d'un menu classique Android défini au niveau XLM. En basant l'identifiant de chaque items du menu sur les identifiants référencées dans le Navigation Graph, le graph de navigation se charge de rediriger automatiquement vers le bon fragement.
+En bas de l'écran, des onglets de navigation sont présents, permettant de naviguer entre les vues principales de l'application, ces *tabs* ont été implémentés à l'aide d'un menu classique Android défini au niveau XML. En basant l'identifiant de chaque item du menu sur les identifiants référencés dans le *navigation graph*, chaque fragment est correctement appelé et affiché lors du clic sur un onglet.
 
 ![Bottom tabs - screenshot](img/screenshots/Bottom_Tabs.png){width=40%}
 
 ## View pager
 
-Pour les vues concernant les films appréciés/pas apprécies et les utilisateurs suivits/suivants il était intressant de pouvoir switcher entre les deux listes rapidement et efficacement. Nous avons donc mis en place des view pagers qui sont en quelque sorte des sous onglets permettant de switcher entre différents fragments assez rapidement.
+Pour les vues concernant les films appréciés/non appréciés et les utilisateurs suivis/abonnés, il était pratique de pouvoir passer d'une liste à l'autre rapidement et efficacement. Nous avons donc mis en place des *view pagers* qui sont en quelque sorte des sous-onglets permettant de "switcher" entre différents fragments assez rapidement. La réutilisation du code pour chaque sous-onglet (uniquement un changement de paramètre) est un avantage supplémentaire.
+
 ![View pagers - screenshot](img/screenshots/likes.png){width=40%}
 
 
-## Search / input
+## Recherche
 
-La recherche est un fragment qui contient au niveau XML uniquement un champ texte permettant de saisire les caractères de recherche et un radio boutton qui permet de séléctionner le type de recherche.
-Lorsque l'action de recherche est effectuée, une recycler view présentant les résutats de la recherche est affichée.
-La recycler view appleé est toujours la même nous avons juste le type des éléments affichés et le layout associé qui varie en fonction du type de la recherche (voir rubrique generic adapter).
+La recherche est un fragment qui contient, au niveau XML, uniquement un champ texte dans lequel les mots-clé sont saisis et un bouton radio sélectionnant dans quelle rubrique rechercher.
+Lorsque l'action de recherche est effectuée, une *recycler view* présentant les résutats de la recherche est affichée.
+La *recycler view* appelée est toujours la même, nous avons uniquement le type des éléments affichés et le layout associé qui varient en fonction du type de la recherche (voir @sec:generic-adapter).
 
-![Serch - screenshot](img/screenshots/search.png){width=40%}
+![Search - screenshot](img/screenshots/search.png){width=40%}
 
 ## Shared preferences
 
-Afin de stocker la session d'un utilisateur connecté à l'application, nous avons fait usage des shard preferences qui sont un moyen très agréable de persister des information dans l'application et d'y accéder depuis les différents fragments.
-Voici un exemple de leurs utilisation afin de stokcer la session d'un utilisateur.
-Création des shared preferences
+Afin de stocker la session d'un utilisateur connecté à l'application, nous avons fait usage des *shared preferences* qui sont un moyen simple (ensemble de clés-valeurs) et pratique de persister des information dans l'application et d'y accéder depuis les différents fragments. Deux exemples de leur utilisation sont disponibles aux listings XY et WZ.
+Création des *shared preferences*
 ```
 val sharedPref = activity?.getSharedPreferences(getString(R.string.preference_file_key) ,Context.MODE_PRIVATE) ?: return
 with (sharedPref!!.edit()) {
@@ -317,7 +314,7 @@ with (sharedPref!!.edit()) {
     commit()
 }
 ```
-Verifications des shared preferences
+Vérification des *shared preferences*
 ```
 val auth = Common.getAuth((activity as MainActivity).
             getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE),
@@ -326,30 +323,30 @@ if (auth != null) {
     ....
 }
 ```
-Desctruction des shard preferences (logout)
+Desctruction des *shared preferences* (logout)
 ```
 with (pref!!.edit()) {
     clear()
     commit()
 }
 ```
-Ce mechanisme permet également de vérifier qu'un utlisateur soit authentifé et de le rediriger vers la page de login dans le cas échéant.
+Ce mécanisme permet également de vérifier qu'un utilisateur soit authentifié et de le rediriger vers la page de login dans le cas échéant.
 
 ## FAB
 
-Un floating action button est disponible en bas de l'écrant à droite, une écouteur sur ce boutton est définit dans la main activity permettant d'intercepter les interactions des utilisateurs. Lorsqu'une interaction est detectée, une redirection vers le fragment dedié à la recherche est effectuée.
+Un *floating action button* (FAB) est disponible en bas à droite de l'écran, un écouteur sur ce bouton est défini dans la *main activity* permettant d'intercepter les interactions des utilisateurs. Lorsqu'une interaction est détectée, une redirection vers le fragment dédié à la recherche est effectuée.
 
 ![FAB - schema](img/schemas/FAB.png){width=40%}
 
-## Generic adapter
+## Generic adapter {#sec:generic-adapter}
 
-Dans le cadre de cette application, nous travaillons très fréquament avec la recycler view qui permet d'afficher une liste Android. Afin de ne pas devoir recréer une recycler view par liste, nous avons choisi d'implémenter un adapter générique permettant de réutiliser la même liste mais avec des itmes de type différents. 
+Dans le cadre de cette application, nous travaillons très fréquemment avec la *recycler view* qui affiche une liste d'items, d'un même type pour toute la liste. Afin de ne pas devoir recréer une *recycler view* par type d'items, nous avons choisi d'implémenter un adapteur générique permettant de réutiliser la même liste mais avec des items de type différents. 
 
 ![Generic adapter - schema](img/schemas/Generic_Adapter.png){width=40%}
 
 ## Relations entre les vues
 
-Voici un schema qui représente globalement les relations entre les différentes vue de l'application.
+Voici un schéma qui représente globalement les relations entre les différentes vues de l'application. Comme nous pouvons l'apercevoir, une attention particulière a été apportée pour réutiliser au maximum les vues et les fragments lorsque cela était possible.
 
 ![Graph de navigation](img/screenshots/nav_graph.png){width=40%}
 Eventuellement a refaire ?? 
@@ -357,23 +354,25 @@ Eventuellement a refaire ??
 
 # Conclusion
 
-Pour conclure ce projet nous a permis d'apprendre et mettre en pratique de nombreux concepts propre à la programmation Android. Nous nous sommes également familiarisé avec le langage "Kotlin" qui une fois pris en main simplifie et optimise grandement les opérations qui en Java sont plus complexes et fastidieuses.
-Enfin, nous restons sur un sentiment très satisfaisant de cette première expérience dans le mode du developpement Android.
+## Bilan personnel
+
+Pour conclure, ce projet nous a permis d'apprendre et mettre en pratique de nombreux concepts propres à la programmation Android. Nous nous sommes également familiarisé avec le langage Kotlin, qui, une fois pris en main, simplifie et optimise grandement les opérations qui peuvent être plus complexes et fastidieuses en Java.
+Enfin, nous restons sur un sentiment très satisfaisant de cette première expérience dans le monde du développement Android.
 
 ## Problèmes rencontrés
 
-Les princiaples difficutés rencontrées durant le dévloppement de ce projet sont les suivantes :
+Les principales difficultés rencontrées durant le développement de ce projet sont les suivantes :
 
 - ???
 - ???
 
 ## Améliorations
 
-En ce qui concerne les améliorations futures à apporter au projet nous avons pensé aux suivantes :
+Les améliorations suivantes pourraient être apportées au projet :
 
-- L'interace graphique qui est toujours optimisable
-- La mise en place d'un cache qui permettrait de ne pas réinteroger l'API pour chaque action effectuée et par conséquent limiter le traffic
-- Interogation de l'API Netflix afin de savoir si le film est disponible sur leurs plateforme de streaming
-- Afficher les films à la une en fonction des préférences de l'utilisateur qui serraient déduite de ses films appréciées
-- Afficher les informations relatives aux horraires des cinemas les plus proches
-- Notifier les utilisateurs lorsu'ils sont suivits par un autre utilisateur
+- L'interface graphique qui est toujours optimisable.
+- La mise en place d'un cache qui éviterait de réinterroger l'API pour chaque action effectuée et par conséquent limiter le traffic réseau.
+- Interrogation de l'API Netflix afin de savoir si le film est disponible sur leur plateforme de streaming.
+- Afficher les films à la une en fonction des préférences de l'utilisateur, par exemple déduites de ses films appréciés ou de ses recherches récentes.
+- Afficher les informations relatives aux horaires des cinémas les plus proches pour les films actuellement dans les salles.
+- Notifier les utilisateurs lorsqu'ils sont suivis par un autre utilisateur.
