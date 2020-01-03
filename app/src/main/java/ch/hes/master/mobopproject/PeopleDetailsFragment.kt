@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.gridlayout.widget.GridLayout
 import androidx.navigation.fragment.navArgs
@@ -25,8 +26,6 @@ class PeopleDetailsFragment : Fragment() {
     private var id : Int? = null
     private var urlImg : String? = null
     private var knownFor: String? = null
-
-    private lateinit var details: PeopleDetails
 
     private val args: PeopleDetailsFragmentArgs by navArgs()
 
@@ -60,18 +59,26 @@ class PeopleDetailsFragment : Fragment() {
                     result.getString("homepage")
                 )
 
-                details = peopleDetails
-                name.text = peopleDetails.name
-                biography.text = peopleDetails.biography
-                knownForTextView.text = peopleDetails.knownFor
-                birthday.text = peopleDetails.birthday
-                deathDay.text = peopleDetails.deathday
-                placeOfBirth.text = peopleDetails.placeOfBirth
-                gender.text = peopleDetails.gender
-                popularity.text = peopleDetails.popularity.toString()
-                homepage.text = peopleDetails.homepage
+                check_text_validity(peopleDetails.name, name)
+                check_text_validity(peopleDetails.biography, biography)
+                check_text_validity(peopleDetails.knownFor, knownForTextView)
+                check_text_validity(peopleDetails.birthday, birthday)
+                check_text_validity(peopleDetails.deathday, deathDay)
+                check_text_validity(peopleDetails.placeOfBirth, placeOfBirth)
+                val genderTxt = if (peopleDetails.gender == "1") "Sex: Woman" else "Sex: Man"
+                check_text_validity(genderTxt, gender)
+                check_text_validity(peopleDetails.popularity.toString(), popularity)
+                check_text_validity(peopleDetails.homepage, homepage)
             }
         })
+    }
+
+    fun check_text_validity(txt: String, textView: TextView) {
+        if (txt != "null") {
+            textView.text = txt
+        } else {
+            textView.isVisible = false
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
