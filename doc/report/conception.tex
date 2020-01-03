@@ -20,7 +20,7 @@ C'est également depuis cette vue qu'il pourra indiquer son appréciation pour l
 
 \subsection{Recherche}
 Une interface de recherche est mise à disposition. La recherche peut être lancée parmi les films, les acteurs ou les autres utilisateur de l'application selon le choix de l'utilisateur (bouton "radio" ou mécanisme similaire).
-Les résultats de la recherche seront présentés sous forme de liste, présentant les différentes actions selon le type de recherche qui aura été effectué :
+Les résultats de la recherche seront présentés sous forme de liste, présentant différentes actions selon le type de recherche qui aura été effectué :
 \begin{itemize}
     \item Si l'utilisateur cherche un film, il obtiendra la liste des films qui correspondent aux critères entrés dans le champs texte de recherche.
     \item S'il cherche un acteur, il obtiendra une liste d'acteurs avec la possibilité de cliquer dessus (comme pour les films) afin d'afficher plus de détails à leur sujet.
@@ -40,8 +40,8 @@ Si l'utilisateur possède un compte dans l'application, il pourra retrouver la l
 La vue réseau d'amis est disponible uniquement si l'utilisateur détient un compte. Son réseau d'amis sera constitué d'une liste d'utilisateurs le suivant (ses "\textit{followers}") ainsi que d'une liste d'utilisateurs auxquels il est abonné (ses "\textit{following}").
 
 \subsection{Authentification}
-Au sein de l'application, l'authentification est requise pour consulter certaines vues spécifiques, comme le réseau d'amis (\ref{reseau-amis}) ou les films préférés (\ref{mes-films}) et les vues comprenant des éventuelles informations persistées.
-Les autres vues de l'application ne requièrent aucune authentificaion. Ce principe a été mis en place afin de ne pas reproduire un des principaux points faibles des applications actuelles qui est de forcer l'utilisateur à s'authentifier sous peine de ne pas pouvoir utiliser l'application. Notre application demandera à l'utilisateur de s'authentifier uniquement lorsque cela est nécessaire.
+Au sein de l'application, l'authentification est requise pour consulter certaines vues spécifiques, comme le réseau d'amis (\ref{reseau-amis}) et les films préférés (\ref{mes-films}).
+Les autres vues de l'application ne requièrent aucune authentificaion. Ce principe a été mis en place afin de ne pas reproduire un des principaux points faibles des applications actuelles qui est de forcer l'utilisateur à s'authentifier sous peine de ne pas pouvoir utiliser l'application. Notre application demande donc à l'utilisateur de s'authentifier uniquement lorsque cela est nécessaire.
  
 \subsubsection{Connexion}
 La vue connexion comporte simplement deux champs permettant de renseigner le pseudo et le mot de passe afin de s'authentifier.
@@ -50,13 +50,4 @@ La vue connexion comporte simplement deux champs permettant de renseigner le pse
 Cette vue comporte les champs nécessaires à la création d'un compte, à savoir un pseudo (unique), un email et un mot de passe.
 
 \subsection{Navigation}
-Pour naviguer d'une vue à une autre, l'utilisateur dispose de différents mécanismes.
-
-\subsubsection{Tabs de navigation}
-En bas de l'écran, nous retrouvons une liste de \textit{tabs} (onglets) permettant de naviguer entre les différentes vues de l'application.
-
-\subsubsection{Barre de navigation}
-En haut de l'écran se trouve une barre comportant le nom de la vue courrante, un bouton "home" (\ref{films-tendance}) et un contrôle faisant apparaitre le menu latéral.
-
-\subsubsection{Menu latéral}
-Finalement, nous avons un menu latéral qui apparaît de gauche à droite de l'écran. Ce menu permet d'afficher les informations relatives au profil de l'utilisateur courant. D'autre part, il propose les action de connexion, création de compte et déconnexion. Si l'utilisateur est connecté, il pourra aussi naviguer vers les vues des films aimés et du réseau d'amis.
+Afin de naviguer dans l'application, l'utilisateur dispose de différents mécanismes tels que les tabs de navigation (en bas de l'écran), la barre de navigation qui se situe en haut de l'écran et enfin un menu latéral mettant à disposition les différentes informations relatives à son compte.

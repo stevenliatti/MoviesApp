@@ -163,9 +163,13 @@ fun httpGet(URL: String, context: Context, callback: ServerCallback<JSONObject>)
 \end{code}
 \bigbreak
 
+\subsubsection{Toolbar}
+En haut de l'écran se trouve une barre comportant le nom du fragment courrant, un bouton "home" (\ref{films-tendance}) et un contrôle faisant apparaitre le menu latéral.
 
 \subsection{Drawer}
-Afin de rendre l'interface utilisateur plus conviviale, nous avons implémenté un \textit{drawer} (menu latéral dans la partie conception), illustré à la figure \ref{drawer}. Ce \textit{drawer} repose également sur la dernière méthode proposée par la documentation d'Android \cite{docandroid}. L'interface graphique du \textit{drawer} est définie dans le \acrshort{xml} à l'aide d'un menu, et initialisée dans la \textit{main activity}. L'identifiant des différents items est nommé selon les identifiants référencés dans le graphe de navigation ce qui permet de naviguer directemnt vers le bon fragment lors de l'interaction d'un utilisateur avec ces derniers. Pour ce faire, le layout de la \textit{main activity} est de type \mintinline{text}{DrawerLayout}, elle inclut tout le contenu (\textit{top bar}, fragments de navigation, et \textit{bottom tabs}) ainsi que le \textit{drawer} qui sera affiché.
+Le drawer est un menu latéral qui apparaît de gauche à droite de l'écran. Ce menu permet d'afficher les informations relatives au profil de l'utilisateur courant. D'autre part, il propose les action de connexion, création de compte et déconnexion. Si l'utilisateur est connecté, il pourra aussi naviguer vers les vues des films aimés et du réseau d'amis.
+Afin de rendre l'interface utilisateur plus conviviale, nous av
+ons implémenté un \textit{drawer}, illustré à la figure \ref{drawer}. Ce \textit{drawer} repose également sur la dernière méthode proposée par la documentation d'Android \cite{docandroid}. L'interface graphique du \textit{drawer} est définie dans le \acrshort{xml} à l'aide d'un menu, et initialisée dans la \textit{main activity}. L'identifiant des différents items est nommé selon les identifiants référencés dans le graphe de navigation ce qui permet de naviguer directemnt vers le bon fragment lors de l'interaction d'un utilisateur avec ces derniers. Pour ce faire, le layout de la \textit{main activity} est de type \mintinline{text}{DrawerLayout}, elle inclut tout le contenu (\textit{top bar}, fragments de navigation, et \textit{bottom tabs}) ainsi que le \textit{drawer} qui sera affiché.
 \begin{figure}
     \begin{center}
         \includegraphics[width=0.5\textwidth]{img/screenshots/Drawer.png}
@@ -176,6 +180,7 @@ Afin de rendre l'interface utilisateur plus conviviale, nous avons implémenté 
 
 \subsection{Bottom tabs}
 En bas de l'écran, des onglets de navigation sont présents, permettant de naviguer entre les vues principales de l'application, ces \textit{tabs} ont été implémentés à l'aide d'un menu classique Android défini au niveau \acrshort{xml}, illustrés à la figure \ref{tabs}. En basant l'identifiant de chaque item du menu sur les identifiants référencés dans le \textit{navigation graph}, chaque fragment est correctement appelé et affiché lors du clic sur un onglet.
+
 \begin{figure}
     \begin{center}
         \includegraphics[width=0.8\textwidth]{img/screenshots/Bottom_Tabs.png}
