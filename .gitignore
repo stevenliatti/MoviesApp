@@ -13,3 +13,9 @@
 .externalNativeBuild
 .cxx
 .env
+
+.settings
+.project
+app/.classpath
+app/.project
+app/.settings/

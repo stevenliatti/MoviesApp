@@ -1,18 +1,22 @@
-OPTIONS = --filter=pandoc-numbering
-OPTIONS += --filter=pandoc-crossref
-OPTIONS += --toc
+CC=xelatex -shell-escape
+REPORT=report
 
-PDFOPTIONS = --highlight-style my_highlight.theme
-PDFOPTIONS += --pdf-engine pdflatex
-PDFOPTIONS += --number-sections
-PDFOPTIONS += --template=./default.latex
+$(REPORT).pdf: $(REPORT).tex report/*.tex bib.bib img/*
+	$(CC) $(REPORT).tex
+	makeglossaries $(REPORT)
+	bibtex $(REPORT)
+	$(CC) $(REPORT).tex
+	$(CC) $(REPORT).tex
+	make mostlyclean
 
-report.pdf: report.md *.theme img/*
-	pandoc -s $(OPTIONS) $(PDFOPTIONS) -o $@ $<
+docker_run:
+	docker run -it --rm -v "$$PWD":/docs -w /docs aergus/latex bash
 
-docker:
-	docker build -t pandoc-augmented .
-	docker run -it --rm --user $$(id -u):$$(id -g) -v "$$PWD":/docs pandoc-augmented bash
+mostlyclean:
+	rm -rf _minted-* *.log *.aux *.out *.lof *.lol *.toc *.bbl *.blg
+	rm -rf *.nav *.snm *.glg *.glo *.gls *.glsdefs *.ist *.lot *.vrb *.pyg
 
 clean:
-	rm -f *.pdf *.html
+	rm -f *.pdf
+	rm -rf _minted-* *.log *.aux *.out *.lof *.lol *.toc *.bbl *.blg
+	rm -rf *.nav *.snm *.glg *.glo *.gls *.glsdefs *.ist *.lot *.vrb *.pyg
