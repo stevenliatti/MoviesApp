@@ -32,16 +32,14 @@ class HttpQueue constructor(context: Context) {
             })
     }
 
-    val cacheDir = File("cache")
-
     // Instantiate the cache
-    val cache = DiskBasedCache(cacheDir, 1024 * 1024) // 1MB cap
+    private val cache = DiskBasedCache(context.cacheDir, 1024 * 1024 * 100)
 
     // Set up the network to use HttpURLConnection as the HTTP client.
-    val network = BasicNetwork(HurlStack())
+    private val network = BasicNetwork(HurlStack())
 
     // Instantiate the RequestQueue with the cache and network. Start the queue.
-    val requestQueue = RequestQueue(cache, network).apply {
+    private val requestQueue = RequestQueue(cache, network).apply {
         start()
     }
 
