@@ -1,12 +1,12 @@
-Nous avons commencé par dessiner les maquettes des vues de notre application afin de se faire une idée de l'aspect visuel de chaque vue et des relations entre les vues, comme illustré à la figure \ref{maquettes}. Tout cela dans le but de simplifier et clarifier la phase de développement proprement dite.
-Durant cette phase, nous nous sommes également documentés sur les APIs existantes proposant des services relatifs aux films, nous avons étudié les différentes technologies permettant de mettre en place une API REST et finalement nous avons analysé les composants et méthodologies étudiés en cours qui seraient utiles d'intégrer dans notre application.
-Les sous-sections suivantes décrivent les vues et les fonctionnalités que l'application devra offrir.
+Nous avons commencé par dessiner les maquettes des vues de notre application afin de se faire une idée de l'aspect visuel de chaque vue et des relations entre elles, comme illustré à la figure \ref{maquettes}. Tout cela dans le but de simplifier et clarifier la phase de développement proprement dite.
+Durant cette phase, nous nous sommes également documentés sur les \acrshort{api}s existantes proposant des services relatifs aux films, nous avons étudié les différentes technologies permettant de mettre en place une \acrshort{api} REST et finalement nous avons analysé les composants et méthodologies étudiés en cours qui seraient utiles d'intégrer dans notre application.
+Les sous-sections suivantes décrivent les vues et les fonctionnalités que propose l'application finale.
 
 \subsection{Films tendance}\label{films-tendance}
 Lorsqu'un utilisateur ouvre l'application, la vue principale (home) lui affiche une liste des films à la une, classés en fonction de leur popularité. Chaque film affiche ses informations de base (poster, titre, courte description). L'utilisateur a la possibilité de cliquer sur un film afin d'obtenir d'avantage d'informations.
 
 \subsection{Détails d'un film}
-Comme décrit à la section \ref{films-tendance}, si l'utilisateur souhaite en savoir plus sur un film, il peut accéder à cette vue présentant les détails d'un film. Elle comporte les informations détaillées du film tel que le titre, la description complète, la liste des acteurs, la liste des réalisateurs, les différentes bande-annonces, les genres associés et une grille qui contient des films similaire au film concerné. La possibilité de cliquer sur un film de la grille afin de naviguer vers ses détails est également intégrée.
+Comme décrit à la section \ref{films-tendance}, si l'utilisateur souhaite en savoir plus sur un film, il peut accéder à cette vue présentant les détails d'un film. Elle comporte les informations détaillées du film tel que le titre, la description complète, la liste des acteurs, la liste des réalisateurs, les différentes bande-annonces, les genres associés et une grille qui contient les films similaires au film concerné. La possibilité de cliquer sur un film de la grille afin de naviguer vers ses détails est également intégrée.
 Si l'utilisateur souhaite visionner une bande-annonce, il lui suffit de cliquer dessus afin que le \textit{player} YouTube soit automatiquement lancé avec la vidéo en question.
 C'est également depuis cette vue qu'il pourra indiquer son appréciation pour le film ("like" ou "dislike"), appréciation qui sera sauvegardée dans son profil.
 
@@ -31,10 +31,10 @@ Les résultats de la recherche seront présentés sous forme de liste, présenta
 Au même titre que la liste des films tendance, nous avons une interface proposant la liste des acteurs actuellement populaires avec la possibilité de cliquer sur chacun d'entre eux afin d'obtenir plus d'informations à leur sujet.
 
 \subsection{Détails d'un "people"}
-Comme pour les détails d'un film, nous avons également une vue présentant les détails d'un acteur, elle permet de consulter diverse informations, telles que sa biographie personnelle et la liste des films dans lesquels il a joué.
+Comme pour les détails d'un film, nous avons également une vue présentant les détails d'un acteur, elle permet de consulter diverses informations, telles que sa biographie personnelle et la liste des films dans lesquels il a joué.
 
 \subsection{Mes films}\label{mes-films}
-Si l'utilisateur possède un compte dans l'application, il pourra retrouver la liste des films appréciés ou non appréciés, sous une forme similaire à la liste des films tendance \ref{films-tendance}.
+Si l'utilisateur possède un compte dans l'application, il pourra retrouver sa liste de films appréciés ou non, sous une forme similaire à la liste des films tendance (sous-section \ref{films-tendance}).
 
 \subsection{Réseau d'amis}\label{reseau-amis}
 La vue réseau d'amis est disponible uniquement si l'utilisateur détient un compte. Son réseau d'amis sera constitué d'une liste d'utilisateurs le suivant (ses "\textit{followers}") ainsi que d'une liste d'utilisateurs auxquels il est abonné (ses "\textit{following}").
