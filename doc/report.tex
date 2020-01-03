@@ -61,24 +61,26 @@
 \author{Jeremy Favre - Steven Liatti}
 \date{Janvier 2020}
 \maketitle
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.6\textwidth]{img/screenshots/movie_list.png}
+    \end{center}
+\end{figure}
 \newpage
 
 
 % \setcounter{tocdepth}{2}
 \addcontentsline{toc}{subsection}{Table des matières}
 \tableofcontents
-\newpage
 \addcontentsline{toc}{subsection}{Table des figures}
 \listoffigures
-\newpage
-\renewcommand{\listtablename}{Table des tables}
-\addcontentsline{toc}{subsection}{Table des tables}
-\listoftables
-\newpage
+% \renewcommand{\listtablename}{Table des tables}
+% \addcontentsline{toc}{subsection}{Table des tables}
+% \listoftables
+% \newpage
 \renewcommand\listoflistingscaption{Table des listings de code source}
 \addcontentsline{toc}{subsection}{Table des listings de code source}
 \listoflistings
-\newpage
 
 \subsection*{Conventions typographiques} %-----------------------------------------------------------------------------------------------
 \addcontentsline{toc}{subsection}{Conventions typographiques}
@@ -101,7 +103,6 @@ fun main() {
     \item Dans les listings, les lignes précédées d'un "\$" sont exécutées dans un shell.
 \end{itemize}
 
-\newpage
 
 \newacronym{api}{API}{\textit{Application Programming Interface}, Interface de programmation : services offerts par un programme producteur à d'autres programmes consommateurs}
 \newacronym{json}{JSON}{\textit{JavaScript Object Notation}, Format d'échange de données léger, facile à lire et écrire par les humains et les machines}
@@ -161,14 +162,3 @@ fun main() {
 %     \label{label}
 % \end{code}
 % \bigbreak
-
-
-
-
-% # Architecture
-
-% ## Diagramme de classes
-
-% <!-- TODO: -->
-% ===========> A FAIRE
-
