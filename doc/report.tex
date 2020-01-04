@@ -77,7 +77,7 @@
 % \renewcommand{\listtablename}{Table des tables}
 % \addcontentsline{toc}{subsection}{Table des tables}
 % \listoftables
-% \newpage
+\newpage
 \renewcommand\listoflistingscaption{Table des listings de code source}
 \addcontentsline{toc}{subsection}{Table des listings de code source}
 \listoflistings
@@ -92,7 +92,6 @@ Lors de la rédaction de ce document, les conventions typographiques ci-dessous 
     utilisation de paramètre, variable, commande utilisable par l'utilisateur, ou extrait de code 
     source est écrite avec une police d'écriture à \mintinline{text}{chasse fixe}.
 	\item Tout extrait de fichier ou de code est écrit selon le format suivant:
-    \bigbreak
     \begin{code}
         \begin{minted}[bgcolor=mygray,breaklines,breaksymbol=,linenos,frame=single,stepnumber=1,tabsize=2]{kotlin}
 fun main() {
@@ -100,7 +99,6 @@ fun main() {
 }
         \end{minted}
     \end{code}
-    \item Dans les listings, les lignes précédées d'un "\$" sont exécutées dans un shell.
 \end{itemize}
 
 

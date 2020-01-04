@@ -1,7 +1,7 @@
 Dans cette partie concernant l'implémentation, nous allons présenter les différentes technologies, méthodes et composants utilisés afin de mener à bien le développement de notre application. Des captures d'écran illustreront le résultat final.
 
-% TODO: screen des fichiers
-\subsection{Structure du projet et arborescence des fichiers}
+\subsection{Architecture globale}
+Nous avons architecturé notre application autour du composant de navigation (voir section \ref{navigation_sec}), instancié par la \textit{main activity}. En fonction du clic de l'utilisateur, le fragment associé est appelé, qui à son tour fait appel à une vue. Dans le cas des listes (films, \textit{peoples} et utilisateurs), un adapteur générique est appelé, pour éviter la duplication de code (voir section \ref{generic-adapter}). La plupart du temps, les fragments se servent du contrôleur HTTP Volley (voir section \ref{volley_sec}) pour récupérer les données. Les données sont transformées en objets Kotlin à l'aide de \textit{data classes}. La figure \ref{arch_global} illustre le schéma global de l'architecture.
 
 \subsection{APIs}
 Pour échanger les informations requises, notre application interagit avec des \acrshort{api}s externes permettant d'obtenir et persister les données nécessaires aux différentes fonctionnalités proposées, comme illustré à la figure \ref{apis_usage}.
@@ -13,9 +13,17 @@ Pour échanger les informations requises, notre application interagit avec des \
     \label{apis_usage}
 \end{figure}
 
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.8\textwidth]{img/global.png}
+    \end{center}
+    \caption{Architecture globale de l'application}
+    \label{arch_global}
+\end{figure}
+
+
 \subsubsection{API TMDb}
 L'\acrshort{api} principalement utilisée dans notre projet est celle proposée par \textit{The Movie Database} (TMDb) \cite{tmdb} qui offre toutes les informations sur les films et les acteurs. Nous avons également considéré \textit{The Open Movie Database} \cite{omdb}, mais elle offre beaucoup moins de possibilités. Nous interagissons avec TMDb en envoyant des requêtes HTTP en fonctions des besoins, nous recevons en retour les informations au format \acrshort{json}. Par exemple, la route GET : \mintinline{text}{/discover/movie} nous retournera les informations sur les films actuellement populaires, visibles au listing \ref{tmdb_example} au format \acrshort{json}. Avec ces différentes informations, nous pouvons construire les listes et les vues de détails des films et des "\textit{peoples}", comme illustrés sur les figures \ref{movies_peoples_list} et \ref{movie_people_details}.
-\bigbreak
 \begin{code}
     \begin{minted}[bgcolor=mygray,breaklines,breaksymbol=,linenos,frame=single,stepnumber=1,tabsize=2]{json}
 {
@@ -45,7 +53,12 @@ L'\acrshort{api} principalement utilisée dans notre projet est celle proposée 
     \caption{Exemple de données retournées par TMDb}
     \label{tmdb_example}
 \end{code}
-\bigbreak
+
+
+\subsubsection{API REST Backend}
+Certaines données de l'application nécessitent d'être persistées, c'est pourquoi nous avons choisi de mettre en place un backend basé sur Akka HTTP \cite{akka} en Scala. Le Scala est un langage relativement proche du Kotlin qui fait également usage de la \acrshort{jvm} et offre de nombreux atouts comme un typage fort, abstraction et programmation orientée objet. Tout cela avec une syntaxe permettant d'écrire le code de manière simple, concise et déclarative. Pour toutes ces raisons, le choix de ce langage nous semblait judicieux. Les routes mises à disposition par cette API REST nous permettent de persister les informations telles que les comptes des utilisateurs, les relations d'abonnements entre eux et les appréciations des films. Elles permettent également de s'authentifier, s'enregistrer et rechercher un utilisateur.
+
+
 \begin{figure}
     \begin{center}
         \includegraphics[width=1\textwidth]{img/screenshots/movies_peoples_list.png}
@@ -60,9 +73,6 @@ L'\acrshort{api} principalement utilisée dans notre projet est celle proposée 
     \caption{Détails d'un film et d'un acteur}
     \label{movie_people_details}
 \end{figure}
-
-\subsubsection{API REST Backend}
-Certaines données de l'application nécessitent d'être persistées, c'est pourquoi nous avons choisi de mettre en place un backend basé sur Akka HTTP \cite{akka} en Scala. Le Scala est un langage relativement proche du Kotlin qui fait également usage de la \acrshort{jvm} et offre de nombreux atouts comme un typage fort, abstraction et programmation orientée objet. Tout cela avec une syntaxe permettant d'écrire le code de manière simple, concise et déclarative. Pour toutes ces raisons, le choix de ce langage nous semblait judicieux. Les routes mises à disposition par cette API REST nous permettent de persister les informations telles que les comptes des utilisateurs, les relations d'abonnements entre eux et les appréciations des films. Elles permettent également de s'authentifier, s'enregistrer et rechercher un utilisateur.
 
 \subsubsection{API YouTube}
 Pour chaque film, TMDb nous offre une liste de vidéos YouTube, comprenant des \textit{trailers} et \textit{teasers} du film. Nous avons alors fait usage de l'\acrshort{api} officielle YouTube \cite{youtube} pour intégrer ces vidéos. Il faut obligatoirement créer une clé \acrshort{api} dans son compte Google pour pouvoir utiliser cette \acrshort{api}. On peut utiliser cette \acrshort{api} globalement de deux manières différentes sur Android :
@@ -93,7 +103,7 @@ Selon le cours et la documentation officielle d'Android \cite{docandroid}, l'arc
     \label{single_activity}
 \end{figure}
 
-\subsection{Navigation component}
+\subsection{Navigation component}\label{navigation_sec}
 Plusieurs possibilités s'offraient à nous concernant la navigation entre les différents fragments. Nous avons choisi d'expérimenter la nouvelle méthode proposée par la documentation officielle d'Android \cite{docandroid} qui est très intéressante et efficace.
 Cette méthode repose sur un graphe de navigation qui est éditable graphiquement ou en \acrshort{xml}, comme illustré à la figure \ref{nav_graph}. Les fragments de l'application représentent les noeuds du graphe et les arcs symbolisent les actions de navigation d'un fragment à un autre avec des éventuelles données passées en arguments de ces actions. Ce composant de navigation génère également le code des actions de navigation en fonction de ce qui a été décrit en \acrshort{xml}.
 \begin{figure}
@@ -105,7 +115,6 @@ Cette méthode repose sur un graphe de navigation qui est éditable graphiquemen
 \end{figure}
 
 Un exemple de code qui permet de naviguer de la liste des films vers les détails d'un film en utilisant cette classe générée automatiquement est disponible au listing de code \ref{nav_kotlin}.
-\bigbreak
 \begin{code}
     \begin{minted}[bgcolor=mygray,breaklines,breaksymbol=,linenos,frame=single,stepnumber=1,tabsize=2]{kotlin}
 view.findNavController()
@@ -115,12 +124,10 @@ view.findNavController()
     \caption{Exemple de navigation}
     \label{nav_kotlin}
 \end{code}
-\bigbreak
 
 
 \subsubsection{Arguments}
 Il est également possible de définir des arguments transmissibles entre les différents fragments, la classe générée automatiquement prendra en compte ces derniers. Du côté du fragment qui sera appelé, une méthode très pratique est à disposition, permettant de réceptionner ces arguments, comme décrit dans le listing \ref{args_kotlin}.
-\bigbreak
 \begin{code}
     \begin{minted}[bgcolor=mygray,breaklines,breaksymbol=,linenos,frame=single,stepnumber=1,tabsize=2]{kotlin}
 private val args: MovieDetailsFragmentArgs by navArgs()
@@ -130,13 +137,11 @@ urlImg = args.urlImg
     \caption{Arguments du graphe de navigation en Kotlin}
     \label{args_kotlin}
 \end{code}
-\bigbreak
 
 
-\subsection{Volley}
+\subsection{Volley}\label{volley_sec}
 \subsubsection{Généralités}
 Notre application est majoritairement composée d'appels HTTP à diverses \acrshort{api}s. Nous avons utilisé la librairie Android conseillée dans la documentation officielle \cite{docandroid}, Volley \cite{volley}. Elle supporte nativement les requêtes sur des chaines de caractères bruts, des images ou du \acrshort{json}. Le listing \ref{volley_kotlin_simple} décrit un exemple d'utilisation : tout d'abord il faut instancier une queue de requêtes, ensuite définir deux \textit{callbacks} traitant les cas de réussite ou d'échec de la requête, enfin ajouter ces \textit{callbacks} à la queue de requêtes. Volley exécute ensuite les requêtes se trouvant dans la queue de manière asynchrone (sans bloquer le \textit{thread} principal d'affichage) et transparente pour l'utilisateur. Il est conseillé de déclarer une seule instance de Volley avec le \textit{pattern} singleton.
-\bigbreak
 \begin{code}
     \begin{minted}[bgcolor=mygray,breaklines,breaksymbol=,linenos,frame=single,stepnumber=1,tabsize=2]{kotlin}
 val textView = findViewById<TextView>(R.id.text)
@@ -152,7 +157,6 @@ queue.add(stringRequest)
     \caption{Usage de la librairie Volley}
     \label{volley_kotlin_simple}
 \end{code}
-\bigbreak
 
 \subsubsection{Asynchronisme}
 Dans la majorité des cas, la logique de l'application requiert d'avoir reçu certaines informations en provenance des APIs avant de pouvoir les afficher sur la vue. Nous avons besoin de garantir que l'intégralité des données soient réceptionnées avant de les afficher, mais tout cela avec la contrainte de ne pas bloquer l'affichage, comme illustré à la figure \ref{asynchrone}.
@@ -166,8 +170,7 @@ Nous avons donc utilisé le mécanisme de fonctions de \textit{callback}. Le pri
 \end{figure}
 
 \subsubsection{Améliorations}
-Etant donné le nombre d'appels HTTP important dans notre application, le code devient rapidement "pollué" par ce code long et répétitif TODO: (Steven met visible au listing 4 stp). Nous avons suivi les bonnes pratiques et simplifié cela en créant une classe \mintinline{text}{VolleyRequestController} offrant les méthodes relatives à tous les appels HTTP requis par notre application. La fonction pour réaliser une requête HTTP GET est visible au listing \ref{volley_kotlin} et son utilisation dans le code au (TODO: STEVENT MET LISTING AU DESSOUS STP). Nous avons également activé le cache réseau sur disque pour améliorer les performances d'affichage des vues.
-\bigbreak
+Etant donné le nombre d'appels HTTP important dans notre application, le code devient rapidement "pollué" par ce code long et répétitif (voir listing \ref{volley_kotlin_simple}). Nous avons suivi les bonnes pratiques et simplifié cela en créant une classe \mintinline{text}{VolleyRequestController} offrant les méthodes relatives à tous les appels HTTP requis par notre application. La fonction pour réaliser une requête HTTP GET est visible au listing \ref{volley_kotlin} et son utilisation dans le code au listing \ref{volley_kotlin_usage}. Nous avons également activé le cache réseau sur disque pour améliorer les performances d'affichage des vues.
 \begin{code}
     \begin{minted}[bgcolor=mygray,breaklines,breaksymbol=,linenos,frame=single,stepnumber=1,tabsize=2]{kotlin}
 fun httpGet(URL: String, context: Context, callback: ServerCallback<JSONObject>) {
@@ -179,26 +182,21 @@ fun httpGet(URL: String, context: Context, callback: ServerCallback<JSONObject>)
     HttpQueue.getInstance(context).addToRequestQueue(jsonObjReq)
 }
     \end{minted}
-    \caption{VolleyRequestController - Améliorations usage de la librairie Volley avec \textit{callback}}
+    \caption{Améliorations usage de la librairie Volley avec \textit{callback}}
     \label{volley_kotlin}
 \end{code}
-\bigbreak
 
-Utilisable dans le code de la facon suivante : 
-
-\bigbreak
 \begin{code}
     \begin{minted}[bgcolor=mygray,breaklines,breaksymbol=,linenos,frame=single,stepnumber=1,tabsize=2]{kotlin}
-    requestController.httpGet(url, context, object : ServerCallback<JSONObject> {
-            override fun onSuccess(result: JSONObject) {
-                // Traitement des données reçues dans result
-            })
-    }
+requestController.httpGet(url, context, object : ServerCallback<JSONObject> {
+    override fun onSuccess(result: JSONObject) {
+        // Traitement des données reçues dans result
+    })
+}
     \end{minted}
-    \caption{Exemple d'utilisation du controlleur "VolleyRequestController" dans le code}
-    \label{volley_kotlin}
+    \caption{Exemple d'utilisation de \mintinline{kotlin}{VolleyRequestController}}
+    \label{volley_kotlin_usage}
 \end{code}
-\bigbreak
 
 \subsection{Listes d'items et grilles}
 Les listes présentes dans l'application sont réalisées avec des \textit{recylcer view}, comme vu en cours, pour améliorer la fluidité de l'affichage lors du défilement (comparé avec les listes classiques) et pour pouvoir au besoin afficher différents types d'items au sein de la même liste. Nous avons également utilisé un \mintinline{kotlin}{GridLayout} pour afficher les grilles des films similaires et du \textit{casting}, comme illustré à la figure \ref{similar_movies}.
@@ -238,7 +236,6 @@ En bas de l'écran, des onglets de navigation sont présents, permettant de navi
 \end{figure}
 
 \subsection{View pager}
-
 Pour les vues concernant les films appréciés/non appréciés et les utilisateurs suivis/abonnés, il était pratique de pouvoir passer d'une liste à l'autre rapidement et efficacement, comme illustré aux figures \ref{view_pager1} et \ref{view_pager2}. Nous avons donc mis en place des \textit{view pagers} qui sont en quelque sorte des sous-onglets permettant de "switcher" entre différents fragments assez rapidement. La réutilisation du code pour chaque sous-onglet (uniquement un changement de paramètre) est un avantage supplémentaire.
 \begin{figure}
     \begin{center}
@@ -258,7 +255,7 @@ Pour les vues concernant les films appréciés/non appréciés et les utilisateu
 
 \subsection{Recherche}
 La recherche est un fragment qui contient, au niveau \acrshort{xml}, uniquement un champ texte dans lequel les mots-clé sont saisis et un bouton radio sélectionnant dans quelle rubrique rechercher.
-Lorsque l'action de recherche est effectuée, une \textit{recycler view} présentant les résutats de la recherche est affichée. La \textit{recycler view} appelée est toujours la même, nous avons uniquement le type des éléments affichés et le layout associé qui varient en fonction du type de la recherche (voir section \ref{generic-adapter}).
+Lorsque l'action de recherche est effectuée, une \textit{recycler view} présentant les résutats de la recherche est affichée. La \textit{recycler view} appelée est toujours la même, nous avons uniquement le type des éléments affichés et le layout associé qui varient en fonction du type de la recherche (voir section \ref{generic-adapter}). La figure \ref{search} illustre ce comportement.
 \begin{figure}
     \begin{center}
         \includegraphics[width=1\textwidth]{img/schemas/Search.png}
@@ -269,8 +266,7 @@ Lorsque l'action de recherche est effectuée, une \textit{recycler view} présen
 
 
 \subsection{Shared preferences}
-Afin de stocker la session d'un utilisateur connecté à l'application, nous avons fait usage des \textit{shared preferences} qui sont un moyen simple (ensemble de clés-valeurs) et pratique de persister des information dans l'application et d'y accéder depuis les différents fragments. Deux exemples de leur utilisation sont disponibles aux listings \ref{share_prefs_kotlin1} et \ref{share_prefs_kotlin2}. Ce mécanisme permet également de vérifier qu'un utilisateur est authentifié et de le rediriger vers la page de login dans le cas échéant.
-\bigbreak
+Afin de stocker la session d'un utilisateur connecté à l'application, nous avons fait usage des \textit{shared preferences} qui sont un moyen simple (ensemble de clés-valeurs) et pratique de persister des information dans l'application et d'y accéder depuis les différents fragments. Des exemples de leur utilisation sont disponibles aux listings \ref{share_prefs_kotlin1}, \ref{share_prefs_kotlin2} et \ref{share_prefs_kotlin3}. Ce mécanisme permet également de vérifier qu'un utilisateur est authentifié et de le rediriger vers la page de login dans le cas échéant.
 \begin{code}
     \begin{minted}[bgcolor=mygray,breaklines,breaksymbol=,linenos,frame=single,stepnumber=1,tabsize=2]{kotlin}
 val sharedPref = activity?
@@ -286,9 +282,7 @@ with (sharedPref!!.edit()) {
     \caption{Création des \textit{shared preferences}}
     \label{share_prefs_kotlin1}
 \end{code}
-\bigbreak
 
-\bigbreak
 \begin{code}
     \begin{minted}[bgcolor=mygray,breaklines,breaksymbol=,linenos,frame=single,stepnumber=1,tabsize=2]{kotlin}
 val auth = Common.getAuth((activity as MainActivity).
@@ -299,7 +293,24 @@ if (auth != null) { ... }
     \caption{Vérification des \textit{shared preferences}}
     \label{share_prefs_kotlin2}
 \end{code}
-\bigbreak
+
+\begin{code}
+    \begin{minted}[bgcolor=mygray,breaklines,breaksymbol=,linenos,frame=single,stepnumber=1,tabsize=2]{kotlin}
+with (pref!!.edit()) {
+    clear()
+    commit()
+}
+    \end{minted}
+    \caption{Destruciton des \textit{shared preferences}}
+    \label{share_prefs_kotlin3}
+\end{code}
+
+
+\subsection{FAB}
+Un \textit{floating action button} (FAB) est disponible en bas à droite de l'écran, comme illustré dans la figure \ref{fab}, un écouteur sur ce bouton est défini dans la \textit{main activity} permettant d'intercepter les interactions des utilisateurs. Lorsqu'une interaction est détectée, une redirection vers le fragment dédié à la recherche est effectuée.
+
+\subsection{Generic adapter}\label{generic-adapter}
+Dans le cadre de cette application, nous travaillons très fréquemment avec la \textit{recycler view} qui affiche une liste d'items, d'un même type pour toute la liste. Afin de ne pas devoir recréer une \textit{recycler view} par type d'items, nous avons choisi d'implémenter un adapteur générique permettant de réutiliser la même liste mais avec des items et \textit{layouts} de type différents, comme illustré à la figure \ref{generic_adapter_img}.
 
 \begin{figure}
     \begin{center}
@@ -309,11 +320,6 @@ if (auth != null) { ... }
     \label{fab}
 \end{figure}
 
-\subsection{FAB}
-Un \textit{floating action button} (FAB) est disponible en bas à droite de l'écran, comme illustré dans la figure \ref{fab}, un écouteur sur ce bouton est défini dans la \textit{main activity} permettant d'intercepter les interactions des utilisateurs. Lorsqu'une interaction est détectée, une redirection vers le fragment dédié à la recherche est effectuée.
-
-\subsection{Generic adapter}\label{generic-adapter}
-Dans le cadre de cette application, nous travaillons très fréquemment avec la \textit{recycler view} qui affiche une liste d'items, d'un même type pour toute la liste. Afin de ne pas devoir recréer une \textit{recycler view} par type d'items, nous avons choisi d'implémenter un adapteur générique permettant de réutiliser la même liste mais avec des items et layouts de type différents, comme illustré à la figure \ref{generic_adapter_img}.
 \begin{figure}
     \begin{center}
         \includegraphics[width=0.8\textwidth]{img/schemas/Generic_Adapter.png}
