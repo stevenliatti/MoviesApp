@@ -1,14 +1,23 @@
 Nous avons commencé par dessiner les maquettes des vues de notre application afin de se faire une idée de l'aspect visuel de chaque vue et des relations entre elles, comme illustré à la figure \ref{maquettes}. Tout cela dans le but de simplifier et clarifier la phase de développement proprement dite.
-Durant cette phase, nous nous sommes également documentés sur les \acrshort{api}s existantes proposant des services relatifs aux films, nous avons étudié les différentes technologies permettant de mettre en place une \acrshort{api} REST et finalement nous avons analysé les composants et méthodologies étudiés en cours qui seraient utiles d'intégrer dans notre application.
-Les sous-sections suivantes décrivent les vues et les fonctionnalités que propose l'application finale.
+Durant cette phase, nous nous sommes également documentés sur les \acrshort{api}s existantes proposant des services relatifs aux films, nous avons étudié les différentes technologies pour manipuler une \acrshort{api} REST et finalement nous avons analysé les composants et méthodologies étudiés en cours qui seraient utiles d'intégrer dans notre application.
+Les sous-sections suivantes décrivent les fonctionnalités que propose l'application finale.
 
 \subsection{Films tendance}\label{films-tendance}
-Lorsqu'un utilisateur ouvre l'application, la vue principale (home) lui affiche une liste des films à la une, classés en fonction de leur popularité. Chaque film affiche ses informations de base (poster, titre, courte description). L'utilisateur a la possibilité de cliquer sur un film afin d'obtenir d'avantage d'informations.
+Lorsqu'un utilisateur ouvre l'application, la vue principale (\textit{home}) lui affiche une liste des films à la une, classés en fonction de leur popularité. Chaque film affiche ses informations de base (poster, titre, courte description). L'utilisateur a la possibilité de cliquer sur un film afin d'obtenir d'avantage d'informations.
 
 \subsection{Détails d'un film}
 Comme décrit à la section \ref{films-tendance}, si l'utilisateur souhaite en savoir plus sur un film, il peut accéder à cette vue présentant les détails d'un film. Elle comporte les informations détaillées du film tel que le titre, la description complète, la liste des acteurs, la liste des réalisateurs, les différentes bande-annonces, les genres associés et une grille qui contient les films similaires au film concerné. La possibilité de cliquer sur un film de la grille afin de naviguer vers ses détails est également intégrée.
 Si l'utilisateur souhaite visionner une bande-annonce, il lui suffit de cliquer dessus afin que le \textit{player} YouTube soit automatiquement lancé avec la vidéo en question.
-C'est également depuis cette vue qu'il pourra indiquer son appréciation pour le film ("like" ou "dislike"), appréciation qui sera sauvegardée dans son profil.
+C'est également depuis cette vue qu'il pourra indiquer son appréciation pour le film ("\textit{like}" ou "\textit{dislike}"), appréciation qui sera sauvegardée dans son profil.
+
+\subsection{Recherche}
+Une interface de recherche est mise à disposition. La recherche peut être lancée parmi les films, les acteurs ou les autres utilisateurs de l'application selon le choix de l'utilisateur (bouton "radio" ou mécanisme similaire).
+Les résultats de la recherche seront présentés sous forme de liste, présentant différentes actions selon le type de recherche qui aura été effectué :
+\begin{itemize}
+    \item Si l'utilisateur cherche un film, il obtiendra la liste des films qui correspondent aux critères entrés dans le champs texte de recherche.
+    \item S'il cherche un acteur, il obtiendra une liste d'acteurs avec la possibilité de cliquer dessus (comme pour les films) afin d'afficher plus de détails à leur sujet.
+    \item S'il cherche un autre utilisateur, il aura alors la possibilité de le suivre en l'ajoutant à son réseau d'amis.
+\end{itemize}
 
 \begin{figure}
     \begin{center}
@@ -17,15 +26,6 @@ C'est également depuis cette vue qu'il pourra indiquer son appréciation pour l
     \caption{Maquettes à main levée des vue de l'application}
     \label{maquettes}
 \end{figure}
-
-\subsection{Recherche}
-Une interface de recherche est mise à disposition. La recherche peut être lancée parmi les films, les acteurs ou les autres utilisateur de l'application selon le choix de l'utilisateur (bouton "radio" ou mécanisme similaire).
-Les résultats de la recherche seront présentés sous forme de liste, présentant différentes actions selon le type de recherche qui aura été effectué :
-\begin{itemize}
-    \item Si l'utilisateur cherche un film, il obtiendra la liste des films qui correspondent aux critères entrés dans le champs texte de recherche.
-    \item S'il cherche un acteur, il obtiendra une liste d'acteurs avec la possibilité de cliquer dessus (comme pour les films) afin d'afficher plus de détails à leur sujet.
-    \item S'il cherche un autre utilisateur, il aura alors la possibilité de le suivre en l'ajoutant à son réseau d'amis.
-\end{itemize}
 
 \subsection{"Peoples"}
 Au même titre que la liste des films tendance, nous avons une interface proposant la liste des acteurs actuellement populaires avec la possibilité de cliquer sur chacun d'entre eux afin d'obtenir plus d'informations à leur sujet.
@@ -50,4 +50,4 @@ La vue connexion comporte simplement deux champs permettant de renseigner le pse
 Cette vue comporte les champs nécessaires à la création d'un compte, à savoir un pseudo (unique), un email et un mot de passe.
 
 \subsection{Navigation}
-Afin de naviguer dans l'application, l'utilisateur dispose de différents mécanismes tels que les tabs de navigation (en bas de l'écran), la barre de navigation qui se situe en haut de l'écran et enfin un menu latéral mettant à disposition les différentes informations relatives à son compte.
+Afin de naviguer dans l'application, l'utilisateur dispose de différents mécanismes tels que les \textit{tabs} de navigation (en bas de l'écran), la barre de navigation qui se situe en haut de l'écran et enfin un menu latéral mettant à disposition les différentes informations relatives à son compte.
