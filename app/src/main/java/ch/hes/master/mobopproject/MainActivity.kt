@@ -108,11 +108,11 @@ class MainActivity : AppCompatActivity(), OnListFragmentInteractionListener {
 
         val auth = Common.getAuth(getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE), this)
         if(auth != null) {
-            tvPseudo.setText(auth.pseudo)
-            tvMail.setText(auth.email)
+            tvPseudo.text = auth.pseudo
+            tvMail.text = auth.email
         } else {
-            tvPseudo.setText("Sign in or register for see your personal information")
-            tvMail.setText("")
+            tvPseudo.text = "Sign in or register for see your personal information"
+            tvMail.text = ""
         }
     }
 

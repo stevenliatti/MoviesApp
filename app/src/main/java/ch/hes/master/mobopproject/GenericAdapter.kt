@@ -29,29 +29,18 @@ interface OnListFragmentInteractionListener {
     }
 }
 
-abstract class GenericAdapter<T>: RecyclerView.Adapter<RecyclerView.ViewHolder> {
+abstract class GenericAdapter<T>(
+    private var listItems: List<T>,
+    mListener: OnListFragmentInteractionListener?
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var listItems: List<T>
     private val mOnClickListener: View.OnClickListener
-    private lateinit var mListener: OnListFragmentInteractionListener
-
-    constructor(listItems: List<T>, mListener: OnListFragmentInteractionListener?) {
-        this.listItems = listItems
-        this.mListener = mListener!!
-    }
-
-    constructor(listItems: List<T>) {
-        this.listItems = listItems
-    }
-
-    constructor() {
-        listItems = emptyList()
-    }
+    private var mListener: OnListFragmentInteractionListener = mListener!!
 
     init {
         mOnClickListener = View.OnClickListener { v ->
             val item = v.tag
-            mListener.onListFragmentInteraction(item, v)
+            mListener?.onListFragmentInteraction(item, v)
         }
     }
 
@@ -70,8 +59,7 @@ abstract class GenericAdapter<T>: RecyclerView.Adapter<RecyclerView.ViewHolder> 
     override fun getItemViewType(position: Int): Int {
         return getLayoutId(position, listItems[position])
     }
-
-
+    
     protected abstract fun getLayoutId(position: Int, obj: T): Int
 
     abstract fun getViewHolder(view: View, viewType: Int):RecyclerView.ViewHolder

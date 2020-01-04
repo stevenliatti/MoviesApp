@@ -85,15 +85,15 @@
     <fragment
         android:id="@+id/userListFragment"
         android:name="ch.hes.master.mobopproject.ListUsersFragment"
-        android:label="Friends Network" >
+        android:label="Network">
         <action
             android:id="@+id/action_userListFragment_to_listLikesMoviesFragment"
             app:destination="@id/listLikesMoviesFragment" />
         <argument
             android:name="query"
+            android:defaultValue="@null"
             app:argType="string"
-            app:nullable="true"
-            android:defaultValue="@null" />
+            app:nullable="true" />
         <action
             android:id="@+id/action_userListFragment_self"
             app:destination="@id/userListFragment" />
@@ -104,15 +104,15 @@
     <fragment
         android:id="@+id/listLikesMoviesFragment"
         android:name="ch.hes.master.mobopproject.ListLikesMoviesFragment"
-        android:label="Likes" >
+        android:label="My Movies">
         <action
             android:id="@+id/action_listLikesMoviesFragment_to_movieDetailsFragment"
             app:destination="@id/movieDetailsFragment" />
         <argument
             android:name="pseudo"
+            android:defaultValue="@null"
             app:argType="string"
-            app:nullable="true"
-            android:defaultValue="@null"/>
+            app:nullable="true" />
         <action
             android:id="@+id/action_listLikesMoviesFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
@@ -138,12 +138,12 @@
     <fragment
         android:id="@+id/userCardFragment"
         android:name="ch.hes.master.mobopproject.UserCardFragment"
-        android:label="UserCardFragment">
+        android:label="Users">
         <argument
             android:name="query"
+            android:defaultValue="@null"
             app:argType="string"
-            app:nullable="true"
-            android:defaultValue="@null" />
+            app:nullable="true" />
         <action
             android:id="@+id/action_userCardFragment_to_listLikesMoviesFragment"
             app:destination="@id/listLikesMoviesFragment" />

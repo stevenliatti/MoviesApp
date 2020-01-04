@@ -14,7 +14,7 @@ Pour échanger les informations requises, notre application interagit avec des \
 \end{figure}
 
 \subsubsection{API TMDb}
-L'\acrshort{api} principalement utilisée dans notre projet est celle proposée par \textit{The Movie Database} (TMDb) \cite{tmdb} qui offre toutes les informations sur les films et les acteurs. Nous avons également considéré \textit{The Open Movie Database} \cite{omdb}, mais elle offre beaucoup moins de possibilités. Nous interagissons avec cette \acrshort{api} en envoyant des requêtes HTTP en fonctions des besoins, nous recevons en retour les informations au format \acrshort{json}. La route GET : \mintinline{text}{/discover/movie} nous retournera les informations visibles au listing \ref{tmdb_example} au format \acrshort{json}.
+L'\acrshort{api} principalement utilisée dans notre projet est celle proposée par \textit{The Movie Database} (TMDb) \cite{tmdb} qui offre toutes les informations sur les films et les acteurs. Nous avons également considéré \textit{The Open Movie Database} \cite{omdb}, mais elle offre beaucoup moins de possibilités. Nous interagissons avec TMDb en envoyant des requêtes HTTP en fonctions des besoins, nous recevons en retour les informations au format \acrshort{json}. Par exemple, la route GET : \mintinline{text}{/discover/movie} nous retournera les informations sur les films actuellement populaires, visibles au listing \ref{tmdb_example} au format \acrshort{json}. Avec ces différentes informations, nous pouvons construire les listes et les vues de détails des films et des "\textit{peoples}", comme illustrés sur les figures \ref{movies_peoples_list} et \ref{movie_people_details}.
 \bigbreak
 \begin{code}
     \begin{minted}[bgcolor=mygray,breaklines,breaksymbol=,linenos,frame=single,stepnumber=1,tabsize=2]{json}
@@ -46,6 +46,20 @@ L'\acrshort{api} principalement utilisée dans notre projet est celle proposée 
     \label{tmdb_example}
 \end{code}
 \bigbreak
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=1\textwidth]{img/screenshots/movies_peoples_list.png}
+    \end{center}
+    \caption{Listes des films et des acteurs tendance}
+    \label{movies_peoples_list}
+\end{figure}
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=1\textwidth]{img/screenshots/movie_people_details.png}
+    \end{center}
+    \caption{Détails d'un film et d'un acteur}
+    \label{movie_people_details}
+\end{figure}
 
 \subsubsection{API REST Backend}
 Certaines données de l'application nécessitent d'être persistées, c'est pourquoi nous avons choisi de mettre en place un backend basé sur Akka HTTP \cite{akka} en Scala. Le Scala est un langage relativement proche du Kotlin qui fait également usage de la \acrshort{jvm} et offre de nombreux atouts comme un typage fort, abstraction et programmation orientée objet. Tout cela avec une syntaxe permettant d'écrire le code de manière simple, concise et déclarative. Pour toutes ces raisons, le choix de ce langage nous semblait judicieux. Les routes mises à disposition par cette API REST nous permettent de persister les informations telles que les comptes des utilisateurs, les relations d'abonnements entre eux et les appréciations des films. Elles permettent également de s'authentifier, s'enregistrer et rechercher un utilisateur.
@@ -57,7 +71,14 @@ Pour chaque film, TMDb nous offre une liste de vidéos YouTube, comprenant des \
     \item \mintinline{text}{YouTubeStandalonePlayer}: la manière plus simple et rapide d'utiliser l'\acrshort{api}, utilise l'application officielle YouTube. Le player attend l'identifiant d'une vidéo et la clé \acrshort{api} et démarre l'activité de l'application officielle YouTube.
 \end{itemize}
 
-Nous avons décidé d'utiliser la deuxième méthode car nous n'avons pas besoin d'un contrôle fin sur le lancement des vidéos. Pour chaque vidéo obtenue sur la vue des détails d'un film, nous commençons par récupérer un \textit{thumbnail} de chaque vidéo avec ce lien : \mintinline{text}{https://img.youtube.com/vi/$youtubeId/1.jpg}. Nous superposons ensuite une icône "play" et ajoutons un listener qui démarre la vidéo sur chaque \textit{thumbnail}. Un \mintinline{kotlin}{catch} de \mintinline{kotlin}{ActivityNotFoundException} est inclu avec affichage d'un message dans un "toast" dans le cas où l'utilisateur n'a pas l'application officielle YouTube installée sur son appareil.
+Nous avons décidé d'utiliser la deuxième méthode car nous n'avons pas besoin d'un contrôle fin sur le lancement des vidéos. Pour chaque vidéo obtenue sur la vue des détails d'un film, nous commençons par récupérer un \textit{thumbnail} de chaque vidéo avec ce lien : \mintinline{text}{https://img.youtube.com/vi/$youtubeId/1.jpg}. Nous superposons ensuite une icône "\textit{play}" et ajoutons un listener qui démarre la vidéo sur chaque \textit{thumbnail}. Un \mintinline{kotlin}{catch} de \mintinline{kotlin}{ActivityNotFoundException} est inclu avec affichage d'un message dans un "\textit{toast}" dans le cas où l'utilisateur n'a pas l'application officielle YouTube installée sur son appareil. La figure \ref{youtube_videos} illustre le rendu.
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.4\textwidth]{img/screenshots/bande_annonces.png}
+    \end{center}
+    \caption{Bandes-annonces dans les détails d'un film}
+    \label{youtube_videos}
+\end{figure}
 
 \subsection{Fragments}
 Toutes les vues de l'application sont implémentées à l'aide de fragments. Chaque fragment est associé à un layout (fichier \acrshort{xml}) qui décrit son aspect graphique. Le code Kotlin propre au fragment nous permet uniquement de définir une implémentation qui permet l'interaction entre les différents composants graphiques de la vue et la logique métier de l'application. Notre code est ainsi réutilisable dans plusieurs vues différentes.
@@ -74,7 +95,7 @@ Selon le cours et la documentation officielle d'Android \cite{docandroid}, l'arc
 
 \subsection{Navigation component}
 Plusieurs possibilités s'offraient à nous concernant la navigation entre les différents fragments. Nous avons choisi d'expérimenter la nouvelle méthode proposée par la documentation officielle d'Android \cite{docandroid} qui est très intéressante et efficace.
-Cette méthode repose sur un graphe de navigation qui est éditable graphiquement ou en \acrshort{xml}, comme illustré à la figure \ref{nav_graph}. Les noeuds de ce graphe sont les relations entre les différents fragments de l'application et les arcs symbolisent les actions de navigation d'un fragment à un autre avec des éventuelles données passées en arguments de ces actions. Ce composant de navigation génère ainsi le code des actions de navigation en fonction de ce qui a été décrit en \acrshort{xml}.
+Cette méthode repose sur un graphe de navigation qui est éditable graphiquement ou en \acrshort{xml}, comme illustré à la figure \ref{nav_graph}. Les fragments de l'application représentent les noeuds du graphe et les arcs symbolisent les actions de navigation d'un fragment à un autre avec des éventuelles données passées en arguments de ces actions. Ce composant de navigation génère également le code des actions de navigation en fonction de ce qui a été décrit en \acrshort{xml}.
 \begin{figure}
     \begin{center}
         \includegraphics[width=1\textwidth]{img/screenshots/nav_graph.png}
@@ -134,18 +155,18 @@ queue.add(stringRequest)
 \bigbreak
 
 \subsubsection{Asynchronisme}
-Dans la majorité des cas, la logique de l'application requiert d'avoir reçu certaines informations en provenance des APIs avant de pouvoir les afficher sur la vue. Nous avons besoin de garantir que l'intégralité des données soient réceptionnées avant de les afficher, mais tout cela avec la contrainte de ne pas bloquer l'affichage.
-Nous avons donc utilisé le mécanisme de fonctions de \textit{callback}. Le principe est simple, la fonction de \textit{callback} n'est appelée que lorsque la requête HTTP est effectué et les données réceptionnées. Un résumé de ce comportement est illustré à la figure \ref{asynchrone}.
+Dans la majorité des cas, la logique de l'application requiert d'avoir reçu certaines informations en provenance des APIs avant de pouvoir les afficher sur la vue. Nous avons besoin de garantir que l'intégralité des données soient réceptionnées avant de les afficher, mais tout cela avec la contrainte de ne pas bloquer l'affichage, comme illustré à la figure \ref{asynchrone}.
+Nous avons donc utilisé le mécanisme de fonctions de \textit{callback}. Le principe est simple, la fonction de \textit{callback} n'est appelée que lorsque la requête HTTP est effectué et les données réceptionnées.
 \begin{figure}
     \begin{center}
-        \includegraphics[width=0.8\textwidth]{img/schemas/Asynchronisme2.png}
+        \includegraphics[width=0.7\textwidth]{img/schemas/Asynchronisme2.png}
     \end{center}
     \caption{Différences entre un fil d'exécution synchrone et asynchrone}
     \label{asynchrone}
 \end{figure}
 
 \subsubsection{Améliorations}
-Etant donné le nombre d'appels HTTP important dans notre application, le code devient rapidement "pollué" par ce code long et répétitif TODO: (Steven met visible au listing 4 stp). Nous avons suivi les bonnes pratiques et simplifié cela en créant une classe \mintinline{text}{VolleyRequestController} offrant les méthodes relatives à tous les appels HTTP. Un exemple d'une requête HTTP GET utilisant cette classe est visible au listing \ref{volley_kotlin}. Nous avons également activé le cache réseau sur disque pour améliorer les performances d'affichage des vues.
+Etant donné le nombre d'appels HTTP important dans notre application, le code devient rapidement "pollué" par ce code long et répétitif TODO: (Steven met visible au listing 4 stp). Nous avons suivi les bonnes pratiques et simplifié cela en créant une classe \mintinline{text}{VolleyRequestController} offrant les méthodes relatives à tous les appels HTTP. La fonction pour réaliser une requête HTTP GET est visible au listing \ref{volley_kotlin}. Nous avons également activé le cache réseau sur disque pour améliorer les performances d'affichage des vues.
 \bigbreak
 \begin{code}
     \begin{minted}[bgcolor=mygray,breaklines,breaksymbol=,linenos,frame=single,stepnumber=1,tabsize=2]{kotlin}
@@ -179,20 +200,15 @@ Utilisable dans le code de la facon suivante :
 \end{code}
 \bigbreak
 
-\subsubsection{Toolbar}
-En haut de l'écran se trouve une barre comportant le nom du fragment courrant, un bouton "home" (\ref{films-tendance}) et un contrôle faisant apparaitre le menu latéral.
+\subsection{Listes d'items et grilles}
+Les listes présentes dans l'application sont réalisées avec des \textit{recylcer view}, comme vu en cours, pour améliorer la fluidité de l'affichage lors du défilement (comparé avec les listes classiques) et pour pouvoir au besoin afficher différents types d'items au sein de la même liste. Nous avons également utilisé un \mintinline{kotlin}{GridLayout} pour afficher les grilles des films similaires et du \textit{casting}, comme illustré à la figure \ref{similar_movies}.
+
+\subsection{Toolbar}
+En haut de l'écran se trouve une barre comportant le nom du fragment courant, un bouton "\textit{home}" (\ref{films-tendance}) et un contrôle faisant apparaitre le menu latéral.
 
 \subsection{Drawer}
-Le drawer est un menu latéral qui apparaît de gauche à droite de l'écran. Ce menu permet d'afficher les informations relatives au profil de l'utilisateur courant. D'autre part, il propose les action de connexion, création de compte et déconnexion. Si l'utilisateur est connecté, il pourra aussi naviguer vers les vues des films aimés et du réseau d'amis.
-Afin de rendre l'interface utilisateur plus conviviale, nous av
-ons implémenté un \textit{drawer}, illustré à la figure \ref{drawer}. Ce \textit{drawer} repose également sur la dernière méthode proposée par la documentation d'Android \cite{docandroid}. L'interface graphique du \textit{drawer} est définie dans le \acrshort{xml} à l'aide d'un menu, et initialisée dans la \textit{main activity}. L'identifiant des différents items est nommé selon les identifiants référencés dans le graphe de navigation ce qui permet de naviguer directemnt vers le bon fragment lors de l'interaction d'un utilisateur avec ces derniers. Pour ce faire, le layout de la \textit{main activity} est de type \mintinline{text}{DrawerLayout}, elle inclut tout le contenu (\textit{top bar}, fragments de navigation, et \textit{bottom tabs}) ainsi que le \textit{drawer} qui sera affiché.
-\begin{figure}
-    \begin{center}
-        \includegraphics[width=0.5\textwidth]{img/screenshots/Drawer.png}
-    \end{center}
-    \caption{Drawer de l'application}
-    \label{drawer}
-\end{figure}
+Le drawer est un menu latéral qui apparaît de gauche à droite de l'écran. Ce menu permet d'afficher les informations relatives au profil de l'utilisateur courant. D'autre part, il propose les actions de connexion, création de compte et déconnexion. Si l'utilisateur est connecté, il pourra aussi naviguer vers les vues des films aimés et du réseau d'amis.
+Afin de rendre l'interface utilisateur plus conviviale, nous avons implémenté un \textit{drawer}, illustré à la figure \ref{drawer}. Ce \textit{drawer} repose également sur la dernière méthode proposée par la documentation d'Android \cite{docandroid}. L'interface graphique du \textit{drawer} est définie dans le \acrshort{xml} à l'aide d'un menu, et initialisée dans la \textit{main activity}. L'identifiant des différents items est nommé selon les identifiants référencés dans le graphe de navigation ce qui permet de naviguer directemnt vers le bon fragment lors de l'interaction d'un utilisateur avec ces derniers. Pour ce faire, le layout de la \textit{main activity} est de type \mintinline{text}{DrawerLayout}, elle inclut tout le contenu (\textit{top bar}, fragments de navigation, et \textit{bottom tabs}) ainsi que le \textit{drawer} qui sera affiché.
 
 \subsection{Bottom tabs}
 En bas de l'écran, des onglets de navigation sont présents, permettant de naviguer entre les vues principales de l'application, ces \textit{tabs} ont été implémentés à l'aide d'un menu classique Android défini au niveau \acrshort{xml}, illustrés à la figure \ref{tabs}. En basant l'identifiant de chaque item du menu sur les identifiants référencés dans le \textit{navigation graph}, chaque fragment est correctement appelé et affiché lors du clic sur un onglet.
@@ -205,20 +221,36 @@ En bas de l'écran, des onglets de navigation sont présents, permettant de navi
     \label{tabs}
 \end{figure}
 
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.4\textwidth]{img/screenshots/similar_movies.png}
+    \end{center}
+    \caption{Grille de films similaires dans les détails d'un film}
+    \label{similar_movies}
+\end{figure}
+
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=0.4\textwidth]{img/screenshots/Drawer.png}
+    \end{center}
+    \caption{Drawer de l'application}
+    \label{drawer}
+\end{figure}
+
 \subsection{View pager}
 
 Pour les vues concernant les films appréciés/non appréciés et les utilisateurs suivis/abonnés, il était pratique de pouvoir passer d'une liste à l'autre rapidement et efficacement, comme illustré aux figures \ref{view_pager1} et \ref{view_pager2}. Nous avons donc mis en place des \textit{view pagers} qui sont en quelque sorte des sous-onglets permettant de "switcher" entre différents fragments assez rapidement. La réutilisation du code pour chaque sous-onglet (uniquement un changement de paramètre) est un avantage supplémentaire.
 \begin{figure}
     \begin{center}
-        \includegraphics[width=0.8\textwidth]{img/screenshots/ViewPager1.png}
+        \includegraphics[width=1\textwidth]{img/screenshots/ViewPager1.png}
     \end{center}
-    \caption{Appreciations des films dans l'application}
+    \caption{Appréciations des films dans l'application}
     \label{view_pager1}
 \end{figure}
 
 \begin{figure}
     \begin{center}
-        \includegraphics[width=0.8\textwidth]{img/screenshots/ViewPager2.png}
+        \includegraphics[width=1\textwidth]{img/screenshots/ViewPager2.png}
     \end{center}
     \caption{Réseau social dans l'application}
     \label{view_pager2}
@@ -237,7 +269,7 @@ Lorsque l'action de recherche est effectuée, une \textit{recycler view} présen
 
 
 \subsection{Shared preferences}
-Afin de stocker la session d'un utilisateur connecté à l'application, nous avons fait usage des \textit{shared preferences} qui sont un moyen simple (ensemble de clés-valeurs) et pratique de persister des information dans l'application et d'y accéder depuis les différents fragments. Deux exemples de leur utilisation sont disponibles aux listings \ref{share_prefs_kotlin1} et \ref{share_prefs_kotlin2}. Ce mécanisme permet également de vérifier qu'un utilisateur soit authentifié et de le rediriger vers la page de login dans le cas échéant.
+Afin de stocker la session d'un utilisateur connecté à l'application, nous avons fait usage des \textit{shared preferences} qui sont un moyen simple (ensemble de clés-valeurs) et pratique de persister des information dans l'application et d'y accéder depuis les différents fragments. Deux exemples de leur utilisation sont disponibles aux listings \ref{share_prefs_kotlin1} et \ref{share_prefs_kotlin2}. Ce mécanisme permet également de vérifier qu'un utilisateur est authentifié et de le rediriger vers la page de login dans le cas échéant.
 \bigbreak
 \begin{code}
     \begin{minted}[bgcolor=mygray,breaklines,breaksymbol=,linenos,frame=single,stepnumber=1,tabsize=2]{kotlin}
@@ -262,24 +294,23 @@ with (sharedPref!!.edit()) {
 val auth = Common.getAuth((activity as MainActivity).
     getSharedPreferences(getString(R.string.preference_file_key),
     Context.MODE_PRIVATE), view.context)
-if (auth != null) {
-    ....
-}
+if (auth != null) { ... }
     \end{minted}
     \caption{Vérification des \textit{shared preferences}}
     \label{share_prefs_kotlin2}
 \end{code}
 \bigbreak
 
-\subsection{FAB}
-Un \textit{floating action button} (FAB) est disponible en bas à droite de l'écran, comme illustré dans la figure \ref{fab} un écouteur sur ce bouton est défini dans la \textit{main activity} permettant d'intercepter les interactions des utilisateurs. Lorsqu'une interaction est détectée, une redirection vers le fragment dédié à la recherche est effectuée.
 \begin{figure}
     \begin{center}
-        \includegraphics[width=0.8\textwidth]{img/screenshots/FAB.png}
+        \includegraphics[width=1\textwidth]{img/screenshots/FAB.png}
     \end{center}
     \caption{FAB de l'application}
     \label{fab}
 \end{figure}
+
+\subsection{FAB}
+Un \textit{floating action button} (FAB) est disponible en bas à droite de l'écran, comme illustré dans la figure \ref{fab}, un écouteur sur ce bouton est défini dans la \textit{main activity} permettant d'intercepter les interactions des utilisateurs. Lorsqu'une interaction est détectée, une redirection vers le fragment dédié à la recherche est effectuée.
 
 \subsection{Generic adapter}\label{generic-adapter}
 Dans le cadre de cette application, nous travaillons très fréquemment avec la \textit{recycler view} qui affiche une liste d'items, d'un même type pour toute la liste. Afin de ne pas devoir recréer une \textit{recycler view} par type d'items, nous avons choisi d'implémenter un adapteur générique permettant de réutiliser la même liste mais avec des items et layouts de type différents, comme illustré à la figure \ref{generic_adapter_img}.
