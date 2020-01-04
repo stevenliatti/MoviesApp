@@ -59,21 +59,21 @@ class PeopleDetailsFragment : Fragment() {
                     result.getString("homepage")
                 )
 
-                check_text_validity(peopleDetails.name, name)
-                check_text_validity(peopleDetails.biography, biography)
-                check_text_validity(peopleDetails.knownFor, knownForTextView)
-                check_text_validity(peopleDetails.birthday, birthday)
-                check_text_validity(peopleDetails.deathday, deathDay)
-                check_text_validity(peopleDetails.placeOfBirth, placeOfBirth)
+                checkTextValidity(peopleDetails.name, name)
+                checkTextValidity(peopleDetails.biography, biography)
+                checkTextValidity(peopleDetails.knownFor, knownForTextView)
+                checkTextValidity(peopleDetails.birthday, birthday)
+                checkTextValidity(peopleDetails.deathday, deathDay)
+                checkTextValidity(peopleDetails.placeOfBirth, placeOfBirth)
                 val genderTxt = if (peopleDetails.gender == "1") "Sex: Woman" else "Sex: Man"
-                check_text_validity(genderTxt, gender)
-                check_text_validity(peopleDetails.popularity.toString(), popularity)
-                check_text_validity(peopleDetails.homepage, homepage)
+                checkTextValidity(genderTxt, gender)
+                checkTextValidity(peopleDetails.popularity.toString(), popularity)
+                checkTextValidity(peopleDetails.homepage, homepage)
             }
         })
     }
 
-    fun check_text_validity(txt: String, textView: TextView) {
+    fun checkTextValidity(txt: String, textView: TextView) {
         if (txt != "null") {
             textView.text = txt
         } else {

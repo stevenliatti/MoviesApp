@@ -2,7 +2,6 @@ package ch.hes.master.mobopproject
 
 import android.app.Activity
 import android.content.Context
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,13 +14,11 @@ import androidx.navigation.findNavController
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputLayout
 import org.json.JSONObject
-import org.w3c.dom.Text
 
 
 class LoginFragment : Fragment() {
 
 
-    // private var listener: OnFragmentInteractionListener? = null
     private val requestController = VolleyRequestController()
     private val urlLogin = "https://mobop.liatti.ch/user/login"
 
@@ -32,8 +29,6 @@ class LoginFragment : Fragment() {
         val password = view.findViewById(R.id.inputMdp) as TextInputLayout
         val button: Button = view.findViewById(R.id.btnLogin)
         val register = view.findViewById(R.id.tvRegister) as TextView
-       //  password.setPasswordVisibilityToggleDrawable(R.drawable.ic_person_greem_100dp)
-      //  if(pseudo.editText!!.text.toString() != "" && password.editText!!.text.toString() != "") {
             button.setOnClickListener {
                 val data = JSONObject()
                 data.put("pseudo", pseudo.editText!!.text.toString())
@@ -45,7 +40,7 @@ class LoginFragment : Fragment() {
                             val email = res.getString("email")
                             val token = res.getString("token")
                             val sharedPref = activity?.getSharedPreferences(getString(R.string.preference_file_key) ,Context.MODE_PRIVATE) ?: return
-                            with (sharedPref!!.edit()) {
+                            with (sharedPref.edit()) {
                                 putString(getString(R.string.pseudo), pseudo)
                                 putString(getString(R.string.email), email)
                                 putString(getString(R.string.token), token)
@@ -60,37 +55,11 @@ class LoginFragment : Fragment() {
                     }
                 })
             }
-        //}
         register.setOnClickListener {
             view.findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToRegisterFragment())
         }
 
-
         return view
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    fun onButtonPressed(uri: Uri) {
-       // listener?.onFragmentInteraction(uri)
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        /*if (context is OnFragmentInteractionListener) {
-            listener = context
-        } else {
-            throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
-        }*/
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        //listener = null
-    }
-
-    interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        fun onFragmentInteraction(uri: Uri)
     }
 
 }
