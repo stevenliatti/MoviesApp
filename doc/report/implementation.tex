@@ -166,7 +166,7 @@ Nous avons donc utilisé le mécanisme de fonctions de \textit{callback}. Le pri
 \end{figure}
 
 \subsubsection{Améliorations}
-Etant donné le nombre d'appels HTTP important dans notre application, le code devient rapidement "pollué" par ce code long et répétitif TODO: (Steven met visible au listing 4 stp). Nous avons suivi les bonnes pratiques et simplifié cela en créant une classe \mintinline{text}{VolleyRequestController} offrant les méthodes relatives à tous les appels HTTP. La fonction pour réaliser une requête HTTP GET est visible au listing \ref{volley_kotlin}. Nous avons également activé le cache réseau sur disque pour améliorer les performances d'affichage des vues.
+Etant donné le nombre d'appels HTTP important dans notre application, le code devient rapidement "pollué" par ce code long et répétitif TODO: (Steven met visible au listing 4 stp). Nous avons suivi les bonnes pratiques et simplifié cela en créant une classe \mintinline{text}{VolleyRequestController} offrant les méthodes relatives à tous les appels HTTP requis par notre application. La fonction pour réaliser une requête HTTP GET est visible au listing \ref{volley_kotlin} et son utilisation dans le code au (TODO: STEVENT MET LISTING AU DESSOUS STP). Nous avons également activé le cache réseau sur disque pour améliorer les performances d'affichage des vues.
 \bigbreak
 \begin{code}
     \begin{minted}[bgcolor=mygray,breaklines,breaksymbol=,linenos,frame=single,stepnumber=1,tabsize=2]{kotlin}
@@ -195,7 +195,7 @@ Utilisable dans le code de la facon suivante :
             })
     }
     \end{minted}
-    \caption{Usage de la librairie Volley avec \textit{callback}}
+    \caption{Exemple d'utilisation du controlleur "VolleyRequestController" dans le code}
     \label{volley_kotlin}
 \end{code}
 \bigbreak
